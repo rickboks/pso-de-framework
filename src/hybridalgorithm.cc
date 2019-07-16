@@ -1,6 +1,5 @@
 #include "hybridalgorithm.h"
 #include "particle.h"
-#include "searchspace.h"
 #include "topologymanager.h"
 #include "genome.h"
 #include "particleupdatesettings.h"

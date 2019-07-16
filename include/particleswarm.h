@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-#include "searchspace.h"
 #include "problem.h"
 #include "particleupdatesettings.h"
 #include "topologymanager.h"

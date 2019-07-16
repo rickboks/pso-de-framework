@@ -1,6 +1,5 @@
 #include "particleswarm.h"
 #include "particle.h"
-#include "searchspace.h"
 #include "topologymanager.h"
 #include "particleupdatesettings.h"
 #include "coco.h"

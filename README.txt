@@ -11,7 +11,7 @@ $ mkdir obj
 
 ... and try again.
 
-See experiment.c and mpi.c for example experiments.
+See experiment.c and mpi_experiment.c for example experiments.
 
 To implement a new module, extend the base class of that module (e.g. for a new velocity update, extend the ParticleUpdateManager class) and implement the member functions. For example, when implementing a new ParticleUpdateManager, you need to extend the update() function. After implementing your ParticleUpdateManager, add a new entry to the UpdateManagerType enum in particleupdatemanager.h that represents your ParticleUpdateManager, and let ParticleUpdateManagerFactory return an instance of your ParticleUpdateManager when the enum entry is passed to createParticleUpdateManager(). You can now pass the integer value from the enum to the constructor of ParticleSwarm, and it will use your ParticleUpdateManager. You should also add your new module to the getIdString() function in the ParticleSwarm or DifferentialEvolution classes, so that the resulting algorithms get an appropriate name.
 

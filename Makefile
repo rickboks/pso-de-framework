@@ -24,10 +24,10 @@ $(EXE): $(OBJ) obj/coco.o obj/experiment.o
 	${CC} ${CFLAGS} -o $(EXE) $(OBJ) obj/coco.o obj/experiment.o ${LDFLAGS}
 
 $(MPI_EXE): $(OBJ) obj/coco.o obj/mpi.o
-	mpiCC ${CFLAGS} -o $(MPI_EXE) $(OBJ) obj/coco.o obj/mpi.o $(LDFLAGS)
+	mpiCC ${CFLAGS} -o $(MPI_EXE) $(OBJ) obj/coco.o obj/mpi_experiment.o $(LDFLAGS)
 	
-obj/mpi.o: include/coco.h src/coco.c src/mpi.c
-	mpiCC -c $(CFLAGS) $(INC) -o obj/mpi.o src/mpi.c
+obj/mpi.o: include/coco.h src/coco.c src/mpi_experiment.c
+	mpiCC -c $(CFLAGS) $(INC) -o obj/mpi_experiment.o src/mpi_experiment.c
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cc $(INC_DIR)/*
 	$(CC) $(CFLAGS) $(INC) -c -o $@ $<

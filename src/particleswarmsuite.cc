@@ -1,8 +1,7 @@
 #include "particleswarmsuite.h"
 #include <iostream>
 #include <algorithm>
-ParticleSwarmSuite::ParticleSwarmSuite(std::map<int,double>& updateParams)
-	:updateParams(updateParams){
+ParticleSwarmSuite::ParticleSwarmSuite(){
 
 	for (int i = 0; i < TOP_END; i++){
 		topologyManagers.push_back((Topology)i);

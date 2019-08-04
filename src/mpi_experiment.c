@@ -70,11 +70,12 @@ static void timing_data_finalize(timing_data_t *timing_data);
 
 int main(int argc, char **argv) {
 	/*Example MPI experiments*/
-
-	/*PSO experiment*/
 	std::map<int,double> updateSettings;
+	//Add settings like this
+  	//updateSettings[S_INER_W] = 0.8;
 
-	ParticleSwarmSuite s(updateSettings);
+
+	ParticleSwarmSuite s;
 	s.setUpdateManagers(std::vector<UpdateManagerType>({INERTIA_WEIGHT, DECR_INERTIA_WEIGHT, BARE_BONES, FIPS}));
 
 	coco_set_log_level("warning");	

@@ -7,12 +7,11 @@
 
 class ParticleSwarmSuite {
 	private:
-		std::map<int,double>& updateParams;
 		std::vector<UpdateManagerType> updateManagers;
 		std::vector<Topology> topologyManagers;
 		std::vector<Synchronicity> synchronicities;
 	public:
-		ParticleSwarmSuite(std::map<int,double> & updateParams);
+		ParticleSwarmSuite();
 
 		class ParticleSwarmSuiteIterator {
 			private:

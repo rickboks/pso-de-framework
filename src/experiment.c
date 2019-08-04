@@ -82,11 +82,9 @@ int main(void) {
   experimentHybrid(ha);
 
   /* PSO suite experiment example */
-  std::map<int,double> updateSettings;
-  updateSettings[S_INER_W] = 0.8;
-  /* Add mode settings if desired */
 
-  ParticleSwarmSuite suite(updateSettings);
+
+  ParticleSwarmSuite suite;
   suite.setUpdateManagers(std::vector<UpdateManagerType>({INERTIA_WEIGHT, DECR_INERTIA_WEIGHT, BARE_BONES, FIPS}));
    for (ParticleSwarm s : suite){
      experimentPSO(s);
@@ -97,6 +95,9 @@ int main(void) {
 
 void experimentHybrid(HybridAlgorithm ha) {
   std::map<int, double> updateSettings;
+  //Add settings like this
+  //updateSettings[S_INER_W] = 0.8;
+
   double const Cr = 0.7;
   double const F = 0.5;
 
@@ -153,7 +154,6 @@ void experimentHybrid(HybridAlgorithm ha) {
 }
 
 void experimentDE(DifferentialEvolution de) {
-
   double const Cr = 0.7;
   double const F = 0.5;
   
@@ -210,10 +210,11 @@ void experimentDE(DifferentialEvolution de) {
   coco_suite_free(suite);  
 }
 
-void experimentPSO(ParticleSwarm ps) {
-
-  
+void experimentPSO(ParticleSwarm ps) {  
   std::map<int, double> updateSettings;
+  //Add settings like this
+  //updateSettings[S_INER_W] = 0.8;
+
   size_t run;
   coco_suite_t *suite;
   coco_observer_t *observer;

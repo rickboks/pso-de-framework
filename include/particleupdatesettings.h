@@ -32,8 +32,8 @@ enum Setting {
 	S_DINER_W, // Decreasing nertia weight
 	S_VMAX,
 	S_FIPS_PHI,
-	S_W_START, // Starting value of decreasing inertia weight
-	S_W_END	// Ending value of decreasing inertia weight
+	S_DINER_W_START, // Starting value of decreasing inertia weight
+	S_DINER_W_END	// Ending value of decreasing inertia weight
 };
 
 struct ParticleUpdateSettings {

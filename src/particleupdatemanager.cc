@@ -161,8 +161,8 @@ DecrInertiaWeightManager::DecrInertiaWeightManager (std::vector<double>& x, std:
 	: ParticleUpdateManager(x,v,p,g, vMax),
 	phi1 (parameters.find(Setting::S_DINER_PHI1) != parameters.end() ? parameters[Setting::S_DINER_PHI1] : DINER_PHI2_DEFAULT),
 	phi2 (parameters.find(Setting::S_DINER_PHI2) != parameters.end() ? parameters[Setting::S_DINER_PHI2] : DINER_PHI2_DEFAULT),	
-	w (parameters.find(Setting::S_W_START) != parameters.end() ? parameters[Setting::S_W_START] : DINER_W_START_DEFAULT),
-	wMin (parameters.find(Setting::S_W_END) != parameters.end() ? parameters[Setting::S_W_END] : DINER_W_END_DEFAULT),
+	w (parameters.find(Setting::S_DINER_W_START) != parameters.end() ? parameters[Setting::S_DINER_W_START] : DINER_W_START_DEFAULT),
+	wMin (parameters.find(Setting::S_DINER_W_END) != parameters.end() ? parameters[Setting::S_DINER_W_END] : DINER_W_END_DEFAULT),
 	wMax(w),
 	distr1(0,phi1),
 	distr2(0,phi2) {

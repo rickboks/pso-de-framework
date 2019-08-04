@@ -68,7 +68,7 @@ static void timing_data_finalize(timing_data_t *timing_data);
 
 int main(void) {
   /* Single algorithm experiment examples */
-
+  
   DifferentialEvolution de (RANDOM, TTB_1, BINOMIAL, false);
   experimentDE(de);
   
@@ -81,10 +81,9 @@ int main(void) {
   HybridAlgorithm ha(INERTIA_WEIGHT, VON_NEUMANN, SYNCHRONOUS, BEST_1, BINOMIAL);
   experimentHybrid(ha);
 
-
   /* PSO suite experiment example */
   std::map<int,double> updateSettings;
-  updateSettings[S_W] = 0.8;
+  updateSettings[S_INER_W] = 0.8;
   /* Add mode settings if desired */
 
   ParticleSwarmSuite suite(updateSettings);

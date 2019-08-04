@@ -63,8 +63,8 @@ ParticleUpdateManager* ParticleUpdateManagerFactory::createParticleUpdateManager
 VmaxManager::VmaxManager(std::vector<double> & x, std::vector<double> & v,
 	std::vector<double> & p, std::vector<double> & g,  std::map<int, double> parameters, std::vector<double> const vMax)
 	: ParticleUpdateManager(x,v,p,g, vMax),
-	phi1 (parameters.find(Setting::S_PHI1) != parameters.end() ? parameters[Setting::S_PHI1] : VMAX_PHI1_DEFAULT),
-	phi2 (parameters.find(Setting::S_PHI2) != parameters.end() ? parameters[Setting::S_PHI2] : VMAX_PHI2_DEFAULT),
+	phi1 (parameters.find(Setting::S_VMAX_PHI1) != parameters.end() ? parameters[Setting::S_VMAX_PHI1] : VMAX_PHI1_DEFAULT),
+	phi2 (parameters.find(Setting::S_VMAX_PHI2) != parameters.end() ? parameters[Setting::S_VMAX_PHI2] : VMAX_PHI2_DEFAULT),
 	distr1(0,phi1), distr2(0,phi2){
 }
 
@@ -109,9 +109,9 @@ void VmaxManager::update(double progress){
 InertiaWeightManager::InertiaWeightManager (std::vector<double>& x, std::vector<double>& v,
 	std::vector<double> & p, std::vector<double>& g,  std::map<int, double> parameters, std::vector<double> const vMax)
 	: ParticleUpdateManager(x,v,p,g, vMax),
-	phi1 (parameters.find(Setting::S_PHI1) != parameters.end() ? parameters[Setting::S_PHI1] : INER_PHI1_DEFAULT),
-	phi2 (parameters.find(Setting::S_PHI2) != parameters.end() ? parameters[Setting::S_PHI2] : INER_PHI2_DEFAULT),	
-	w (parameters.find(Setting::S_W) != parameters.end() ? parameters[Setting::S_W] : INER_W_DEFAULT),
+	phi1 (parameters.find(Setting::S_INER_PHI1) != parameters.end() ? parameters[Setting::S_INER_PHI1] : INER_PHI1_DEFAULT),
+	phi2 (parameters.find(Setting::S_INER_PHI2) != parameters.end() ? parameters[Setting::S_INER_PHI2] : INER_PHI2_DEFAULT),	
+	w (parameters.find(Setting::S_INER_W) != parameters.end() ? parameters[Setting::S_INER_W] : INER_W_DEFAULT),
 	distr1(0,phi1),
 	distr2(0,phi2){
 }
@@ -159,10 +159,10 @@ void InertiaWeightManager::update(double progress) {
 DecrInertiaWeightManager::DecrInertiaWeightManager (std::vector<double>& x, std::vector<double>& v,
 	std::vector<double> & p, std::vector<double>& g,  std::map<int, double> parameters, std::vector<double> const vMax)
 	: ParticleUpdateManager(x,v,p,g, vMax),
-	phi1 (parameters.find(Setting::S_PHI1) != parameters.end() ? parameters[Setting::S_PHI1] : INER_PHI1_DEFAULT),
-	phi2 (parameters.find(Setting::S_PHI2) != parameters.end() ? parameters[Setting::S_PHI2] : INER_PHI2_DEFAULT),	
-	w (parameters.find(Setting::S_W) != parameters.end() ? parameters[Setting::S_W] : INER_W_START_DEFAULT),
-	wMin (parameters.find(Setting::S_W_END) != parameters.end() ? parameters[Setting::S_W_END] : INER_W_END_DEFAULT),
+	phi1 (parameters.find(Setting::S_DINER_PHI1) != parameters.end() ? parameters[Setting::S_DINER_PHI1] : DINER_PHI2_DEFAULT),
+	phi2 (parameters.find(Setting::S_DINER_PHI2) != parameters.end() ? parameters[Setting::S_DINER_PHI2] : DINER_PHI2_DEFAULT),	
+	w (parameters.find(Setting::S_W_START) != parameters.end() ? parameters[Setting::S_W_START] : DINER_W_START_DEFAULT),
+	wMin (parameters.find(Setting::S_W_END) != parameters.end() ? parameters[Setting::S_W_END] : DINER_W_END_DEFAULT),
 	wMax(w),
 	distr1(0,phi1),
 	distr2(0,phi2) {
@@ -215,8 +215,8 @@ void DecrInertiaWeightManager::update(double progress) {
 ConstrictionCoefficientManager::ConstrictionCoefficientManager(std::vector<double> & x, std::vector<double> & v,
 	std::vector<double> & p, std::vector<double> & g,  std::map<int, double> parameters, std::vector<double> const vMax)
 	: ParticleUpdateManager(x,v,p,g, vMax),
-	phi1 (parameters.find(Setting::S_PHI1) != parameters.end() ? parameters[Setting::S_PHI1] : CC_PHI1_DEFAULT),
-	phi2 (parameters.find(Setting::S_PHI2) != parameters.end() ? parameters[Setting::S_PHI2] : CC_PHI2_DEFAULT),
+	phi1 (parameters.find(Setting::S_CC_PHI1) != parameters.end() ? parameters[Setting::S_CC_PHI1] : CC_PHI1_DEFAULT),
+	phi2 (parameters.find(Setting::S_CC_PHI2) != parameters.end() ? parameters[Setting::S_CC_PHI2] : CC_PHI2_DEFAULT),
 	chi (2 / ((phi1+phi2) -2 + sqrt( pow(phi1+phi2, 2) - 4 * (phi1+phi2)))),
 	distr1(0,phi1),
 	distr2(0,phi2){
@@ -266,7 +266,7 @@ FIPSManager::FIPSManager(std::vector<double> & x, std::vector<double> & v,
 	std::vector<double> & p, std::vector<double> & g,  std::map<int, double> parameters
 	, std::vector<Particle*>& neighborhood, std::vector<double> const vMax)
 	: ParticleUpdateManager(x,v,p,g, vMax),
-	phi (parameters.find(Setting::S_PHI) != parameters.end() ? parameters[Setting::S_PHI] : FIPS_PHI_DEFAULT),
+	phi (parameters.find(Setting::S_FIPS_PHI) != parameters.end() ? parameters[Setting::S_FIPS_PHI] : FIPS_PHI_DEFAULT),
 	chi (2 / ((phi) -2 + sqrt( pow(phi, 2) - 4 * (phi)))),
 	neighborhood(neighborhood),
 	distr(0,phi){

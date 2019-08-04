@@ -98,11 +98,11 @@ class MultiSwarmTopologyManager : public TopologyManager {
 		int count;
 		std::random_device randDev;
 		std::mt19937 generator;
+		void createClusters();
 	public:
 		MultiSwarmTopologyManager(std::vector<Particle*> const & particles);
 		void initialize();
-		void update(double progress);
-		void createClusters();
+		void update(double progress);		;
 		int getClosestValidPopulationSize(int const popSize);
 };
 

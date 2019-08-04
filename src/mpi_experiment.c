@@ -42,17 +42,11 @@ static void evaluate_function(const double *x, double *y) {
 }
 
 /* Declarations of all functions implemented in this file (so that their order is not important): */
-void experimentPSO(const char *suite_name,
-                        const char *observer_name, ParticleSwarm swarm, std::map<int,double> updateSettings);
+void experimentPSO(ParticleSwarm swarm, std::map<int,double> updateSettings);
 
-void experimentDE(const char *suite_name,
-                        const char *observer_name, DifferentialEvolution de);
+void experimentDE(DifferentialEvolution de);
 
-void experimentHybrid(const char *suite_name,
-                        const char *observer_name, HybridAlgorithm hybrid, std::map<int,double> updateSettings);
-
-void debug (const char *suite_name,
-                        const char *observer_name);
+void experimentHybrid(HybridAlgorithm hybrid, std::map<int,double> updateSettings);
 
 static const long INDEPENDENT_RESTARTS = 1e5;
 static const unsigned int BUDGET_MULTIPLIER = 1e4;
@@ -93,7 +87,7 @@ int main(int argc, char **argv) {
 
 	if (id < s.size()){
 		ParticleSwarm pso = s.getParticleSwarm(id);
-		experimentPSO("bbob", "bbob", pso, updateSettings);
+		experimentPSO(pso, updateSettings);
 	} else {
 		std::cout << "Error: suite does not contain " << id << std::endl;
 	}
@@ -113,15 +107,14 @@ int main(int argc, char **argv) {
 
 	// if (id < s.size()){
 	// 	DifferentialEvolution de = s.getDE(id);
-	// 	experimentDE("bbob", "bbob", de);
+	// 	experimentDE(de);
 	// } else {
 	// 	std::cout << "Error: suite does not contain " << id << std::endl;
 	// }
 	// MPI_Finalize();
 }
 
-void experimentPSO(const char *suite_name,
-                        const char *observer_name, ParticleSwarm swarm, std::map<int,double> updateSettings) {
+void experimentPSO(ParticleSwarm swarm, std::map<int,double> updateSettings) {
 	 
 	size_t run;
 	coco_suite_t *suite;
@@ -133,9 +126,9 @@ void experimentPSO(const char *suite_name,
 	"algorithm_name: %s "
 	"", swarm.getIdString().c_str(), swarm.getIdString().c_str());
 
-	suite = coco_suite(suite_name, "instances: 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 ", 
+	suite = coco_suite("bbob", "instances: 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 ", 
 		"dimensions: 2,5,20");
-	observer = coco_observer(observer_name, observer_options);
+	observer = coco_observer("bbob", observer_options);
 	coco_free_memory(observer_options);
 
 	/* Initialize timing */
@@ -185,8 +178,7 @@ void experimentPSO(const char *suite_name,
 	coco_suite_free(suite);
 }
 
-void experimentDE(const char *suite_name,
-                        const char *observer_name, DifferentialEvolution de) {
+void experimentDE(DifferentialEvolution de) {
 	size_t run;
 	coco_suite_t *suite;
 	coco_observer_t *observer;
@@ -197,9 +189,9 @@ void experimentDE(const char *suite_name,
 	"algorithm_name: %s "
 	"", de.getIdString().c_str(), de.getIdString().c_str());
 
-	suite = coco_suite(suite_name, "instances: 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 ",
+	suite = coco_suite("bbob", "instances: 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 ",
 	 "dimensions: 2,5,20");
-	observer = coco_observer(observer_name, observer_options);
+	observer = coco_observer("bbob", observer_options);
 	coco_free_memory(observer_options);
 
 	/* Initialize timing */
@@ -248,8 +240,7 @@ void experimentDE(const char *suite_name,
 	coco_suite_free(suite);
 }
 
-void experimentHybrid(const char *suite_name,
-                        const char *observer_name, HybridAlgorithm hybrid, std::map<int,double> updateSettings) {
+void experimentHybrid(HybridAlgorithm hybrid, std::map<int,double> updateSettings) {
 	size_t run;
 	coco_suite_t *suite;
 	coco_observer_t *observer;
@@ -260,9 +251,9 @@ void experimentHybrid(const char *suite_name,
 	"algorithm_name: %s "
 	"", hybrid.getIdString().c_str(), hybrid.getIdString().c_str());
 
-	suite = coco_suite(suite_name, "instances: 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 ", 
+	suite = coco_suite("bbob", "instances: 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 ", 
 		"dimensions: 2,5,20");
-	observer = coco_observer(observer_name, observer_options);
+	observer = coco_observer("bbob", observer_options);
 	coco_free_memory(observer_options);
 
 	/* Initialize timing */

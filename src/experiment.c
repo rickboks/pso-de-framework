@@ -40,15 +40,11 @@ static void evaluate_function(const double *x, double *y) {
   coco_evaluate_function(PROBLEM, x, y);
 }
 
-/* Declarations of all functions implemented in this file (so that their order is not important): */
-void experimentPSO(const char *suite_name,
-                        const char *observer_name, ParticleSwarm pso);
+void experimentPSO(ParticleSwarm pso);
 
-void experimentDE(const char *suite_name,
-                        const char *observer_name, DifferentialEvolution de);
+void experimentDE(DifferentialEvolution de);
 
-void experimentHybrid(const char *suite_name,
-                        const char *observer_name, HybridAlgorithm ha);
+void experimentHybrid(HybridAlgorithm ha);
 
 static const long INDEPENDENT_RESTARTS = 1e5;
 static const unsigned int BUDGET_MULTIPLIER = 1e4;
@@ -74,16 +70,16 @@ int main(void) {
   /* Single algorithm experiment examples */
 
   DifferentialEvolution de (RANDOM, TTB_1, BINOMIAL, false);
-  experimentDE("bbob", "bbob", de);
+  experimentDE(de);
   
   ParticleSwarm ps(DECR_INERTIA_WEIGHT, VON_NEUMANN, ASYNCHRONOUS);
-  experimentPSO("bbob", "bbob", ps);
+  experimentPSO(ps);
 
   ParticleSwarm ps2(INERTIA_WEIGHT, VON_NEUMANN, ASYNCHRONOUS);
-  experimentPSO("bbob", "bbob", ps2);
+  experimentPSO(ps2);
 
   HybridAlgorithm ha(INERTIA_WEIGHT, VON_NEUMANN, SYNCHRONOUS, BEST_1, BINOMIAL);
-  experimentHybrid("bbob", "bbob", ha);
+  experimentHybrid(ha);
 
 
   /* PSO suite experiment example */
@@ -94,14 +90,13 @@ int main(void) {
   ParticleSwarmSuite suite(updateSettings);
   suite.setUpdateManagers(std::vector<UpdateManagerType>({INERTIA_WEIGHT, DECR_INERTIA_WEIGHT, BARE_BONES, FIPS}));
    for (ParticleSwarm s : suite){
-     experimentPSO("bbob", "bbob", s);
+     experimentPSO(s);
   }
 
   return 0;
 }
 
-void experimentHybrid(const char *suite_name,
-                        const char *observer_name, HybridAlgorithm ha) {
+void experimentHybrid(HybridAlgorithm ha) {
   std::map<int, double> updateSettings;
   double const Cr = 0.7;
   double const F = 0.5;
@@ -115,8 +110,8 @@ void experimentHybrid(const char *suite_name,
                    "algorithm_name: %s "
                    "", ha.getIdString().c_str(), ha.getIdString().c_str());
 
-  suite = coco_suite(suite_name, "instances: 1,1,1,1,1", "dimensions: 5");
-  observer = coco_observer(observer_name, observer_options);
+  suite = coco_suite("bbob", "instances: 1,1,1,1,1", "dimensions: 5");
+  observer = coco_observer("bbob", observer_options);
   coco_free_memory(observer_options);
 
   timing_data = timing_data_initialize(suite);
@@ -158,8 +153,7 @@ void experimentHybrid(const char *suite_name,
 
 }
 
-void experimentDE(const char *suite_name,
-                        const char *observer_name, DifferentialEvolution de) {
+void experimentDE(DifferentialEvolution de) {
 
   double const Cr = 0.7;
   double const F = 0.5;
@@ -174,8 +168,8 @@ void experimentDE(const char *suite_name,
                    "algorithm_name: %s "
                    "", de.getIdString().c_str(), de.getIdString().c_str());
 
-  suite = coco_suite(suite_name, "instances: 1,1,1,1,1", "dimensions: 5");
-  observer = coco_observer(observer_name, observer_options);
+  suite = coco_suite("bbob", "instances: 1,1,1,1,1", "dimensions: 5");
+  observer = coco_observer("bbob", observer_options);
   coco_free_memory(observer_options);
 
   timing_data = timing_data_initialize(suite);
@@ -217,8 +211,7 @@ void experimentDE(const char *suite_name,
   coco_suite_free(suite);  
 }
 
-void experimentPSO(const char *suite_name,
-                        const char *observer_name, ParticleSwarm ps) {
+void experimentPSO(ParticleSwarm ps) {
 
   
   std::map<int, double> updateSettings;
@@ -232,8 +225,8 @@ void experimentPSO(const char *suite_name,
                    "algorithm_name: %s "
                    "", ps.getIdString().c_str(), ps.getIdString().c_str());
 
-  suite = coco_suite(suite_name, "instances: 1,1,1,1,1", "dimensions: 20");
-  observer = coco_observer(observer_name, observer_options);
+  suite = coco_suite("bbob", "instances: 1,1,1,1,1", "dimensions: 20");
+  observer = coco_observer("bbob", observer_options);
   coco_free_memory(observer_options);
 
   timing_data = timing_data_initialize(suite);

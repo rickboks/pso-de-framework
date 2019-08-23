@@ -20,22 +20,26 @@ all: $(EXE)
 .PHONY: mpi
 mpi: $(MPI_EXE)
 
-$(EXE): $(OBJ) obj/coco.o obj/experiment.o
-	${CC} ${CFLAGS} -o $(EXE) $(OBJ) obj/coco.o obj/experiment.o ${LDFLAGS}
+$(EXE): $(OBJ) $(OBJ_DIR)/coco.o $(OBJ_DIR)/experiment.o
+	${CC} ${CFLAGS} -o $(EXE) $(OBJ) $(OBJ_DIR)/coco.o $(OBJ_DIR)/experiment.o ${LDFLAGS}
 
-$(MPI_EXE): $(OBJ) obj/coco.o obj/mpi.o
-	mpiCC ${CFLAGS} -o $(MPI_EXE) $(OBJ) obj/coco.o obj/mpi_experiment.o $(LDFLAGS)
+$(MPI_EXE): $(OBJ) $(OBJ_DIR)/coco.o $(OBJ_DIR)/mpi.o
+	mpiCC ${CFLAGS} -o $(MPI_EXE) $(OBJ) $(OBJ_DIR)/coco.o $(OBJ_DIR)/mpi_experiment.o $(LDFLAGS)
 	
-obj/mpi.o: include/coco.h src/coco.c src/mpi_experiment.c
-	mpiCC -c $(CFLAGS) $(INC) -o obj/mpi_experiment.o src/mpi_experiment.c
+$(OBJ_DIR)/mpi.o: $(INC_DIR)/coco.h $(SRC_DIR)/coco.c $(SRC_DIR)/mpi_experiment.c | $(OBJ_DIR)
+	mpiCC -c $(CFLAGS) $(INC) -o $(OBJ_DIR)/mpi_experiment.o $(SRC_DIR)/mpi_experiment.c
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cc $(INC_DIR)/*
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cc $(INC_DIR)/* | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
 
-obj/coco.o: include/coco.h src/coco.c
-	gcc -c $(COCOFLAGS) $(INC) -o obj/coco.o src/coco.c
-obj/experiment.o: include/coco.h src/coco.c src/experiment.c
-	g++ -c $(CFLAGS) $(INC) -o obj/experiment.o src/experiment.c
+$(OBJ_DIR)/coco.o: $(INC_DIR)/coco.h $(SRC_DIR)/coco.c | $(OBJ_DIR)
+	gcc -c $(COCOFLAGS) $(INC) -o $(OBJ_DIR)/coco.o $(SRC_DIR)/coco.c
+
+$(OBJ_DIR)/experiment.o: $(INC_DIR)/coco.h $(SRC_DIR)/coco.c $(SRC_DIR)/experiment.c | $(OBJ_DIR)
+	${CC} -c $(CFLAGS) $(INC) -o $(OBJ_DIR)/experiment.o $(SRC_DIR)/experiment.c
+
+$(OBJ_DIR):
+	mkdir $(OBJ_DIR)
 
 .PHONY:  clean
 clean:

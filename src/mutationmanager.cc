@@ -1,9 +1,10 @@
 #include "mutationmanager.h"
-#include <random>
 #include <algorithm>
 #include <iostream>
 #include <functional>
 #include <limits>
+#include "rng.h"
+#include "vectoroperations.h"
 
 // FACTORY
 MutationManager* MutationManagerFactory::createMutationManager(MutationType const mutationType, std::vector<Genome*>& genomes, double const F){
@@ -32,7 +33,7 @@ MutationManager* MutationManagerFactory::createMutationManager(MutationType cons
 
 //BASE
 MutationManager::MutationManager(std::vector<Genome*>& genomes, double const F)
-:genomes(genomes), F(F), D(genomes[0]->getDimension()), popSize(genomes.size()), generator(randDev()){
+:genomes(genomes), F(F), D(genomes[0]->getDimension()), popSize(genomes.size()){
 
 }
 
@@ -56,11 +57,9 @@ Genome* MutationManager::getBest(){
 }
 
 Genome* MutationManager::pickRandom(std::vector<Genome*>& possibilities) {
-	std::uniform_int_distribution<int>  distr(0, possibilities.size() -1);
-	int const r = distr(generator);
+	int const r = rng.randInt(0,possibilities.size()-1);
 	Genome* g = possibilities[r];
 	possibilities.erase(possibilities.begin() + r);
-
 	return g;
 }
 
@@ -89,17 +88,9 @@ std::vector<Genome*> Rand1MutationManager::mutate(){
 
 		std::vector<double> x = xr0;
 		std::vector<double> subtraction(D);
-
-		std::transform( xr1.begin(), xr1.end(),
-		                xr2.begin(), subtraction.begin(), 
-		                std::minus<double>());
-
-		std::transform(subtraction.begin(), subtraction.end(), subtraction.begin(),
-	       std::bind(std::multiplies<double>(), std::placeholders::_1, F));
-
-		std::transform( x.begin(), x.end(),
-		                subtraction.begin(), x.begin(), 
-		                std::plus<double>());
+		subtract(xr1, xr2, subtraction);
+		multiply(subtraction, F);
+		add(x,subtraction, x);
 
 		mutant->setX(x);
 		mutants.push_back(mutant);		
@@ -127,32 +118,16 @@ std::vector<Genome*> TTB1MutationManager::mutate(){
 
 		std::vector<double> mutant = genomes[i]->getX();
 		std::vector<double> subtraction(D);
-
-		std::transform( best.begin(), best.end(),
-		    (genomes[i]->getX()).begin(), subtraction.begin(), 
-		    std::minus<double>());
-
-		std::transform(subtraction.begin(), subtraction.end(), subtraction.begin(),
-	       std::bind(std::multiplies<double>(), std::placeholders::_1, F));
-
-		std::transform( mutant.begin(), mutant.end(),
-		    subtraction.begin(), mutant.begin(), 
-		    std::plus<double>());
-
+		subtract(best, genomes[i]->getX(), subtraction);
+		multiply(subtraction, F);
+		add(mutant, subtraction, mutant);
 
 		std::vector<double> xr0 = pickRandom(possibilities)->getX();
 		std::vector<double> xr1 = pickRandom(possibilities)->getX();
 
-		std::transform( xr0.begin(), xr0.end(),
-		    xr1.begin(), subtraction.begin(), 
-		    std::minus<double>());
-
-		std::transform(subtraction.begin(), subtraction.end(), subtraction.begin(),
-	       std::bind(std::multiplies<double>(), std::placeholders::_1, F));
-
-		std::transform( mutant.begin(), mutant.end(),
-		    subtraction.begin(), mutant.begin(), 
-		    std::plus<double>());
+		subtract(xr0, xr1, subtraction);
+		multiply(subtraction,F);
+		add(mutant, subtraction, mutant);
 
 		Genome* m = new Genome(D);
 		m->setX(mutant);
@@ -188,16 +163,9 @@ std::vector<Genome*> Best1MutationManager::mutate(){
 		std::vector<double> xr0 = pickRandom(possibilities)->getX();
 		std::vector<double> xr1 = pickRandom(possibilities)->getX();
 
-		std::transform( xr0.begin(), xr0.end(),
-		    xr1.begin(), subtraction.begin(), 
-		    std::minus<double>());
-
-		std::transform(subtraction.begin(), subtraction.end(), subtraction.begin(),
-	       std::bind(std::multiplies<double>(), std::placeholders::_1, F));
-
-		std::transform( mutant.begin(), mutant.end(),
-		    subtraction.begin(), mutant.begin(), 
-		    std::plus<double>());
+		subtract(xr0, xr1, subtraction);
+		multiply(subtraction,F);
+		add(mutant, subtraction, mutant);
 
 		Genome* m = new Genome(D);
 		m->setX(mutant);
@@ -233,28 +201,12 @@ std::vector<Genome*> Best2MutationManager::mutate(){
 		std::vector<double> xr1 = pickRandom(possibilities)->getX();
 		std::vector<double> xr2 = pickRandom(possibilities)->getX();
 		std::vector<double> xr3 = pickRandom(possibilities)->getX();
-
-		std::transform(xr0.begin(), xr0.end(),
-		    xr1.begin(), subtraction.begin(), 
-		    std::minus<double>());
-
-		std::transform(subtraction.begin(), subtraction.end(), subtraction.begin(),
-	       std::bind(std::multiplies<double>(), std::placeholders::_1, F));
-
-		std::transform(mutant.begin(), mutant.end(),
-		    subtraction.begin(), mutant.begin(), 
-		    std::plus<double>());
-
-		std::transform( xr2.begin(), xr2.end(),
-		    xr3.begin(), subtraction.begin(), 
-		    std::minus<double>());
-
-		std::transform(subtraction.begin(), subtraction.end(), subtraction.begin(),
-	       std::bind(std::multiplies<double>(), std::placeholders::_1, F));
-
-		std::transform( mutant.begin(), mutant.end(),
-		    subtraction.begin(), mutant.begin(), 
-		    std::plus<double>());
+		subtract(xr0, xr1, subtraction);
+		multiply(subtraction, F);
+		add(mutant, subtraction, mutant);
+		subtract(xr2, xr3, subtraction);
+		multiply(subtraction, F);
+		add(mutant, subtraction, mutant);
 
 		Genome* m = new Genome(D);
 		m->setX(mutant);
@@ -290,30 +242,12 @@ std::vector<Genome*> Rand2MutationManager::mutate(){
 
 		std::vector<double> mutant = xr4;
 		std::vector<double> subtraction(D);
-
-
-		std::transform(xr0.begin(), xr0.end(),
-		    xr1.begin(), subtraction.begin(), 
-		    std::minus<double>());
-
-		std::transform(subtraction.begin(), subtraction.end(), subtraction.begin(),
-	       std::bind(std::multiplies<double>(), std::placeholders::_1, F));
-
-		std::transform(mutant.begin(), mutant.end(),
-		    subtraction.begin(), mutant.begin(), 
-		    std::plus<double>());
-
-
-		std::transform( xr2.begin(), xr2.end(),
-		    xr3.begin(), subtraction.begin(), 
-		    std::minus<double>());
-
-		std::transform(subtraction.begin(), subtraction.end(), subtraction.begin(),
-	       std::bind(std::multiplies<double>(), std::placeholders::_1, F));
-
-		std::transform( mutant.begin(), mutant.end(),
-		    subtraction.begin(), mutant.begin(),
-		    std::plus<double>());
+		subtract(xr0, xr1, subtraction);
+		multiply(subtraction, F);
+		add(mutant, subtraction, mutant);
+		subtract(xr2, xr3, subtraction);
+		multiply(subtraction, F);
+		add(mutant, subtraction, mutant);
 
 		Genome* m = new Genome(D);
 		m->setX(mutant);
@@ -366,25 +300,11 @@ std::vector<Genome*> Rand2DirMutationManager::mutate(){
 
 		std::vector<double> mutant = xr0;
 		std::vector<double> subtraction(D);
-
-		std::transform(xr0.begin(), xr0.end(),
-		    xr1.begin(), subtraction.begin(), 
-		    std::minus<double>());
-
-		std::transform(subtraction.begin(), subtraction.end(),
-		    xr2.begin(), subtraction.begin(), 
-		    std::plus<double>());
-
-		std::transform(subtraction.begin(), subtraction.end(),
-		    xr3.begin(), subtraction.begin(), 
-		    std::minus<double>());
-
-		std::transform(subtraction.begin(), subtraction.end(), subtraction.begin(),
-	       std::bind(std::multiplies<double>(), std::placeholders::_1, F*0.5));
-
-		std::transform(mutant.begin(), mutant.end(),
-		    subtraction.begin(), mutant.begin(), 
-		    std::plus<double>());	
+		subtract(xr0, xr1, subtraction);
+		add(subtraction, xr2, subtraction);
+		subtract(subtraction, xr3, subtraction);
+		multiply(subtraction, F*0.5);
+		add(mutant, subtraction, mutant);
 
 		Genome* m = new Genome(D);
 		m->setX(mutant);
@@ -406,9 +326,6 @@ std::vector<Genome*> NSDEMutationManager::mutate(){
 	std::vector<Genome*> mutants;
 	mutants.reserve(popSize);
 
-	std::uniform_real_distribution<double>  distr(0, 1);
-
-
 	for (int i = 0; i < popSize; i++){
 		std::vector<Genome*> possibilities = genomes;
 
@@ -421,27 +338,18 @@ std::vector<Genome*> NSDEMutationManager::mutate(){
 		std::vector<double> xr2 = pickRandom(possibilities)->getX();
 
 		std::vector<double> subtraction(D);
+		subtract(xr1, xr2, subtraction);
 
-		std::transform( xr1.begin(), xr1.end(),
-			                xr2.begin(), subtraction.begin(), 
-			                std::minus<double>());
-
-		if (distr(generator) < 0.5){
-			std::normal_distribution<double> N(0.5,0.5);
-			double n = N(generator);
-			std::transform(subtraction.begin(), subtraction.end(), subtraction.begin(),
-		       std::bind(std::multiplies<double>(), std::placeholders::_1, n));
+		if (rng.randDouble(0,1) < 0.5){
+			double n = rng.normalDistribution(0.5,0.5);
+			multiply(subtraction, n);
 		} else {
-			std::cauchy_distribution<double> cauchy(0,1);
-			double c = cauchy(generator);
-			std::transform(subtraction.begin(), subtraction.end(), subtraction.begin(),
-		       std::bind(std::multiplies<double>(), std::placeholders::_1, c));
+			// std::cauchy_distribution<double> cauchy(0,1);
+			double c = rng.cauchyDistribution(0,1);
+			multiply(subtraction, c);
 		}
 
-		std::transform(mutant.begin(), mutant.end(),
-		    subtraction.begin(), mutant.begin(), 
-		    std::plus<double>());
-
+		add(mutant, subtraction, mutant);
 
 		Genome* m = new Genome(D);
 		m->setX(mutant);
@@ -474,9 +382,8 @@ std::vector<Genome*> TopologyMutationManager::getNeighbors(int const i) const{
 
 TopologyMutationManager::TopologyMutationManager(std::vector<Genome*>& genomes, double const F)
 	:MutationManager(genomes, F), radius(3), alpha(F), beta(F){
-	std::uniform_real_distribution<double>  distr(0, 1);
 	for (Genome* g : genomes){
-		g->setWeightFactor(distr(generator));
+		g->setWeightFactor(rng.randDouble(0,1));
 	}
 }
 
@@ -506,30 +413,13 @@ std::vector<Genome*> TopologyMutationManager::mutate(){
 
 		std::vector<double> localVector = genomes[i]->getX();
 		std::vector<double> subtraction(D);
-		std::transform(bestNeighbor.begin(), bestNeighbor.end(),
-			                genomes[i]->getX().begin(), subtraction.begin(), 
-			                std::minus<double>());
-
-		std::transform(subtraction.begin(), subtraction.end(), subtraction.begin(),
-		       std::bind(std::multiplies<double>(), std::placeholders::_1, alpha));
-
-		std::transform( subtraction.begin(), subtraction.end(),
-			               	localVector.begin(), localVector.begin(), 
-			                std::plus<double>());
-
-		std::transform( xr0.begin(), xr0.end(),
-			                xr1.begin(), subtraction.begin(), 
-			                std::minus<double>());
-
-		std::transform(subtraction.begin(), subtraction.end(), subtraction.begin(),
-		       std::bind(std::multiplies<double>(), std::placeholders::_1, beta));
-
-		std::transform( subtraction.begin(), subtraction.end(),
-			               	localVector.begin(), localVector.begin(), 
-			                std::plus<double>());	
-
-		std::transform(localVector.begin(), localVector.end(), localVector.begin(),
-		       std::bind(std::multiplies<double>(), std::placeholders::_1, 1 - genomes[i]->getWeightFactor()));	
+		subtract(bestNeighbor, genomes[i]->getX(), subtraction);
+		multiply(subtraction, alpha);
+		add(subtraction, localVector, localVector);
+		subtract(xr0, xr1, subtraction);
+		multiply(subtraction, beta);
+		add(subtraction, localVector, localVector);
+		multiply(localVector, 1-genomes[i]->getWeightFactor());
 
 		// GLOBAL VECTOR CREATION
 
@@ -539,38 +429,17 @@ std::vector<Genome*> TopologyMutationManager::mutate(){
 
 		xr0 = pickRandom(possibilities)->getX();
 		xr1 = pickRandom(possibilities)->getX();
-
-		std::transform( bestX.begin(), bestX.end(),
-			                genomes[i]->getX().begin(), subtraction.begin(), 
-			                std::minus<double>());
-
-		std::transform(subtraction.begin(), subtraction.end(), subtraction.begin(),
-		       std::bind(std::multiplies<double>(), std::placeholders::_1, alpha));
-
-		std::transform( subtraction.begin(), subtraction.end(),
-			               	globalVector.begin(), globalVector.begin(), 
-			                std::plus<double>());
-
-		std::transform( xr0.begin(), xr0.end(),
-			                xr1.begin(), subtraction.begin(), 
-			                std::minus<double>());
-
-		std::transform(subtraction.begin(), subtraction.end(), subtraction.begin(),
-		       std::bind(std::multiplies<double>(), std::placeholders::_1, beta));
-
-		std::transform( subtraction.begin(), subtraction.end(),
-			               	globalVector.begin(), globalVector.begin(), 
-			                std::plus<double>());
-
-		std::transform(globalVector.begin(), globalVector.end(), globalVector.begin(),
-		       std::bind(std::multiplies<double>(), std::placeholders::_1, genomes[i]->getWeightFactor()));
+		subtract(bestX, genomes[i]->getX(), subtraction);
+		multiply(subtraction, alpha);
+		add(subtraction, globalVector, globalVector);
+		subtract(xr0, xr1, subtraction);
+		multiply(subtraction, beta);
+		add(subtraction, globalVector, globalVector);
+		multiply(globalVector, genomes[i]->getWeightFactor());
 
 
 		std::vector<double> mutant(D);
-		std::transform( localVector.begin(), localVector.end(),
-			               	globalVector.begin(), mutant.begin(), 
-			                std::plus<double>());
-
+		add(localVector, globalVector, mutant);
 
 		std::vector<Genome*> copy = genomes;
 		copy.erase(std::find(copy.begin(), copy.end(), genomes[i]));

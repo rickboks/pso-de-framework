@@ -24,10 +24,6 @@ class CrossoverManager {
 		double const Cr;
 		int const D;
 		int const popSize;
-		std::random_device randDev;
-		std::mt19937 generator;
-
-
 	public:
 		CrossoverManager(std::vector<Genome*>& genomes, std::vector<Genome*>& mutants, double const Cr);
 		virtual ~CrossoverManager();

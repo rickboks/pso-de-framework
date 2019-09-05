@@ -24,8 +24,6 @@ class ParticleUpdateManager {
 		int const D;
 		std::vector<double> const vMax;
 		bool const useVMax;
-		std::random_device randDev;
-		std::mt19937 generator;
 		void applyVMax();
 		void updatePosition();
 	public:
@@ -52,8 +50,6 @@ class InertiaWeightManager : public ParticleUpdateManager{
 		double const phi1;
 		double const phi2;
 		double w;
-		std::uniform_real_distribution<double>  distr1;
-		std::uniform_real_distribution<double>  distr2;
 
 	public:
 		InertiaWeightManager(std::vector<double>& x, std::vector<double>& v,
@@ -68,8 +64,6 @@ class DecrInertiaWeightManager : public ParticleUpdateManager {
 		double w;
 		double const wMin;
 		double const wMax;
-		std::uniform_real_distribution<double>  distr1;
-		std::uniform_real_distribution<double>  distr2;
 
 	public:
 		DecrInertiaWeightManager(std::vector<double>& x, std::vector<double>& v,
@@ -82,8 +76,6 @@ class VmaxManager : public ParticleUpdateManager {
 	private:		
 		double const phi1;
 		double const phi2;
-		std::uniform_real_distribution<double> distr1;
-		std::uniform_real_distribution<double> distr2;
 	public:
 
 		VmaxManager(std::vector<double> & x, std::vector<double> & v,
@@ -98,8 +90,6 @@ class ConstrictionCoefficientManager : public ParticleUpdateManager {
 		double const phi1;
 		double const phi2;
 		double const chi;
-		std::uniform_real_distribution<double> distr1;
-		std::uniform_real_distribution<double> distr2;
 	public: 
 
 		ConstrictionCoefficientManager(std::vector<double> & x, std::vector<double> & v,
@@ -114,8 +104,6 @@ class FIPSManager : public ParticleUpdateManager {
 		double const phi;
 		double const chi;
 		std::vector<Particle*>& neighborhood;
-		std::uniform_real_distribution<double> distr;
-
 	public:
 		FIPSManager(std::vector<double> & x, std::vector<double> & v,
 			std::vector<double> & p, std::vector<double> & g, 

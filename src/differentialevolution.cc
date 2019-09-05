@@ -1,6 +1,7 @@
 #include "differentialevolution.h"
 #include "deinitializer.h"
 #include "coco.h"
+#include "rng.h"
 #include <random>
 #include <algorithm>
 #include <iostream>
@@ -205,13 +206,9 @@ std::string DifferentialEvolution::getIdString() const {
 
 }
 
-void DifferentialEvolution::oppositionGenerationJump(Problem const problem){
-	std::random_device dev;
-    std::mt19937 generator(dev());
-	
-    std::uniform_real_distribution<double> distr(0,1);
+void DifferentialEvolution::oppositionGenerationJump(Problem const problem){	
 
-	if (distr(generator) > 0.3){
+	if (rng.randDouble(0,1) > 0.3){
 		return;
 	}
 

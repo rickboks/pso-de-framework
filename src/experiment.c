@@ -69,10 +69,12 @@ static void timing_data_finalize(timing_data_t *timing_data);
 int main(void) {
   /* Single algorithm experiment examples */
   
-  DifferentialEvolution de (RANDOM, TTB_1, BINOMIAL, false);
+  DifferentialEvolution de (RANDOM, BEST_1, BINOMIAL, false);
   experimentDE(de);
+
+  return 0;
   
-  ParticleSwarm ps(DECR_INERTIA_WEIGHT, VON_NEUMANN, ASYNCHRONOUS);
+  ParticleSwarm ps(INERTIA_WEIGHT, VON_NEUMANN, ASYNCHRONOUS);
   experimentPSO(ps);
 
   ParticleSwarm ps2(INERTIA_WEIGHT, VON_NEUMANN, ASYNCHRONOUS);
@@ -82,8 +84,6 @@ int main(void) {
   experimentHybrid(ha);
 
   /* PSO suite experiment example */
-
-
   ParticleSwarmSuite suite;
   suite.setUpdateManagers(std::vector<UpdateManagerType>({INERTIA_WEIGHT, DECR_INERTIA_WEIGHT, BARE_BONES, FIPS}));
    for (ParticleSwarm s : suite){
@@ -225,7 +225,7 @@ void experimentPSO(ParticleSwarm ps) {
                    "algorithm_name: %s "
                    "", ps.getIdString().c_str(), ps.getIdString().c_str());
 
-  suite = coco_suite("bbob", "instances: 1,1,1,1,1", "dimensions: 20");
+  suite = coco_suite("bbob", "instances: 1,1,1,1,1", "dimensions: 5");
   observer = coco_observer("bbob", observer_options);
   coco_free_memory(observer_options);
 

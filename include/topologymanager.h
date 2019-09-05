@@ -72,8 +72,6 @@ class IncreasingTopologyManager : public TopologyManager {
 		int currentConnectivity;
 		int maxConnectivity; // Maximum amount of neighbors for a particle (popSize-1)
 		int minConnectivity;
-		std::random_device randDev;
-		std::mt19937 generator;
 	public:
 		IncreasingTopologyManager(std::vector<Particle*> const & particles);
 		void initialize();
@@ -84,8 +82,6 @@ class DecreasingTopologyManager : public TopologyManager {
 	private:
 		int currentConnectivity;
 		int maxConnectivity;
-		std::random_device randDev;
-		std::mt19937 generator;
 	public:
 		DecreasingTopologyManager(std::vector<Particle*> const & particles);
 		void initialize();
@@ -96,8 +92,6 @@ class MultiSwarmTopologyManager : public TopologyManager {
 	private:
 		int const clusterSize;
 		int count;
-		std::random_device randDev;
-		std::mt19937 generator;
 		void createClusters();
 	public:
 		MultiSwarmTopologyManager(std::vector<Particle*> const & particles);

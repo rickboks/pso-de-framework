@@ -1,14 +1,12 @@
 #include "particle.h"
 #include "particleupdatesettings.h"
 #include "particleupdatemanager.h"
+#include "rng.h"
 #include <iostream>
 #include <algorithm>
 #include <functional>
 #include <random>
 #include <cmath>
-
-std::random_device rand_dev;
-std::mt19937 generator(rand_dev());
 
 constexpr double DOUBLE_MAX = std::numeric_limits<double>::max();
 constexpr double DOUBLE_MIN = std::numeric_limits<double>::min();
@@ -34,8 +32,7 @@ Particle::~Particle(){
 
 void Particle::randomize(std::vector<double> lowerBounds, std::vector<double> upperBounds){
 	for (int i = 0; i < D; i++){
-		std::uniform_real_distribution<double> distr(lowerBounds[i], upperBounds[i]);
-		x[i] = distr(generator);
+		x[i] = rng.randDouble(lowerBounds[i], upperBounds[i]);
 		v[i] = 0;
 	}
 	p = x;

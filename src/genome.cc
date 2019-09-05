@@ -1,12 +1,10 @@
 #include "genome.h"
+#include "rng.h"
 #include <random>
 #include <algorithm>
 #include <functional>
 #include "particle.h"
 #include <iostream>
-
-std::random_device rdev;
-std::mt19937 gen(rdev());
 
 Genome::Genome(int const D): 
 	D(D), x(D), evaluated(false){
@@ -25,8 +23,7 @@ Genome::Genome(std::vector<double>x):
 
 void Genome::randomize(std::vector<double> lowerBounds, std::vector<double> upperBounds){
 	for (int i = 0; i < D; i++){
-		std::uniform_real_distribution<double> distr(lowerBounds[i], upperBounds[i]);
-		x[i] = distr(gen);
+		x[i] = rng.randDouble(lowerBounds[i], upperBounds[i]);
 	}
 }
 

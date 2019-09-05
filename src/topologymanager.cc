@@ -1,6 +1,6 @@
 #include "topologymanager.h"
 #include "particle.h"
-#include <random>
+#include "rng.h"
 #include <algorithm>
 #include <iostream>
 
@@ -105,8 +105,6 @@ RandomTopologyManager::RandomTopologyManager(std::vector<Particle*> const & part
 
 void RandomTopologyManager::initialize(){
 	int const popSize = particles.size();
-	std::random_device rand_dev;
-	std::mt19937 generator(rand_dev());
 
 	for (int i = 0; i < popSize; i++){
 		std::vector<int> possibilities;
@@ -118,8 +116,7 @@ void RandomTopologyManager::initialize(){
 		}
 
 		for (int j = 0; j < connections; j++){
-			std::uniform_int_distribution<int>  distr(0, possibilities.size()-1);
-			int index = distr(generator);
+			int index = rng.randInt(0,possibilities.size()-1);
 			particles[i]->addNeighbor(particles[possibilities[index]]);
 			possibilities.erase(possibilities.begin() + index);
 		}
@@ -188,7 +185,7 @@ void WheelTopologyManager::initialize(){
 
 /*		Increasing connectivity 	*/
 IncreasingTopologyManager::IncreasingTopologyManager(std::vector<Particle*> const & particles)
-	:TopologyManager(particles), currentConnectivity(2), minConnectivity(2), randDev(), generator(randDev()){
+	:TopologyManager(particles), currentConnectivity(2), minConnectivity(2){
 }
 
 void IncreasingTopologyManager::initialize(){
@@ -221,8 +218,7 @@ void IncreasingTopologyManager::update(double progress){
 					possibilities.push_back(particles[k]);
 
 			for (int j = 0; j < newNeighbors; j++){
-				std::uniform_int_distribution<int> distr(0, possibilities.size()-1);
-				int randIndex = distr(generator);
+				int randIndex = rng.randInt(0,possibilities.size()-1);
 				particles[i]->addNeighbor(possibilities[randIndex]);
 				possibilities.erase(possibilities.begin() + randIndex);			
 			}			
@@ -236,7 +232,7 @@ void IncreasingTopologyManager::update(double progress){
 /* Decreasing connectivity */
 
 DecreasingTopologyManager::DecreasingTopologyManager(std::vector<Particle*> const & particles)
-	:TopologyManager(particles), randDev(), generator(randDev()){
+	:TopologyManager(particles){
 }
 
 void DecreasingTopologyManager::initialize(){
@@ -268,8 +264,7 @@ void DecreasingTopologyManager::update(double progress){
 			}
 
 			for (int k = 0; k < removeNeighbors; k++){
-				std::uniform_int_distribution<int> distr(0, possibilities.size()-1);
-				int randIndex = distr(generator);
+				int randIndex = rng.randInt(0,possibilities.size()-1);
 				particles[i]->removeNeighbor(possibilities[randIndex]);
 				possibilities.erase(possibilities.begin() + randIndex);
 
@@ -285,7 +280,7 @@ void DecreasingTopologyManager::update(double progress){
 /* Dynamic multi-swarm */
 
 MultiSwarmTopologyManager::MultiSwarmTopologyManager(std::vector<Particle*> const & particles)
-	:TopologyManager(particles), clusterSize(3), count(0), randDev(), generator(randDev()){
+	:TopologyManager(particles), clusterSize(3), count(0){
 
 }
 
@@ -303,8 +298,7 @@ void MultiSwarmTopologyManager::createClusters(){
 
 		cluster.reserve(newClusterSize);
 		for (int i = 0; i < newClusterSize; i++){
-			std::uniform_int_distribution<int> distr(0, toInitialize.size()-1);
-			int randIndex = distr(generator);
+			int randIndex = rng.randInt(0,toInitialize.size()-1);
 			cluster.push_back(toInitialize[randIndex]);
 			toInitialize.erase(toInitialize.begin() + randIndex);
 		}

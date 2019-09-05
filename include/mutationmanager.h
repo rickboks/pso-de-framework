@@ -26,8 +26,6 @@ class MutationManager {
 		double const F;
 		int const D;
 		int const popSize;
-		std::random_device randDev;
-		std::mt19937 generator;
 		Genome* getBest();
 		Genome* pickRandom(std::vector<Genome*>& possibilities);
 

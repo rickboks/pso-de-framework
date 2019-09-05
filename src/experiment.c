@@ -71,14 +71,9 @@ int main(void) {
   
   DifferentialEvolution de (RANDOM, BEST_1, BINOMIAL, false);
   experimentDE(de);
-
-  return 0;
   
   ParticleSwarm ps(INERTIA_WEIGHT, VON_NEUMANN, ASYNCHRONOUS);
   experimentPSO(ps);
-
-  ParticleSwarm ps2(INERTIA_WEIGHT, VON_NEUMANN, ASYNCHRONOUS);
-  experimentPSO(ps2);
 
   HybridAlgorithm ha(INERTIA_WEIGHT, VON_NEUMANN, SYNCHRONOUS, BEST_1, BINOMIAL);
   experimentHybrid(ha);

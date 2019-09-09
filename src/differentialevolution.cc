@@ -106,10 +106,7 @@ void DifferentialEvolution::run(Problem const problem, int const evalBudget, int
 		if (jumpOpposition)
 			oppositionGenerationJump(problem);
 
-		if (improved)
-			noImprovement = 0;
-		else
-			noImprovement++;		
+		improved ? notImproved=0 : notImproved++;		
 	}
 
 	for (Genome* d : genomes)
@@ -206,7 +203,7 @@ std::string DifferentialEvolution::getIdString() const {
 
 }
 
-void DifferentialEvolution::oppositionGenerationJump(Problem const problem){	
+void DifferentialEvolution::oppositionGenerationJump(Problem const problem){
 
 	if (rng.randDouble(0,1) > 0.3){
 		return;

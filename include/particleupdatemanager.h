@@ -19,8 +19,8 @@ class ParticleUpdateManager {
 	protected:
 		std::vector<double> & x;
 		std::vector<double> & v;
-		std::vector<double> const & p;
-		std::vector<double> const & g;
+		std::vector<double> & p;
+		std::vector<double> & g;
 		int const D;
 		std::vector<double> const vMax;
 		bool const useVMax;

@@ -7,7 +7,6 @@
 #include <iostream>
 #include <problem.h>
 
-constexpr double DOUBLE_MIN = std::numeric_limits<double>::min();
 constexpr double DOUBLE_MAX = std::numeric_limits<double>::max();
 
 ParticleSwarm::ParticleSwarm(UpdateManagerType const updateManagerType,
@@ -61,19 +60,17 @@ void ParticleSwarm::runAsynchronous(Problem const problem, int const evalBudget,
 
 	maxResV = sqrt(maxResV);
 
-	for (int i = 0; i < popSize; i++)
-		particles.push_back(new Particle(coco_problem_get_dimension(problem.PROBLEM), settings));
-
-	for (Particle* const p : particles)
+	for (int i = 0; i < popSize; i++){
+		Particle* p = new Particle(coco_problem_get_dimension(problem.PROBLEM), settings);
 		p->randomize(settings.xMax, settings.xMin);
-
+		particles.push_back(p);
+	}
 	for (Particle* const p : particles)
 		p->updateGbest();
 
 	topologyManager->initialize();
 	
 	int iterations = 0;
-
 	double bestFitness = DOUBLE_MAX;
 	int notImproved = 0;
 	bool improved;
@@ -106,10 +103,7 @@ void ParticleSwarm::runAsynchronous(Problem const problem, int const evalBudget,
 			particles[i]->updateVelocityAndPosition(double(evaluations)/double(evalBudget));			
 		}
 
-		if (improved)
-			notImproved = 0;
-		else 
-			notImproved++;	
+		improved ? notImproved=0 : notImproved++;
 
 		iterations++;	
 		topologyManager->update(double(evaluations)/double(evalBudget));	
@@ -136,12 +130,11 @@ void ParticleSwarm::runSynchronous(Problem const problem, int const evalBudget, 
 
 	maxResV = sqrt(maxResV);
 
-	for (int i = 0; i < popSize; i++)
-		particles.push_back(new Particle(coco_problem_get_dimension(problem.PROBLEM), settings));
-
-	for (Particle* const p : particles)
+	for (int i = 0; i < popSize; i++){
+		Particle* p = new Particle(coco_problem_get_dimension(problem.PROBLEM), settings);
 		p->randomize(settings.xMax, settings.xMin);
-
+		particles.push_back(p);
+	}
 	for (Particle* const p : particles)
 		p->updateGbest();
 
@@ -178,10 +171,7 @@ void ParticleSwarm::runSynchronous(Problem const problem, int const evalBudget, 
 	
 		}		
 
-		if (improved)
-			notImproved = 0;
-		else 
-			notImproved++;
+		improved ? notImproved=0 : notImproved++;
 		
 		for (int i = 0; i < popSize; i++)
 			particles[i]->updatePbest();

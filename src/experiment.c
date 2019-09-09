@@ -69,8 +69,8 @@ static void timing_data_finalize(timing_data_t *timing_data);
 int main(void) {
   /* Single algorithm experiment examples */
   
-  DifferentialEvolution de (RANDOM, BEST_1, BINOMIAL, false);
-  experimentDE(de);
+  // DifferentialEvolution de (RANDOM, BEST_1, BINOMIAL, false);
+  // experimentDE(de);
   
   ParticleSwarm ps(INERTIA_WEIGHT, VON_NEUMANN, ASYNCHRONOUS);
   experimentPSO(ps);

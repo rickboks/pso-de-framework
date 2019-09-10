@@ -106,7 +106,7 @@ void DifferentialEvolution::run(Problem const problem, int const evalBudget, int
 		if (jumpOpposition)
 			oppositionGenerationJump(problem);
 
-		improved ? notImproved=0 : notImproved++;		
+		improved ? noImprovement=0 : noImprovement++;		
 	}
 
 	for (Genome* d : genomes)

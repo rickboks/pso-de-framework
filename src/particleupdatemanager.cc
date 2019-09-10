@@ -193,8 +193,8 @@ void FIPSManager::update(double progress){
 
 	for (int i = 0; i < (int) neighborhood.size(); i++){
 		subtract(p_n[i], x, pMinx);
-		randomMult(pMinx, 0, phi);
-		add(sum, pMinx, sum);	
+		multiply(pMinx, rng.randDouble(0,phi));
+		add(sum, pMinx, sum);		
 	}
 
 	multiply(sum, oneOverK);

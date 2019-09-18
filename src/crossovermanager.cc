@@ -6,20 +6,21 @@
 
 // FACTORY
 CrossoverManager* CrossoverManagerFactory::createCrossoverManager(CrossoverType const crossoverType, 
-	std::vector<Genome*>& genomes, std::vector<Genome*>& mutants,double const Cr){
+	std::vector<Genome*>& genomes, std::vector<Genome*>& mutants,double const Cr, int const D){
 	switch(crossoverType){
 		case BINOMIAL:
-			return new BinomialCrossoverManager(genomes, mutants, Cr);
+			return new BinomialCrossoverManager(genomes, mutants, Cr, D);
 		case EXPONENTIAL:
-			return new ExponentialCrossoverManager(genomes, mutants, Cr);
+			return new ExponentialCrossoverManager(genomes, mutants, Cr, D);
 		default:
 			throw std::invalid_argument("Error: Invalid DE crossover type");
 	}
 }
 
 // BASE
-CrossoverManager::CrossoverManager(std::vector<Genome*>& genomes, std::vector<Genome*>& mutants, double const Cr)
-: genomes(genomes), mutants(mutants), Cr(Cr), D(genomes[0]->getDimension()), popSize(genomes.size()){
+CrossoverManager::CrossoverManager(std::vector<Genome*>& genomes, std::vector<Genome*>& mutants, 
+	double const Cr, int const D)
+: genomes(genomes), mutants(mutants), Cr(Cr), D(D){
 
 }
 
@@ -29,17 +30,18 @@ CrossoverManager::~CrossoverManager(){
 
 // BINOMIAL
 
-BinomialCrossoverManager::BinomialCrossoverManager(std::vector<Genome*>& genomes, std::vector<Genome*>& mutants, double const Cr)
-: CrossoverManager(genomes, mutants, Cr){
+BinomialCrossoverManager::BinomialCrossoverManager(std::vector<Genome*>& genomes, std::vector<Genome*>& mutants, 
+	double const Cr, int const D)
+: CrossoverManager(genomes, mutants, Cr, D){
 
 }
 
 std::vector<Genome*> BinomialCrossoverManager::crossover() {
 	std::vector<Genome*> donors;
-	donors.reserve(popSize);
+	donors.reserve(genomes.size());
 	std::vector<double> x(D);
 
-	for (int i = 0; i < popSize; i++){
+	for (int i = 0; i < genomes.size(); i++){
 		std::vector<double> mutantX = mutants[i]->getX();
 		std::vector<double> parentX = genomes[i]->getX();
 		int const jrand = rng.randInt(0,D-1);
@@ -60,17 +62,18 @@ std::vector<Genome*> BinomialCrossoverManager::crossover() {
 }
 
 // Exponential
-ExponentialCrossoverManager::ExponentialCrossoverManager(std::vector<Genome*>& genomes, std::vector<Genome*>& mutants, double const Cr)
-: CrossoverManager(genomes, mutants, Cr){
+ExponentialCrossoverManager::ExponentialCrossoverManager(std::vector<Genome*>& genomes, std::vector<Genome*>& mutants, 
+	double const Cr, int const D)
+: CrossoverManager(genomes, mutants, Cr, D){
 
 }
 
 std::vector<Genome*> ExponentialCrossoverManager::crossover() {
 	std::vector<Genome*> donors;
-	donors.reserve(popSize);
+	donors.reserve(genomes.size());
 	std::vector<double> x(D);
 
-	for (int i = 0; i < popSize; i++){
+	for (int i = 0; i < genomes.size(); i++){
 		std::vector<double> mutantX = mutants[i]->getX();
 		std::vector<double> parentX = genomes[i]->getX();
 		std::vector<int> mutantIndices;

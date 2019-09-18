@@ -113,7 +113,7 @@ void ParticleSwarm::runAsynchronous(Problem const problem, int const evalBudget,
 }
 
 void ParticleSwarm::runSynchronous(Problem const problem, int const evalBudget, int popSize, std::map<int,double> particleUpdateParams){
-		this->topologyManager = TopologyManagerFactory::createTopologyManager(topologyManagerType, particles);
+	this->topologyManager = TopologyManagerFactory::createTopologyManager(topologyManagerType, particles);
 	popSize = this->topologyManager->getClosestValidPopulationSize(popSize);
 
 	int const dimension = coco_problem_get_dimension(problem.PROBLEM);

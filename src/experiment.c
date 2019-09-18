@@ -72,18 +72,18 @@ int main(void) {
   DifferentialEvolution de (RANDOM, BEST_1, BINOMIAL, false);
   experimentDE(de);
   
-  ParticleSwarm ps(FIPS, MULTI_SWARM, ASYNCHRONOUS);
+  ParticleSwarm ps(INERTIA_WEIGHT, VON_NEUMANN, SYNCHRONOUS);
   experimentPSO(ps);
 
   HybridAlgorithm ha(INERTIA_WEIGHT, VON_NEUMANN, SYNCHRONOUS, BEST_1, BINOMIAL);
   experimentHybrid(ha);
 
   /* PSO suite experiment example */
-  ParticleSwarmSuite suite;
-  suite.setUpdateManagers(std::vector<UpdateManagerType>({INERTIA_WEIGHT, DECR_INERTIA_WEIGHT, BARE_BONES, FIPS}));
-   for (ParticleSwarm s : suite){
-     experimentPSO(s);
-  }
+  // ParticleSwarmSuite suite;
+  // suite.setUpdateManagers(std::vector<UpdateManagerType>({INERTIA_WEIGHT, DECR_INERTIA_WEIGHT, BARE_BONES, FIPS}));
+  //  for (ParticleSwarm s : suite){
+  //    experimentPSO(s);
+  // }
 
   return 0;
 }

@@ -7,24 +7,25 @@
 #include "vectoroperations.h"
 
 // FACTORY
-MutationManager* MutationManagerFactory::createMutationManager(MutationType const mutationType, std::vector<Genome*>& genomes, double const F){
+MutationManager* MutationManagerFactory::createMutationManager(MutationType const mutationType, 
+	std::vector<Genome*>& genomes, double const F, int const D){
 	switch(mutationType){
 		case RAND_1:
-			return new Rand1MutationManager(genomes,F);
+			return new Rand1MutationManager(genomes,F,D);
 		case TTB_1:
-			return new TTB1MutationManager(genomes, F);
+			return new TTB1MutationManager(genomes, F,D);
 		case BEST_1:
-			return new Best1MutationManager(genomes, F);
+			return new Best1MutationManager(genomes, F,D);
 		case BEST_2:
-			return new Best2MutationManager(genomes,F);
+			return new Best2MutationManager(genomes,F,D);
 		case RAND_2:
-			return new Rand2MutationManager(genomes,F);
+			return new Rand2MutationManager(genomes,F,D);
 		case RAND_2_DIR:
-			return new Rand2DirMutationManager(genomes,F);
+			return new Rand2DirMutationManager(genomes,F,D);
 		case NSDE:
-			return new NSDEMutationManager(genomes,F);
+			return new NSDEMutationManager(genomes,F,D);
 		case TOPOLOGY:
-			return new TopologyMutationManager(genomes,F);
+			return new TopologyMutationManager(genomes,F,D);
 
 		default:
 			throw std::invalid_argument("Error: Invalid DE mutation type");
@@ -32,8 +33,8 @@ MutationManager* MutationManagerFactory::createMutationManager(MutationType cons
 }
 
 //BASE
-MutationManager::MutationManager(std::vector<Genome*>& genomes, double const F)
-:genomes(genomes), F(F), D(genomes[0]->getDimension()), popSize(genomes.size()){
+MutationManager::MutationManager(std::vector<Genome*>& genomes, double const F, int const D)
+:genomes(genomes), F(F), D(D){
 
 }
 
@@ -45,7 +46,7 @@ Genome* MutationManager::getBest(){
 	int best = 0;
 	double bestF = std::numeric_limits<double>::max();
 
-	for (int i = 0; i < popSize; i++){
+	for (int i = 0; i < genomes.size(); i++){
 		double const score = genomes[i]->getFitness();
 		if (score < bestF){
 			bestF = score;
@@ -64,16 +65,16 @@ Genome* MutationManager::pickRandom(std::vector<Genome*>& possibilities) {
 }
 
 //RAND1
-Rand1MutationManager::Rand1MutationManager(std::vector<Genome*>& genomes, double const F)
-:MutationManager(genomes, F){
+Rand1MutationManager::Rand1MutationManager(std::vector<Genome*>& genomes, double const F, int const D)
+:MutationManager(genomes, F,D){
 
 }
 
 std::vector<Genome*> Rand1MutationManager::mutate(){
 	std::vector<Genome*> mutants;
-	mutants.reserve(popSize);
+	mutants.reserve(genomes.size());
 
-	for (int i = 0; i < popSize; i++){
+	for (int i = 0; i < genomes.size(); i++){
 		std::vector<Genome*> possibilities = genomes;
 
 		auto position = std::find(possibilities.begin(), possibilities.end(), genomes[i]);
@@ -99,17 +100,17 @@ std::vector<Genome*> Rand1MutationManager::mutate(){
 }
 
 // TTB1
-TTB1MutationManager::TTB1MutationManager(std::vector<Genome*>& genomes, double const F)
-:MutationManager(genomes, F){
+TTB1MutationManager::TTB1MutationManager(std::vector<Genome*>& genomes, double const F, int const D)
+:MutationManager(genomes, F, D){
 
 }
 
 std::vector<Genome*> TTB1MutationManager::mutate(){
 	std::vector<double> best = getBest()->getX(); 
 	std::vector<Genome*> mutants;
-	mutants.reserve(popSize);
+	mutants.reserve(genomes.size());
 
-	for (int i = 0; i < popSize; i++){
+	for (int i = 0; i < genomes.size(); i++){
 		std::vector<Genome*> possibilities = genomes;
 
 		auto position = std::find(possibilities.begin(), possibilities.end(), genomes[i]);
@@ -140,17 +141,17 @@ std::vector<Genome*> TTB1MutationManager::mutate(){
 
 
 // BEST 1
-Best1MutationManager::Best1MutationManager(std::vector<Genome*>& genomes, double const F)
-	:MutationManager(genomes, F){
+Best1MutationManager::Best1MutationManager(std::vector<Genome*>& genomes, double const F, int const D)
+	:MutationManager(genomes, F, D){
 
 }
 
 std::vector<Genome*> Best1MutationManager::mutate(){
 	std::vector<Genome*> mutants;
-	mutants.reserve(popSize);
+	mutants.reserve(genomes.size());
 	std::vector<double> best = getBest()->getX();
 
-	for (int i = 0; i < popSize; i++){
+	for (int i = 0; i < genomes.size(); i++){
 		std::vector<Genome*> possibilities = genomes;
 
 		auto position = std::find(possibilities.begin(), possibilities.end(), genomes[i]);
@@ -173,21 +174,22 @@ std::vector<Genome*> Best1MutationManager::mutate(){
 		mutants.push_back(m);
 	}
 
+
 	return mutants;
 }
 
 // BEST 2
-Best2MutationManager::Best2MutationManager(std::vector<Genome*>& genomes, double const F)
-	:MutationManager(genomes, F){
+Best2MutationManager::Best2MutationManager(std::vector<Genome*>& genomes, double const F, int const D)
+	:MutationManager(genomes, F, D){
 
 }
 
 std::vector<Genome*> Best2MutationManager::mutate(){
 	std::vector<double> best = getBest()->getX(); 
 	std::vector<Genome*> mutants;
-	mutants.reserve(popSize);
+	mutants.reserve(genomes.size());
 
-	for (int i = 0; i < popSize; i++){
+	for (int i = 0; i < genomes.size(); i++){
 		std::vector<Genome*> possibilities = genomes;
 
 		auto position = std::find(possibilities.begin(), possibilities.end(), genomes[i]);
@@ -218,16 +220,16 @@ std::vector<Genome*> Best2MutationManager::mutate(){
 }
 
 // RAND 2
-Rand2MutationManager::Rand2MutationManager(std::vector<Genome*>& genomes, double const F)
-	:MutationManager(genomes, F){
+Rand2MutationManager::Rand2MutationManager(std::vector<Genome*>& genomes, double const F, int const D)
+	:MutationManager(genomes, F, D){
 
 }
 
 std::vector<Genome*> Rand2MutationManager::mutate(){
 	std::vector<Genome*> mutants;
-	mutants.reserve(popSize);
+	mutants.reserve(genomes.size());
 
-	for (int i = 0; i < popSize; i++){
+	for (int i = 0; i < genomes.size(); i++){
 		std::vector<Genome*> possibilities = genomes;
 
 		auto position = std::find(possibilities.begin(), possibilities.end(), genomes[i]);
@@ -259,16 +261,16 @@ std::vector<Genome*> Rand2MutationManager::mutate(){
 }
 
 // RAND 2 DIR
-Rand2DirMutationManager::Rand2DirMutationManager(std::vector<Genome*>& genomes, double const F)
-	:MutationManager(genomes, F){
+Rand2DirMutationManager::Rand2DirMutationManager(std::vector<Genome*>& genomes, double const F, int const D)
+	:MutationManager(genomes, F, D){
 
 }
 
 std::vector<Genome*> Rand2DirMutationManager::mutate(){
 	std::vector<Genome*> mutants;
-	mutants.reserve(popSize);
+	mutants.reserve(genomes.size());
 
-	for (int i = 0; i < popSize; i++){
+	for (int i = 0; i < genomes.size(); i++){
 		std::vector<Genome*> possibilities = genomes;
 
 		auto position = std::find(possibilities.begin(), possibilities.end(), genomes[i]);
@@ -317,16 +319,16 @@ std::vector<Genome*> Rand2DirMutationManager::mutate(){
 
 // NSDE
 
-NSDEMutationManager::NSDEMutationManager(std::vector<Genome*>& genomes, double const F)
-	:MutationManager(genomes, F){
+NSDEMutationManager::NSDEMutationManager(std::vector<Genome*>& genomes, double const F, int const D)
+	:MutationManager(genomes, F, D){
 
 }
 
 std::vector<Genome*> NSDEMutationManager::mutate(){
 	std::vector<Genome*> mutants;
-	mutants.reserve(popSize);
+	mutants.reserve(genomes.size());
 
-	for (int i = 0; i < popSize; i++){
+	for (int i = 0; i < genomes.size(); i++){
 		std::vector<Genome*> possibilities = genomes;
 
 		auto position = std::find(possibilities.begin(), possibilities.end(), genomes[i]);
@@ -369,19 +371,19 @@ std::vector<Genome*> TopologyMutationManager::getNeighbors(int const i) const{
 	for (int k = 1; k <= radius; k++){
 		int index = i - k;
 		if (index < 0)
-			index = index + popSize;
+			index = index + genomes.size();
 		neighbors.push_back(genomes[index]);
 	}
 
 	for (int k = 1; k <= radius; k++){
-		int index = (i + k) % popSize;
+		int index = (i + k) % genomes.size();
 		neighbors.push_back(genomes[index]);
 	}
 	return neighbors;
 }
 
-TopologyMutationManager::TopologyMutationManager(std::vector<Genome*>& genomes, double const F)
-	:MutationManager(genomes, F), radius(3), alpha(F), beta(F){
+TopologyMutationManager::TopologyMutationManager(std::vector<Genome*>& genomes, double const F, int const D)
+	:MutationManager(genomes, F, D), radius(3), alpha(F), beta(F){
 	for (Genome* g : genomes){
 		g->setWeightFactor(rng.randDouble(0,1));
 	}
@@ -389,7 +391,7 @@ TopologyMutationManager::TopologyMutationManager(std::vector<Genome*>& genomes, 
 
 std::vector<Genome*> TopologyMutationManager::mutate(){
 	std::vector<Genome*> mutants;
-	mutants.reserve(popSize);
+	mutants.reserve(genomes.size());
 
 	Genome* best = getBest();
 	std::vector<double> bestX = best->getX();

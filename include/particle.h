@@ -29,6 +29,7 @@ class Particle {
 		void randomize(std::vector<double> lowerBounds, std::vector<double> upperBounds);
 		std::vector<double> getPosition() const;
 		void setPosition(std::vector<double> position, double fitness);
+		void setVelocity(std::vector<double> v);
 		void addNeighbor(Particle* const neighbor);
 		void removeNeighbor(Particle* const neighbor);
 		void removeAllNeighbors();

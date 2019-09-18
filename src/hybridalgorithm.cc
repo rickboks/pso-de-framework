@@ -3,9 +3,11 @@
 #include "topologymanager.h"
 #include "genome.h"
 #include "particleupdatesettings.h"
+#include "vectoroperations.h"
 #include "coco.h"
 #include <limits>
 #include <iostream>
+#include <algorithm>   
 #include <problem.h>
 
 constexpr double DOUBLE_MIN = std::numeric_limits<double>::min();
@@ -78,20 +80,20 @@ void HybridAlgorithm::runSynchronous(Problem const problem, int const evalBudget
 	double const F, double const Cr){
 
 	std::vector<Genome*> p0;
-	std::vector<Genome*> p1;
+	std::vector<Particle*> p1;
 	std::vector<Genome*> p2;
 	std::vector<Genome*> p3;
 		
 	topologyManager = TopologyManagerFactory::createTopologyManager(topologyManagerType, particles);
 	popSize = topologyManager->getClosestValidPopulationSize(popSize);	
 
-	int const dimension = coco_problem_get_dimension(problem.PROBLEM);
+	int const D = coco_problem_get_dimension(problem.PROBLEM);
 	double const* smallest = coco_problem_get_smallest_values_of_interest(problem.PROBLEM);
 	double const* largest = coco_problem_get_largest_values_of_interest(problem.PROBLEM);
 
 	ParticleUpdateSettings settings(updateManagerType, particleUpdateParams, 
-				std::vector<double>(smallest, smallest + dimension), 
-				std::vector<double>(largest, largest + dimension));
+				std::vector<double>(smallest, smallest + D), 
+				std::vector<double>(largest, largest + D));
 
 	double maxResV = 0;
 	for (double d : settings.vMax)
@@ -104,20 +106,12 @@ void HybridAlgorithm::runSynchronous(Problem const problem, int const evalBudget
 
 	for (Particle* const p : particles)
 		p->randomize(settings.xMax, settings.xMin);
-
 	for (Particle* const p : particles)
 		p->updateGbest();
 
 	topologyManager->initialize();
 
-	p0 = toGenomes(particles);
-	p1 = toGenomes(particles);
-
-	crossoverManager = CrossoverManagerFactory::createCrossoverManager(crossoverType, p1, p2, Cr);
-	mutationManager = MutationManagerFactory::createMutationManager(mutationType, p0, F);
-
-	for (Genome* g : p0) delete g;
-	for (Genome* g : p1) delete g;	
+	mutationManager = MutationManagerFactory::createMutationManager(mutationType, p0, F, D);
 	
 	int iterations = 0;
 
@@ -131,14 +125,9 @@ void HybridAlgorithm::runSynchronous(Problem const problem, int const evalBudget
 			!coco_problem_final_target_hit(problem.PROBLEM)){
 		
 		improved = false;
-
 		for (int i = 0; i < popSize; i++){
 			double y = particles[i]->evaluate(problem.evalFunc);
 			evaluations++;
-			if (evaluations >= evalBudget || coco_problem_final_target_hit(problem.PROBLEM)){
-				reset();
-				return;
-			}
 
 			if (y < bestFitness){
 				improved = true;
@@ -148,51 +137,47 @@ void HybridAlgorithm::runSynchronous(Problem const problem, int const evalBudget
 
 		improved ? notImproved = 0 : notImproved++;
 
-		std::vector<Particle*> copy = copyPopulation(particles);
+		p1 = copyPopulation(particles);
 		
 		for (int i = 0; i < popSize; i++)
-			copy[i]->updatePbest();
-
+			p1[i]->updatePbest();
 		for (int i = 0; i < popSize; i++)
-			copy[i]->updateGbest();
-
+			p1[i]->updateGbest();
 		for (int i = 0; i < popSize; i++)
-			copy[i]->updateVelocityAndPosition(double(evaluations)/double(evalBudget));
+			p1[i]->updateVelocityAndPosition(double(evaluations)/double(evalBudget));
 
 		p0 = toGenomes(particles);
-		p1 = toGenomes(copy);
-		p2 = mutationManager->mutate();
-		p3 = crossoverManager->crossover();
-
-		for (Genome* g : p1) delete g;
-		for (Genome* g : p2) delete g;
-		for (Particle* g : copy) delete g;
+		p2 = mutationManager->mutate();	
 			
 		improved = false;
-		for (unsigned int i = 0; i < p3.size(); i++){
-			p3[i]->evaluate(problem.evalFunc);
-			evaluations++;
-			if (evaluations >= evalBudget || coco_problem_final_target_hit(problem.PROBLEM)){
-				reset();
-				for (Genome* g : p0) delete g;
-				for (Genome* g : p3) delete g;
-				return;
+		for (unsigned int i = 0; i < p2.size(); i++){
+			p1[i]->evaluate(problem.evalFunc);
+			p2[i]->evaluate(problem.evalFunc);
+			evaluations+=2;
+
+			if (p1[i]->getFitness() < p2[i]->getFitness()){
+				particles[i]->setPosition(p1[i]->getPosition(), p1[i]->getFitness());
+			} else {
+				std::vector<double> new_velocity(D);
+				subtract(p2[i]->getX(), particles[i]->getPosition(), new_velocity);
+				particles[i]->setVelocity(new_velocity);
+				particles[i]->setPosition(p2[i]->getX(), p2[i]->getFitness());								
 			}
 
-			if (p3[i]->getFitness() < particles[i]->getFitness()){
-				particles[i]->setPosition(p3[i]->getX(), p3[i]->getFitness());
-			}
-
-			if (p3[i]->getFitness() < bestFitness){
+			double minF = std::min(p1[i]->getFitness(), p2[i]->getFitness());	
+			if (minF < bestFitness){
 				improved = true;
-				bestFitness = p3[i]->getFitness();
+				bestFitness = minF;
 			}
 		}
 
 		improved ? notImproved = 0 : notImproved++;
 
-		for (Genome* g : p3) delete g;
-		for (Genome* g : p0) delete g;
+		for (int i = 0; i < popSize; i++) {
+			delete p0[i];  
+			delete p1[i]; 
+			delete p2[i];
+		}
 
 		iterations++;	
 		topologyManager->update(double(evaluations)/double(evalBudget));	

@@ -14,7 +14,7 @@ enum CrossoverType {
 class CrossoverManagerFactory {
 	public:
 		static CrossoverManager* createCrossoverManager(CrossoverType const crossoverType, 
-	std::vector<Genome*>& genomes, std::vector<Genome*>& mutants,double const Cr);
+	std::vector<Genome*>& genomes, std::vector<Genome*>& mutants,double const Cr, int const D);
 };
 
 class CrossoverManager {
@@ -23,9 +23,8 @@ class CrossoverManager {
 		std::vector<Genome*>& mutants;
 		double const Cr;
 		int const D;
-		int const popSize;
 	public:
-		CrossoverManager(std::vector<Genome*>& genomes, std::vector<Genome*>& mutants, double const Cr);
+		CrossoverManager(std::vector<Genome*>& genomes, std::vector<Genome*>& mutants, double const Cr, int const D);
 		virtual ~CrossoverManager();
 		virtual std::vector<Genome*> crossover() = 0;
 };
@@ -34,7 +33,7 @@ class BinomialCrossoverManager : public CrossoverManager {
 	private:
 
 	public:
-		BinomialCrossoverManager(std::vector<Genome*>& genomes, std::vector<Genome*>& mutants, double const Cr);
+		BinomialCrossoverManager(std::vector<Genome*>& genomes, std::vector<Genome*>& mutants, double const Cr, int const D);
 		std::vector<Genome*> crossover();
 };
 
@@ -42,6 +41,6 @@ class ExponentialCrossoverManager : public CrossoverManager {
 	private:
 
 	public:
-		ExponentialCrossoverManager(std::vector<Genome*>& genomes, std::vector<Genome*>& mutants, double const Cr);
+		ExponentialCrossoverManager(std::vector<Genome*>& genomes, std::vector<Genome*>& mutants, double const Cr, int const D);
 		std::vector<Genome*> crossover();
 };

@@ -17,7 +17,8 @@ enum MutationType {
 class MutationManager;
 class MutationManagerFactory {
 	public:
-		static MutationManager* createMutationManager(MutationType const mutationType, std::vector<Genome*>& genomes, double const F);
+		static MutationManager* createMutationManager(MutationType const mutationType, 
+			std::vector<Genome*>& genomes, double const F, int const D);
 };
 
 class MutationManager {
@@ -25,12 +26,11 @@ class MutationManager {
 		std::vector<Genome*> & genomes;
 		double const F;
 		int const D;
-		int const popSize;
 		Genome* getBest();
 		Genome* pickRandom(std::vector<Genome*>& possibilities);
 
 	public:
-		MutationManager(std::vector<Genome*>& genomes, double const F);
+		MutationManager(std::vector<Genome*>& genomes, double const F, int const D);
 		virtual ~MutationManager();
 		virtual std::vector<Genome*> mutate() = 0;
 };
@@ -39,7 +39,7 @@ class Rand1MutationManager : public MutationManager {
 	private:
 
 	public:
-		Rand1MutationManager(std::vector<Genome*>& genomes, double const F);
+		Rand1MutationManager(std::vector<Genome*>& genomes, double const F, int const D);
 		std::vector<Genome*> mutate();
 };
 
@@ -47,7 +47,7 @@ class TTB1MutationManager : public MutationManager {
 	private:
 
 	public:
-		TTB1MutationManager(std::vector<Genome*>& genomes, double const F);
+		TTB1MutationManager(std::vector<Genome*>& genomes, double const F, int const D);
 		std::vector<Genome*> mutate();
 };
 
@@ -55,7 +55,7 @@ class Best1MutationManager: public MutationManager {
 	private:
 
 	public:
-		Best1MutationManager(std::vector<Genome*>& genomes, double const F);
+		Best1MutationManager(std::vector<Genome*>& genomes, double const F, int const D);
 		std::vector<Genome*> mutate();
 };
 
@@ -63,7 +63,7 @@ class Best2MutationManager: public MutationManager {
 	private:
 
 	public:
-		Best2MutationManager(std::vector<Genome*>& genomes, double const F);
+		Best2MutationManager(std::vector<Genome*>& genomes, double const F, int const D);
 		std::vector<Genome*> mutate();
 };
 
@@ -71,7 +71,7 @@ class Rand2MutationManager: public MutationManager {
 	private:
 
 	public:
-		Rand2MutationManager(std::vector<Genome*>& genomes, double const F);
+		Rand2MutationManager(std::vector<Genome*>& genomes, double const F, int const D);
 		std::vector<Genome*> mutate();
 };
 
@@ -79,7 +79,7 @@ class Rand2DirMutationManager : public MutationManager {
 	private:
 
 	public:
-		Rand2DirMutationManager(std::vector<Genome*>& genomes, double const F);
+		Rand2DirMutationManager(std::vector<Genome*>& genomes, double const F, int const D);
 		std::vector<Genome*> mutate();
 };
 
@@ -87,7 +87,7 @@ class NSDEMutationManager : public MutationManager {
 	private:
 
 	public:
-		NSDEMutationManager(std::vector<Genome*>& genomes, double const F);
+		NSDEMutationManager(std::vector<Genome*>& genomes, double const F, int const D);
 		std::vector<Genome*> mutate();
 
 };
@@ -99,6 +99,6 @@ class TopologyMutationManager : public MutationManager {
 		double const beta;
 		std::vector<Genome*> getNeighbors(int const i) const;
 	public:
-		TopologyMutationManager(std::vector<Genome*>& genomes, double const F);
+		TopologyMutationManager(std::vector<Genome*>& genomes, double const F, int const D);
 		std::vector<Genome*> mutate();
 };

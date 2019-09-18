@@ -51,6 +51,10 @@ void Particle::setPosition(std::vector<double> position, double fitness){
 	this->x = position;
 }
 
+void Particle::setVelocity(std::vector<double> v){
+	this->v = v;
+}
+
 void Particle::addNeighbor(Particle* const neighbor){
 	neighborhood.push_back(neighbor);
 }

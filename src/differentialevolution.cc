@@ -43,8 +43,8 @@ void DifferentialEvolution::run(Problem const problem, int const evalBudget, int
 	newPopulation.reserve(popSize);
 	oldPopulation.reserve(popSize);
 
-	crossoverManager = CrossoverManagerFactory::createCrossoverManager(crossoverType, genomes, mutants, Cr);
-	mutationManager = MutationManagerFactory::createMutationManager(mutationType, genomes, F);
+	crossoverManager = CrossoverManagerFactory::createCrossoverManager(crossoverType, genomes, mutants, Cr, dimension);
+	mutationManager = MutationManagerFactory::createMutationManager(mutationType, genomes, F, dimension);
 
 	while (noImprovement < 100 && evaluations < evalBudget && !coco_problem_final_target_hit(problem.PROBLEM)){
 		improved = false;
@@ -96,7 +96,6 @@ void DifferentialEvolution::run(Problem const problem, int const evalBudget, int
 
 		genomes = newPopulation;
 		newPopulation.clear();
-
 
 		for (Genome* g : oldPopulation)
 			delete g;

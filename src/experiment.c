@@ -75,8 +75,17 @@ int main(void) {
   ParticleSwarm ps(INERTIA_WEIGHT, VON_NEUMANN, SYNCHRONOUS);
   experimentPSO(ps);
 
-  HybridAlgorithm ha(INERTIA_WEIGHT, VON_NEUMANN, SYNCHRONOUS, BEST_1, BINOMIAL);
-  experimentHybrid(ha);
+  HybridAlgorithm ha1(FIPS, VON_NEUMANN, SYNCHRONOUS, BEST_1, BINOMIAL);
+  experimentHybrid(ha1);
+
+  // HybridAlgorithm ha2(FIPS, VON_NEUMANN, ASYNCHRONOUS, BEST_1, BINOMIAL);
+  // experimentHybrid(ha2);
+
+  // HybridAlgorithm ha3(DECR_INERTIA_WEIGHT, GBEST, ASYNCHRONOUS, RAND_1, BINOMIAL);
+  // experimentHybrid(ha3);
+
+  // HybridAlgorithm ha4(INERTIA_WEIGHT, WHEEL, SYNCHRONOUS, BEST_2, BINOMIAL);
+  // experimentHybrid(ha4);
 
   /* PSO suite experiment example */
   // ParticleSwarmSuite suite;
@@ -105,7 +114,7 @@ void experimentHybrid(HybridAlgorithm ha) {
                    "algorithm_name: %s "
                    "", ha.getIdString().c_str(), ha.getIdString().c_str());
 
-  suite = coco_suite("bbob", "instances: 1,1,1,1,1", "dimensions: 5");
+  suite = coco_suite("bbob", "", "dimensions: 5");
   observer = coco_observer("bbob", observer_options);
   coco_free_memory(observer_options);
 
@@ -162,7 +171,7 @@ void experimentDE(DifferentialEvolution de) {
                    "algorithm_name: %s "
                    "", de.getIdString().c_str(), de.getIdString().c_str());
 
-  suite = coco_suite("bbob", "instances: 1,1,1,1,1", "dimensions: 5");
+  suite = coco_suite("bbob", "", "dimensions: 5");
   observer = coco_observer("bbob", observer_options);
   coco_free_memory(observer_options);
 
@@ -220,7 +229,7 @@ void experimentPSO(ParticleSwarm ps) {
                    "algorithm_name: %s "
                    "", ps.getIdString().c_str(), ps.getIdString().c_str());
 
-  suite = coco_suite("bbob", "instances: 1,1,1,1,1", "dimensions: 5");
+  suite = coco_suite("bbob", "", "dimensions: 5");
   observer = coco_observer("bbob", observer_options);
   coco_free_memory(observer_options);
 

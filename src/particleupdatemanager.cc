@@ -22,10 +22,12 @@ ParticleUpdateManager::~ParticleUpdateManager(){
 
 void ParticleUpdateManager::applyVMax(){
 	for (int i = 0; i < D; i++){
-		if (v[i] > vMax[i])
+		if (v[i] > vMax[i]){
 			v[i] = vMax[i];
-		else if (v[i] < -vMax[i])
+		}
+		else if (v[i] < -vMax[i]){
 			v[i] = -vMax[i];
+		} 
 	}
 }
 
@@ -103,7 +105,7 @@ void InertiaWeightManager::update(double progress) {
 	randomMult(gMinx, 0, phi2);	
 	multiply(v, w);
 	add(v,pMinx, v);
-	add(v,gMinx,v);
+	add(v,gMinx, v);
 
 	if (useVMax)
 		applyVMax();

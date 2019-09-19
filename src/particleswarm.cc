@@ -42,7 +42,8 @@ void ParticleSwarm::run(Problem const problem, int const evalBudget, int popSize
 		runAsynchronous(problem, evalBudget, popSize, particleUpdateParams);
 }
 
-void ParticleSwarm::runAsynchronous(Problem const problem, int const evalBudget, int popSize, std::map<int,double> particleUpdateParams){
+void ParticleSwarm::runAsynchronous(Problem const problem, int const evalBudget, 
+	int popSize, std::map<int,double> particleUpdateParams){
 	this->topologyManager = TopologyManagerFactory::createTopologyManager(topologyManagerType, particles);
 	popSize = this->topologyManager->getClosestValidPopulationSize(popSize);
 
@@ -80,8 +81,8 @@ void ParticleSwarm::runAsynchronous(Problem const problem, int const evalBudget,
 			notImproved < 100 && 
 			evaluations <= evalBudget &&
 			!coco_problem_final_target_hit(problem.PROBLEM)){
+		
 		improved = false;
-
 
 		for (int i = 0; i < popSize; i++){
 			std::vector<double> position = particles[i]->getPosition();			

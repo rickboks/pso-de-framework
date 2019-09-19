@@ -245,6 +245,7 @@ void HybridAlgorithm::runAsynchronous(Problem const problem, int const evalBudge
 			!coco_problem_final_target_hit(problem.PROBLEM)){
 		
 		improved = false;
+		p1 = copyPopulation(particles);
 		for (int i = 0; i < popSize; i++){
 			double y = particles[i]->evaluate(problem.evalFunc);
 			evaluations++;
@@ -260,9 +261,6 @@ void HybridAlgorithm::runAsynchronous(Problem const problem, int const evalBudge
 		}
 
 		improved ? notImproved = 0 : notImproved++;
-
-		p1 = copyPopulation(particles);
-		
 
 
 		p0 = toGenomes(particles);
@@ -405,6 +403,13 @@ std::string HybridAlgorithm::getIdString() const{
 		default:
 			id += "ERR";
 			break;
+	}
+
+	id += "_";
+	if (synchronicity == SYNCHRONOUS){
+		id += "S";
+	} else {
+		id += "A";
 	}
 
 	return id;

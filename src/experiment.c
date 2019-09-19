@@ -75,8 +75,8 @@ int main(void) {
   ParticleSwarm ps(INERTIA_WEIGHT, VON_NEUMANN, SYNCHRONOUS);
   experimentPSO(ps);
 
-  HybridAlgorithm ha1(FIPS, VON_NEUMANN, SYNCHRONOUS, BEST_1, BINOMIAL);
-  experimentHybrid(ha1);
+  // HybridAlgorithm ha1(FIPS, VON_NEUMANN, SYNCHRONOUS, BEST_1, BINOMIAL);
+  // experimentHybrid(ha1);
 
   // HybridAlgorithm ha2(FIPS, VON_NEUMANN, ASYNCHRONOUS, BEST_1, BINOMIAL);
   // experimentHybrid(ha2);

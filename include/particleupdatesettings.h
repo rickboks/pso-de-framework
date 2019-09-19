@@ -1,5 +1,6 @@
 #pragma once
 #include <map>
+#include <cstdlib>
 #include <vector>
 #include "particleupdatemanager.h"
 #include <iostream>
@@ -48,8 +49,9 @@ struct ParticleUpdateSettings {
 
 	void initVMax(){
 		vMax.reserve(xMin.size());
-		for (int i = 0; i < (int)xMin.size(); i++)
-			vMax.push_back(xMax[i] - xMin[i]);
+		for (int i = 0; i < (int)xMin.size(); i++){
+			vMax.push_back(xMax[i] + fabs(xMin[i]));
+		}
 	}
 
 	UpdateManagerType managerType;

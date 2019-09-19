@@ -10,9 +10,9 @@ OBJ = $(SRC:$(SRC_DIR)/%.cc=$(OBJ_DIR)/%.o)
 INC = -I $(INC_DIR)/
 
 CC      = g++
-CFLAGS  = -Wall -std=c++14 -g
+CFLAGS  = -Wall -std=c++14 -g -O2
 
-COCOFLAGS = -g -ggdb -std=c89 -pedantic -Wall -Wextra -Wstrict-prototypes -Wshadow -Wno-sign-compare -Wconversion
+COCOFLAGS = -g -ggdb -std=c89 -pedantic -Wall -Wextra -Wstrict-prototypes -Wshadow -Wno-sign-compare -Wconversion -O2
 
 .PHONY: all
 all: $(EXE)

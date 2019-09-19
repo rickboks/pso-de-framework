@@ -51,7 +51,7 @@ void DEInitializer::initOpposition(std::vector<Genome*>& genomes) const {
 	opposite.reserve(random.size());
 
 	for (Genome* g : random) {
-		std::vector<double> x = g->getX();
+		std::vector<double> x = g->getPosition();
 		for (int i = 0; i < D; i++){
 			x[i] = problem.smallestValues[i] + problem.largestValues[i] - x[i];
 		}

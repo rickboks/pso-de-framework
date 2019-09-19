@@ -31,11 +31,11 @@ double Genome::getFitness() const {
 	return fitness;
 }
 
-std::vector<double> Genome::getX() const {
+std::vector<double> Genome::getPosition() const {
 	return x;
 }
 
-void Genome::setX(std::vector<double> const x){
+void Genome::setPosition(std::vector<double> const x){
 	this->x = x;
 }
 

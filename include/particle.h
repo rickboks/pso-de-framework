@@ -22,12 +22,12 @@ class Particle {
 		std::vector<double> const vMax;
 		bool evaluated;
 	public:
-
 		Particle(int const D, ParticleUpdateSettings& particleUpdateSettings);
 		Particle(const Particle& other);
 		~Particle();
 		void randomize(std::vector<double> lowerBounds, std::vector<double> upperBounds);
 		std::vector<double> getPosition() const;
+		std::vector<double> getVelocity() const;
 		void setPosition(std::vector<double> position, double fitness);
 		void setVelocity(std::vector<double> v);
 		void addNeighbor(Particle* const neighbor);

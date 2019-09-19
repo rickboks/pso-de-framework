@@ -46,7 +46,10 @@ void DifferentialEvolution::run(Problem const problem, int const evalBudget, int
 	crossoverManager = CrossoverManagerFactory::createCrossoverManager(crossoverType, genomes, mutants, Cr, dimension);
 	mutationManager = MutationManagerFactory::createMutationManager(mutationType, genomes, F, dimension);
 
-	while (noImprovement < 100 && evaluations < evalBudget && !coco_problem_final_target_hit(problem.PROBLEM)){
+	while (
+		noImprovement < 100 && 
+		evaluations < evalBudget && 
+		!coco_problem_final_target_hit(problem.PROBLEM)){
 		improved = false;
 		
 		mutants = mutationManager->mutate();
@@ -106,6 +109,7 @@ void DifferentialEvolution::run(Problem const problem, int const evalBudget, int
 			oppositionGenerationJump(problem);
 
 		improved ? noImprovement=0 : noImprovement++;		
+
 	}
 
 	for (Genome* d : genomes)
@@ -212,7 +216,7 @@ void DifferentialEvolution::oppositionGenerationJump(Problem const problem){
 	std::vector<double> maxValues(dimension, -std::numeric_limits<double>::max());
 
 	for (Genome* genome: genomes){
-		std::vector<double> x = genome->getX();
+		std::vector<double> x = genome->getPosition();
 
 		for (int i = 0; i < dimension; i++){
 			if (x[i] < minValues[i])
@@ -226,7 +230,7 @@ void DifferentialEvolution::oppositionGenerationJump(Problem const problem){
 	combined.reserve(popSize * 2);
 
 	for (Genome* g : genomes) {
-		std::vector<double> x = g->getX();
+		std::vector<double> x = g->getPosition();
 		for (int i = 0; i < dimension; i++){
 			x[i] = minValues[i] + maxValues[i] - x[i];
 		}

@@ -76,7 +76,8 @@ void ParticleSwarm::runAsynchronous(Problem const problem, int const evalBudget,
 	bool improved;
 	int evaluations = 0;
 
-	while (	notImproved < 100 && 
+	while (	
+			notImproved < 100 && 
 			evaluations <= evalBudget &&
 			!coco_problem_final_target_hit(problem.PROBLEM)){
 		improved = false;
@@ -148,7 +149,7 @@ void ParticleSwarm::runSynchronous(Problem const problem, int const evalBudget, 
 	int evaluations = 0;
 
 	while (	notImproved < 100 && 
-			evaluations <= evalBudget &&
+			// evaluations <= evalBudget &&
 			!coco_problem_final_target_hit(problem.PROBLEM)){
 		
 		improved = false;

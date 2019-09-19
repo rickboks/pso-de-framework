@@ -41,9 +41,9 @@ std::vector<Genome*> BinomialCrossoverManager::crossover() {
 	donors.reserve(genomes.size());
 	std::vector<double> x(D);
 
-	for (int i = 0; i < genomes.size(); i++){
-		std::vector<double> mutantX = mutants[i]->getX();
-		std::vector<double> parentX = genomes[i]->getX();
+	for (unsigned int i = 0; i < genomes.size(); i++){
+		std::vector<double> mutantX = mutants[i]->getPosition();
+		std::vector<double> parentX = genomes[i]->getPosition();
 		int const jrand = rng.randInt(0,D-1);
 		for (int j = 0; j < D; j++){
 			if (j == jrand || rng.randDouble(0,1) < Cr){
@@ -54,7 +54,7 @@ std::vector<Genome*> BinomialCrossoverManager::crossover() {
 		}
 
 		Genome* donor = new Genome(D);
-		donor->setX(x);
+		donor->setPosition(x);
 		donors.push_back(donor);
 	}
 
@@ -73,9 +73,9 @@ std::vector<Genome*> ExponentialCrossoverManager::crossover() {
 	donors.reserve(genomes.size());
 	std::vector<double> x(D);
 
-	for (int i = 0; i < genomes.size(); i++){
-		std::vector<double> mutantX = mutants[i]->getX();
-		std::vector<double> parentX = genomes[i]->getX();
+	for (unsigned int i = 0; i < genomes.size(); i++){
+		std::vector<double> mutantX = mutants[i]->getPosition();
+		std::vector<double> parentX = genomes[i]->getPosition();
 		std::vector<int> mutantIndices;
 		int const n = rng.randInt(0,D-1);
 
@@ -98,7 +98,7 @@ std::vector<Genome*> ExponentialCrossoverManager::crossover() {
 		}
 
 		Genome* donor = new Genome(D);
-		donor->setX(x);
+		donor->setPosition(x);
 		donors.push_back(donor);
 	}
 

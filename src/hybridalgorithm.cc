@@ -13,6 +13,15 @@
 constexpr double DOUBLE_MIN = std::numeric_limits<double>::min();
 constexpr double DOUBLE_MAX = std::numeric_limits<double>::max();
 
+void printVector(std::vector<double> v){
+	std::cout << "{";
+	for (unsigned int i = 0; i < v.size() -1; i++){
+		std::cout << v[i] << " ";
+	}
+
+	std::cout << v[v.size() -1] << "}" << std::endl;
+}
+
 HybridAlgorithm::HybridAlgorithm(UpdateManagerType const updateManagerType, 
 			Topology topologyManagerType, Synchronicity const synchronicity, MutationType const mutationType, 
 			CrossoverType const crossoverType):
@@ -71,7 +80,7 @@ void HybridAlgorithm::run(Problem const problem, int const evalBudget, int popSi
 	if (synchronicity == SYNCHRONOUS)
 		runSynchronous(problem, evalBudget, popSize, particleUpdateParams, F, Cr);
 	else if (synchronicity == ASYNCHRONOUS){
-		throw std::invalid_argument("Error: Asynchronous updates not implemented in HybridAlgorithm");
+		runAsynchronous(problem, evalBudget, popSize, particleUpdateParams, F, Cr);
 	}
 
 }
@@ -110,7 +119,6 @@ void HybridAlgorithm::runSynchronous(Problem const problem, int const evalBudget
 		p->updateGbest();
 
 	topologyManager->initialize();
-
 	mutationManager = MutationManagerFactory::createMutationManager(mutationType, p0, F, D);
 	
 	int iterations = 0;
@@ -119,8 +127,9 @@ void HybridAlgorithm::runSynchronous(Problem const problem, int const evalBudget
 	int notImproved = 0;
 	bool improved;
 	int evaluations = 0;
-	//Main loop
-	while (	notImproved < 100 && 
+
+	while (	
+			notImproved < 100 && 
 			evaluations <= evalBudget &&
 			!coco_problem_final_target_hit(problem.PROBLEM)){
 		
@@ -157,11 +166,123 @@ void HybridAlgorithm::runSynchronous(Problem const problem, int const evalBudget
 
 			if (p1[i]->getFitness() < p2[i]->getFitness()){
 				particles[i]->setPosition(p1[i]->getPosition(), p1[i]->getFitness());
+				particles[i]->setVelocity(p1[i]->getVelocity());
 			} else {
 				std::vector<double> new_velocity(D);
-				subtract(p2[i]->getX(), particles[i]->getPosition(), new_velocity);
+				//reverse engineer velocity
+				subtract(p2[i]->getPosition(), particles[i]->getPosition(), new_velocity);
 				particles[i]->setVelocity(new_velocity);
-				particles[i]->setPosition(p2[i]->getX(), p2[i]->getFitness());								
+				particles[i]->setPosition(p2[i]->getPosition(), p2[i]->getFitness());								
+			}
+
+			double minF = std::min(p1[i]->getFitness(), p2[i]->getFitness());	
+			if (minF < bestFitness){
+				improved = true;
+				bestFitness = minF;
+			}
+		}
+
+		improved ? notImproved = 0 : notImproved++;
+
+		for (int i = 0; i < popSize; i++) {
+			delete p0[i];  
+			delete p1[i]; 
+			delete p2[i];
+		}
+
+		iterations++;	
+		topologyManager->update(double(evaluations)/double(evalBudget));	
+	}
+
+	reset();
+}
+
+void HybridAlgorithm::runAsynchronous(Problem const problem, int const evalBudget, int popSize, std::map<int,double> particleUpdateParams,
+	double const F, double const Cr){
+
+	std::vector<Genome*> p0;
+	std::vector<Particle*> p1;
+	std::vector<Genome*> p2;
+	std::vector<Genome*> p3;
+		
+	topologyManager = TopologyManagerFactory::createTopologyManager(topologyManagerType, particles);
+	popSize = topologyManager->getClosestValidPopulationSize(popSize);	
+
+	int const D = coco_problem_get_dimension(problem.PROBLEM);
+	double const* smallest = coco_problem_get_smallest_values_of_interest(problem.PROBLEM);
+	double const* largest = coco_problem_get_largest_values_of_interest(problem.PROBLEM);
+
+	ParticleUpdateSettings settings(updateManagerType, particleUpdateParams, 
+				std::vector<double>(smallest, smallest + D), 
+				std::vector<double>(largest, largest + D));
+
+	double maxResV = 0;
+	for (double d : settings.vMax)
+		maxResV += d*d;
+
+	maxResV = sqrt(maxResV);
+
+	for (int i = 0; i < popSize; i++)
+		particles.push_back(new Particle(coco_problem_get_dimension(problem.PROBLEM), settings));
+
+	for (Particle* const p : particles)
+		p->randomize(settings.xMax, settings.xMin);
+	for (Particle* const p : particles)
+		p->updateGbest();
+
+	topologyManager->initialize();
+	mutationManager = MutationManagerFactory::createMutationManager(mutationType, p0, F, D);
+	
+	int iterations = 0;
+
+	double bestFitness = DOUBLE_MAX;
+	int notImproved = 0;
+	bool improved;
+	int evaluations = 0;
+
+	while (	notImproved < 100 && 
+			evaluations <= evalBudget &&
+			!coco_problem_final_target_hit(problem.PROBLEM)){
+		
+		improved = false;
+		for (int i = 0; i < popSize; i++){
+			double y = particles[i]->evaluate(problem.evalFunc);
+			evaluations++;
+
+			if (y < bestFitness){
+				improved = true;
+				bestFitness = y;
+			}
+
+			p1[i]->updatePbest();
+			p1[i]->updateGbest();			
+			p1[i]->updateVelocityAndPosition(double(evaluations)/double(evalBudget));
+		}
+
+		improved ? notImproved = 0 : notImproved++;
+
+		p1 = copyPopulation(particles);
+		
+
+
+		p0 = toGenomes(particles);
+		p2 = mutationManager->mutate();	
+			
+		improved = false;
+		for (unsigned int i = 0; i < p2.size(); i++){
+			p1[i]->evaluate(problem.evalFunc);
+			p2[i]->evaluate(problem.evalFunc);
+			evaluations+=2;
+
+			if (p1[i]->getFitness() < p2[i]->getFitness()){
+				particles[i]->setPosition(p1[i]->getPosition(), p1[i]->getFitness());
+				particles[i]->setVelocity(p1[i]->getVelocity());
+			} else {
+				std::vector<double> new_velocity(D);
+				//reverse engineer velocity
+				subtract(p2[i]->getPosition(), particles[i]->getPosition(), new_velocity);
+				particles[i]->setVelocity(new_velocity);
+				particles[i]->setPosition(p2[i]->getPosition(), p2[i]->getFitness());								
 			}
 
 			double minF = std::min(p1[i]->getFitness(), p2[i]->getFitness());	

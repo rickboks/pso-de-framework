@@ -45,6 +45,10 @@ std::vector<double> Particle::getPosition() const {
 	return x;
 }
 
+std::vector<double> Particle::getVelocity() const {
+	return v;
+}
+
 void Particle::setPosition(std::vector<double> position, double fitness){
 	evaluated = true;
 	this->fitness = fitness;

@@ -21,6 +21,10 @@ class HybridAlgorithm {
 		void runSynchronous(Problem const problem, int const evalBudget, int const popSize, std::map<int,double> particleUpdateParams,
 			double const F, double const Cr);
 
+		void runAsynchronous(Problem const problem, int const evalBudget, int const popSize, std::map<int,double> particleUpdateParams,
+			double const F, double const Cr);
+
+
 		public:
 		HybridAlgorithm(UpdateManagerType const updateManagerType, 
 			Topology topologyManager, Synchronicity const synchronous, MutationType const mutationType, CrossoverType const crossoverType);

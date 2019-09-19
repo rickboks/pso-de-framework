@@ -18,8 +18,8 @@ class Genome {
 		Genome(std::vector<double>x);
 		Genome(double const Cr, CrossoverType const crossoverType, Genome const* parent, Genome const* mutant);
 		void randomize(std::vector<double> lowerBounds, std::vector<double> upperBounds);
-		std::vector<double> getX() const;
-		void setX(std::vector<double> const x);
+		std::vector<double> getPosition() const;
+		void setPosition(std::vector<double> const x);
 		void print() const;
 		int getDimension() const;
 		double getFitness() const;

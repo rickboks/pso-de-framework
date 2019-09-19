@@ -46,7 +46,7 @@ Genome* MutationManager::getBest(){
 	int best = 0;
 	double bestF = std::numeric_limits<double>::max();
 
-	for (int i = 0; i < genomes.size(); i++){
+	for (unsigned int i = 0; i < genomes.size(); i++){
 		double const score = genomes[i]->getFitness();
 		if (score < bestF){
 			bestF = score;
@@ -74,16 +74,16 @@ std::vector<Genome*> Rand1MutationManager::mutate(){
 	std::vector<Genome*> mutants;
 	mutants.reserve(genomes.size());
 
-	for (int i = 0; i < genomes.size(); i++){
+	for (unsigned int i = 0; i < genomes.size(); i++){
 		std::vector<Genome*> possibilities = genomes;
 
 		auto position = std::find(possibilities.begin(), possibilities.end(), genomes[i]);
 		if (position != possibilities.end())
 		    possibilities.erase(position);
 
-		std::vector<double> xr0 = pickRandom(possibilities)->getX();
-		std::vector<double> xr1 = pickRandom(possibilities)->getX();
-		std::vector<double> xr2 = pickRandom(possibilities)->getX();
+		std::vector<double> xr0 = pickRandom(possibilities)->getPosition();
+		std::vector<double> xr1 = pickRandom(possibilities)->getPosition();
+		std::vector<double> xr2 = pickRandom(possibilities)->getPosition();
 
 		Genome* mutant = new Genome(D);
 
@@ -93,7 +93,7 @@ std::vector<Genome*> Rand1MutationManager::mutate(){
 		multiply(subtraction, F);
 		add(x,subtraction, x);
 
-		mutant->setX(x);
+		mutant->setPosition(x);
 		mutants.push_back(mutant);		
 	}
 	return mutants;
@@ -106,32 +106,32 @@ TTB1MutationManager::TTB1MutationManager(std::vector<Genome*>& genomes, double c
 }
 
 std::vector<Genome*> TTB1MutationManager::mutate(){
-	std::vector<double> best = getBest()->getX(); 
+	std::vector<double> best = getBest()->getPosition(); 
 	std::vector<Genome*> mutants;
 	mutants.reserve(genomes.size());
 
-	for (int i = 0; i < genomes.size(); i++){
+	for (unsigned int i = 0; i < genomes.size(); i++){
 		std::vector<Genome*> possibilities = genomes;
 
 		auto position = std::find(possibilities.begin(), possibilities.end(), genomes[i]);
 		if (position != possibilities.end())
 		    possibilities.erase(position);
 
-		std::vector<double> mutant = genomes[i]->getX();
+		std::vector<double> mutant = genomes[i]->getPosition();
 		std::vector<double> subtraction(D);
-		subtract(best, genomes[i]->getX(), subtraction);
+		subtract(best, genomes[i]->getPosition(), subtraction);
 		multiply(subtraction, F);
 		add(mutant, subtraction, mutant);
 
-		std::vector<double> xr0 = pickRandom(possibilities)->getX();
-		std::vector<double> xr1 = pickRandom(possibilities)->getX();
+		std::vector<double> xr0 = pickRandom(possibilities)->getPosition();
+		std::vector<double> xr1 = pickRandom(possibilities)->getPosition();
 
 		subtract(xr0, xr1, subtraction);
 		multiply(subtraction,F);
 		add(mutant, subtraction, mutant);
 
 		Genome* m = new Genome(D);
-		m->setX(mutant);
+		m->setPosition(mutant);
 
 		mutants.push_back(m);
 	}
@@ -149,9 +149,9 @@ Best1MutationManager::Best1MutationManager(std::vector<Genome*>& genomes, double
 std::vector<Genome*> Best1MutationManager::mutate(){
 	std::vector<Genome*> mutants;
 	mutants.reserve(genomes.size());
-	std::vector<double> best = getBest()->getX();
+	std::vector<double> best = getBest()->getPosition();
 
-	for (int i = 0; i < genomes.size(); i++){
+	for (unsigned int i = 0; i < genomes.size(); i++){
 		std::vector<Genome*> possibilities = genomes;
 
 		auto position = std::find(possibilities.begin(), possibilities.end(), genomes[i]);
@@ -161,15 +161,15 @@ std::vector<Genome*> Best1MutationManager::mutate(){
 		std::vector<double> mutant = best;
 		std::vector<double> subtraction(D);
 
-		std::vector<double> xr0 = pickRandom(possibilities)->getX();
-		std::vector<double> xr1 = pickRandom(possibilities)->getX();
+		std::vector<double> xr0 = pickRandom(possibilities)->getPosition();
+		std::vector<double> xr1 = pickRandom(possibilities)->getPosition();
 
 		subtract(xr0, xr1, subtraction);
 		multiply(subtraction,F);
 		add(mutant, subtraction, mutant);
 
 		Genome* m = new Genome(D);
-		m->setX(mutant);
+		m->setPosition(mutant);
 
 		mutants.push_back(m);
 	}
@@ -185,11 +185,11 @@ Best2MutationManager::Best2MutationManager(std::vector<Genome*>& genomes, double
 }
 
 std::vector<Genome*> Best2MutationManager::mutate(){
-	std::vector<double> best = getBest()->getX(); 
+	std::vector<double> best = getBest()->getPosition(); 
 	std::vector<Genome*> mutants;
 	mutants.reserve(genomes.size());
 
-	for (int i = 0; i < genomes.size(); i++){
+	for (unsigned int i = 0; i < genomes.size(); i++){
 		std::vector<Genome*> possibilities = genomes;
 
 		auto position = std::find(possibilities.begin(), possibilities.end(), genomes[i]);
@@ -199,10 +199,10 @@ std::vector<Genome*> Best2MutationManager::mutate(){
 		std::vector<double> mutant = best;
 		std::vector<double> subtraction(D);
 
-		std::vector<double> xr0 = pickRandom(possibilities)->getX();
-		std::vector<double> xr1 = pickRandom(possibilities)->getX();
-		std::vector<double> xr2 = pickRandom(possibilities)->getX();
-		std::vector<double> xr3 = pickRandom(possibilities)->getX();
+		std::vector<double> xr0 = pickRandom(possibilities)->getPosition();
+		std::vector<double> xr1 = pickRandom(possibilities)->getPosition();
+		std::vector<double> xr2 = pickRandom(possibilities)->getPosition();
+		std::vector<double> xr3 = pickRandom(possibilities)->getPosition();
 		subtract(xr0, xr1, subtraction);
 		multiply(subtraction, F);
 		add(mutant, subtraction, mutant);
@@ -211,7 +211,7 @@ std::vector<Genome*> Best2MutationManager::mutate(){
 		add(mutant, subtraction, mutant);
 
 		Genome* m = new Genome(D);
-		m->setX(mutant);
+		m->setPosition(mutant);
 
 		mutants.push_back(m);
 	}
@@ -229,18 +229,18 @@ std::vector<Genome*> Rand2MutationManager::mutate(){
 	std::vector<Genome*> mutants;
 	mutants.reserve(genomes.size());
 
-	for (int i = 0; i < genomes.size(); i++){
+	for (unsigned int i = 0; i < genomes.size(); i++){
 		std::vector<Genome*> possibilities = genomes;
 
 		auto position = std::find(possibilities.begin(), possibilities.end(), genomes[i]);
 		if (position != possibilities.end())
 		    possibilities.erase(position);		
 
-		std::vector<double> xr0 = pickRandom(possibilities)->getX();
-		std::vector<double> xr1 = pickRandom(possibilities)->getX();
-		std::vector<double> xr2 = pickRandom(possibilities)->getX();
-		std::vector<double> xr3 = pickRandom(possibilities)->getX();
-		std::vector<double> xr4 = pickRandom(possibilities)->getX();
+		std::vector<double> xr0 = pickRandom(possibilities)->getPosition();
+		std::vector<double> xr1 = pickRandom(possibilities)->getPosition();
+		std::vector<double> xr2 = pickRandom(possibilities)->getPosition();
+		std::vector<double> xr3 = pickRandom(possibilities)->getPosition();
+		std::vector<double> xr4 = pickRandom(possibilities)->getPosition();
 
 		std::vector<double> mutant = xr4;
 		std::vector<double> subtraction(D);
@@ -252,7 +252,7 @@ std::vector<Genome*> Rand2MutationManager::mutate(){
 		add(mutant, subtraction, mutant);
 
 		Genome* m = new Genome(D);
-		m->setX(mutant);
+		m->setPosition(mutant);
 
 		mutants.push_back(m);
 	}
@@ -270,7 +270,7 @@ std::vector<Genome*> Rand2DirMutationManager::mutate(){
 	std::vector<Genome*> mutants;
 	mutants.reserve(genomes.size());
 
-	for (int i = 0; i < genomes.size(); i++){
+	for (unsigned int i = 0; i < genomes.size(); i++){
 		std::vector<Genome*> possibilities = genomes;
 
 		auto position = std::find(possibilities.begin(), possibilities.end(), genomes[i]);
@@ -285,19 +285,19 @@ std::vector<Genome*> Rand2DirMutationManager::mutate(){
 		std::vector<double> xr0, xr1, xr2, xr3;
 
 		if (r0->getFitness() < r1->getFitness()){
-			xr0 = r0->getX();
-			xr1 = r1->getX();
+			xr0 = r0->getPosition();
+			xr1 = r1->getPosition();
 		} else {
-			xr0 = r1->getX();
-			xr1 = r0->getX();
+			xr0 = r1->getPosition();
+			xr1 = r0->getPosition();
 		}
 
 		if (r2->getFitness() < r3->getFitness()){
-			xr2 = r2->getX();
-			xr3 = r3->getX();
+			xr2 = r2->getPosition();
+			xr3 = r3->getPosition();
 		} else {
-			xr2 = r3->getX();
-			xr3 = r2->getX();
+			xr2 = r3->getPosition();
+			xr3 = r2->getPosition();
 		}
 
 		std::vector<double> mutant = xr0;
@@ -309,7 +309,7 @@ std::vector<Genome*> Rand2DirMutationManager::mutate(){
 		add(mutant, subtraction, mutant);
 
 		Genome* m = new Genome(D);
-		m->setX(mutant);
+		m->setPosition(mutant);
 
 		mutants.push_back(m);
 	}
@@ -328,16 +328,16 @@ std::vector<Genome*> NSDEMutationManager::mutate(){
 	std::vector<Genome*> mutants;
 	mutants.reserve(genomes.size());
 
-	for (int i = 0; i < genomes.size(); i++){
+	for (unsigned int i = 0; i < genomes.size(); i++){
 		std::vector<Genome*> possibilities = genomes;
 
 		auto position = std::find(possibilities.begin(), possibilities.end(), genomes[i]);
 		if (position != possibilities.end())
 		    possibilities.erase(position);
 
-		std::vector<double> mutant = pickRandom(possibilities)->getX();
-		std::vector<double> xr1 = pickRandom(possibilities)->getX();
-		std::vector<double> xr2 = pickRandom(possibilities)->getX();
+		std::vector<double> mutant = pickRandom(possibilities)->getPosition();
+		std::vector<double> xr1 = pickRandom(possibilities)->getPosition();
+		std::vector<double> xr2 = pickRandom(possibilities)->getPosition();
 
 		std::vector<double> subtraction(D);
 		subtract(xr1, xr2, subtraction);
@@ -354,7 +354,7 @@ std::vector<Genome*> NSDEMutationManager::mutate(){
 		add(mutant, subtraction, mutant);
 
 		Genome* m = new Genome(D);
-		m->setX(mutant);
+		m->setPosition(mutant);
 
 		mutants.push_back(m);
 	}
@@ -394,9 +394,9 @@ std::vector<Genome*> TopologyMutationManager::mutate(){
 	mutants.reserve(genomes.size());
 
 	Genome* best = getBest();
-	std::vector<double> bestX = best->getX();
+	std::vector<double> bestX = best->getPosition();
 
-	for (int i = 0; i < (int)genomes.size(); i++){
+	for (unsigned int i = 0; i < genomes.size(); i++){
 		std::vector<Genome*> neighbors = getNeighbors(i);
 
 		double bestF = std::numeric_limits<double>::max();
@@ -405,17 +405,17 @@ std::vector<Genome*> TopologyMutationManager::mutate(){
 		for (Genome* g : neighbors){
 			if (g->getFitness() < bestF){
 				bestF = g->getFitness();
-				bestNeighbor = g->getX();
+				bestNeighbor = g->getPosition();
 			}
 		}
 
 		// LOCAL VECTOR CREATION
-		std::vector<double> xr0 = pickRandom(neighbors)->getX();
-		std::vector<double> xr1 = pickRandom(neighbors)->getX();
+		std::vector<double> xr0 = pickRandom(neighbors)->getPosition();
+		std::vector<double> xr1 = pickRandom(neighbors)->getPosition();
 
-		std::vector<double> localVector = genomes[i]->getX();
+		std::vector<double> localVector = genomes[i]->getPosition();
 		std::vector<double> subtraction(D);
-		subtract(bestNeighbor, genomes[i]->getX(), subtraction);
+		subtract(bestNeighbor, genomes[i]->getPosition(), subtraction);
 		multiply(subtraction, alpha);
 		add(subtraction, localVector, localVector);
 		subtract(xr0, xr1, subtraction);
@@ -425,13 +425,13 @@ std::vector<Genome*> TopologyMutationManager::mutate(){
 
 		// GLOBAL VECTOR CREATION
 
-		std::vector<double> globalVector = genomes[i]->getX();
+		std::vector<double> globalVector = genomes[i]->getPosition();
 		std::vector<Genome*> possibilities = genomes;
 		possibilities.erase(std::find(possibilities.begin(), possibilities.end(), genomes[i]));
 
-		xr0 = pickRandom(possibilities)->getX();
-		xr1 = pickRandom(possibilities)->getX();
-		subtract(bestX, genomes[i]->getX(), subtraction);
+		xr0 = pickRandom(possibilities)->getPosition();
+		xr1 = pickRandom(possibilities)->getPosition();
+		subtract(bestX, genomes[i]->getPosition(), subtraction);
 		multiply(subtraction, alpha);
 		add(subtraction, globalVector, globalVector);
 		subtract(xr0, xr1, subtraction);

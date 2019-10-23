@@ -46,7 +46,7 @@ void experimentPSO(ParticleSwarm swarm, std::map<int,double> updateSettings);
 
 void experimentDE(DifferentialEvolution de);
 
-void experimentHybrid(HybridAlgorithm hybrid, std::map<int,double> updateSettings);
+void experimentHybrid(HybridAlgorithm hybrid, double Cr, double F);
 
 static const long INDEPENDENT_RESTARTS = 1e5;
 static const unsigned int BUDGET_MULTIPLIER = 1e4;
@@ -70,13 +70,14 @@ static void timing_data_finalize(timing_data_t *timing_data);
 
 int main(int argc, char **argv) {
 	/*Example MPI experiments*/
-	std::map<int,double> updateSettings;
+	//std::map<int,double> updateSettings;
 	//Add settings like this
   	//updateSettings[S_INER_W] = 0.8;
 
+  	HybridAlgorithm ha1(FIPS, MULTI_SWARM, ASYNCHRONOUS, BEST_1, BINOMIAL, P3);
+  	//experimentHybrid(ha1);
 
-	ParticleSwarmSuite s;
-	s.setUpdateManagers(std::vector<UpdateManagerType>({INERTIA_WEIGHT, DECR_INERTIA_WEIGHT, BARE_BONES, FIPS}));
+	std::vector<double> Fs({0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9});
 
 	coco_set_log_level("warning");	
 	int id;
@@ -86,14 +87,30 @@ int main(int argc, char **argv) {
 	if (id == 0)
 		coco_set_log_level("info");
 
-	if (id < s.size()){
-		ParticleSwarm pso = s.getParticleSwarm(id);
-		experimentPSO(pso, updateSettings);
-	} else {
-		std::cout << "Error: suite does not contain " << id << std::endl;
-	}
+	experimentHybrid(ha1, Fs[id%10] , Fs[int(id/10)]);
+
 	MPI_Finalize();
 
+
+  	// coco_set_log_level("warning");	
+	// int id;
+	// MPI_Init(&argc, &argv);
+	// MPI_Comm_rank(MPI_COMM_WORLD, &id);
+
+	// if (id == 0)
+	// 	coco_set_log_level("info");
+
+	// if (id < s.size()){
+	// 	ParticleSwarm pso = s.getParticleSwarm(id);
+	// 	experimentPSO(pso, updateSettings);
+	// } else {
+	// 	std::cout << "Error: suite does not contain " << id << std::endl;
+	// }
+	// MPI_Finalize();
+
+
+	// ParticleSwarmSuite s;
+	// s.setUpdateManagers(std::vector<UpdateManagerType>({INERTIA_WEIGHT, DECR_INERTIA_WEIGHT, BARE_BONES, FIPS}));
 
 	/* DE experiment */
 	// DESuite s;
@@ -116,7 +133,7 @@ int main(int argc, char **argv) {
 }
 
 void experimentPSO(ParticleSwarm swarm, std::map<int,double> updateSettings) {
-	 
+
 	size_t run;
 	coco_suite_t *suite;
 	coco_observer_t *observer;
@@ -138,7 +155,7 @@ void experimentPSO(ParticleSwarm swarm, std::map<int,double> updateSettings) {
 	while ((PROBLEM = coco_suite_get_next_problem(suite, observer)) != NULL) {
 
 	size_t dimension = coco_problem_get_dimension(PROBLEM);
-	int const popSize = dimension * 6;
+	int const popSize = dimension * 5;
 
 	/* Run the algorithm at least once */
 	for (run = 1; run <= 1 + INDEPENDENT_RESTARTS; run++) {
@@ -201,7 +218,7 @@ void experimentDE(DifferentialEvolution de) {
 	while ((PROBLEM = coco_suite_get_next_problem(suite, observer)) != NULL) {
 
 		size_t dimension = coco_problem_get_dimension(PROBLEM);
-		int const popSize = dimension * 8;
+		int const popSize = dimension * 10;
 
 		/* Run the algorithm at least once */
 		for (run = 1; run <= 1 + INDEPENDENT_RESTARTS; run++) {
@@ -218,7 +235,7 @@ void experimentDE(DifferentialEvolution de) {
 
 			Problem const problem(evaluate_function, PROBLEM);
 			/* Call the optimization algorithm for the remaining number of evaluations */
-			de.run(problem, evaluations_remaining, popSize, 0.5, 0.7); 
+			de.run(problem, evaluations_remaining, popSize, 0.9, 0.9); 
 
 			/* Break the loop if the algorithm performed no evaluations or an unexpected thing happened */
 			if ((long int)coco_problem_get_evaluations(PROBLEM) == evaluations_done) {
@@ -241,7 +258,12 @@ void experimentDE(DifferentialEvolution de) {
 	coco_suite_free(suite);
 }
 
-void experimentHybrid(HybridAlgorithm hybrid, std::map<int,double> updateSettings) {
+void experimentHybrid(HybridAlgorithm hybrid, double Cr, double F) {
+
+	std::map<int,double> updateSettings;
+
+	std::string name = "H_" + std::to_string(Cr) + std::to_string(F);
+	 
 	size_t run;
 	coco_suite_t *suite;
 	coco_observer_t *observer;
@@ -250,10 +272,10 @@ void experimentHybrid(HybridAlgorithm hybrid, std::map<int,double> updateSetting
 	char *observer_options =
 	coco_strdupf("result_folder: %s " 
 	"algorithm_name: %s "
-	"", hybrid.getIdString().c_str(), hybrid.getIdString().c_str());
+	"", name.c_str(), name.c_str());
 
-	suite = coco_suite("bbob", "instances: 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 ", 
-		"dimensions: 2,5,20");
+	suite = coco_suite("bbob", "", 
+		"dimensions: 5, 20");
 	observer = coco_observer("bbob", observer_options);
 	coco_free_memory(observer_options);
 
@@ -280,7 +302,7 @@ void experimentHybrid(HybridAlgorithm hybrid, std::map<int,double> updateSetting
 		Problem const problem(evaluate_function, PROBLEM);
 
 		/* Call the optimization algorithm for the remaining number of evaluations */
-		hybrid.run(problem, evaluations_remaining, 6 * dimension, updateSettings, 0.5, 0.7); 
+		hybrid.run(problem, evaluations_remaining, 10 * dimension, updateSettings, F, Cr); 
 
 		/* Break the loop if the algorithm performed no evaluations or an unexpected thing happened */
 		if ((long int)coco_problem_get_evaluations(PROBLEM) == evaluations_done) {

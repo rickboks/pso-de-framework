@@ -16,7 +16,6 @@ enum Topology {
 
 class Particle;
 
-
 class TopologyManager {
 	protected:
 		std::vector<Particle*> const & particles;

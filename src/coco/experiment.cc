@@ -40,11 +40,11 @@ static void evaluate_function(const double *x, double *y) {
   coco_evaluate_function(PROBLEM, x, y);
 }
 
-void experimentPSO(ParticleSwarm pso);
+void experimentPSO(ParticleSwarm& pso);
 
-void experimentDE(DifferentialEvolution de);
+void experimentDE(DifferentialEvolution& de);
 
-void experimentHybrid(HybridAlgorithm ha);
+void experimentHybrid(HybridAlgorithm& ha, double F, double Cr);
 
 static const long INDEPENDENT_RESTARTS = 1e5;
 static const unsigned int BUDGET_MULTIPLIER = 1e4;
@@ -68,42 +68,26 @@ static void timing_data_finalize(timing_data_t *timing_data);
 
 int main(void) {
   /* Single algorithm experiment examples */
-  
-  DifferentialEvolution de (RANDOM, BEST_1, BINOMIAL, false);
-  experimentDE(de);
-  
-  ParticleSwarm ps(INERTIA_WEIGHT, VON_NEUMANN, SYNCHRONOUS);
-  experimentPSO(ps);
+  HybridSuite suite;
 
-  // HybridAlgorithm ha1(FIPS, VON_NEUMANN, SYNCHRONOUS, BEST_1, BINOMIAL);
-  // experimentHybrid(ha1);
+  suite.setTopologyManagers(std::vector<Topology>({GBEST, LBEST}));
+  suite.setUpdateManagers(std::vector<UpdateManagerType>({INERTIA_WEIGHT, FIPS}));
 
-  // HybridAlgorithm ha2(FIPS, VON_NEUMANN, ASYNCHRONOUS, BEST_1, BINOMIAL);
-  // experimentHybrid(ha2);
+  for (int i = 0 ; i < suite.size(); i++){
+    HybridAlgorithm ha = suite.getHybrid(i);
+    std::cout << ha.getIdString() << std::endl;
+  }
 
-  // HybridAlgorithm ha3(DECR_INERTIA_WEIGHT, GBEST, ASYNCHRONOUS, RAND_1, BINOMIAL);
-  // experimentHybrid(ha3);
-
-  // HybridAlgorithm ha4(INERTIA_WEIGHT, WHEEL, SYNCHRONOUS, BEST_2, BINOMIAL);
-  // experimentHybrid(ha4);
-
-  /* PSO suite experiment example */
-  // ParticleSwarmSuite suite;
-  // suite.setUpdateManagers(std::vector<UpdateManagerType>({INERTIA_WEIGHT, DECR_INERTIA_WEIGHT, BARE_BONES, FIPS}));
-  //  for (ParticleSwarm s : suite){
-  //    experimentPSO(s);
-  // }
-
+  return 1;
+  DifferentialEvolution de1 (RANDOM, BEST_1, BINOMIAL, JADE, false);
+  experimentDE(de1);
   return 0;
 }
 
-void experimentHybrid(HybridAlgorithm ha) {
+void experimentHybrid(HybridAlgorithm& ha, double const F, double const Cr) {
   std::map<int, double> updateSettings;
   //Add settings like this
   //updateSettings[S_INER_W] = 0.8;
-
-  double const Cr = 0.7;
-  double const F = 0.5;
 
   size_t run;
   coco_suite_t *suite;
@@ -114,7 +98,7 @@ void experimentHybrid(HybridAlgorithm ha) {
                    "algorithm_name: %s "
                    "", ha.getIdString().c_str(), ha.getIdString().c_str());
 
-  suite = coco_suite("bbob", "", "dimensions: 5");
+  suite = coco_suite("bbob", "", "function_indices:5,9,14 dimensions: 20");
   observer = coco_observer("bbob", observer_options);
   coco_free_memory(observer_options);
 
@@ -123,6 +107,7 @@ void experimentHybrid(HybridAlgorithm ha) {
   while ((PROBLEM = coco_suite_get_next_problem(suite, observer)) != NULL) {
     
     size_t dimension = coco_problem_get_dimension(PROBLEM);
+    int const popSize = 10* dimension;
 
     for (run = 1; run <= 1 + INDEPENDENT_RESTARTS; run++) {
 
@@ -136,7 +121,7 @@ void experimentHybrid(HybridAlgorithm ha) {
         break;
 
       Problem const problem(evaluate_function, PROBLEM);        
-      ha.run(problem, evaluations_remaining, 6 * dimension, updateSettings, F, Cr); 
+      ha.run(problem, evaluations_remaining, popSize, updateSettings, F, Cr); 
 
       if ((long int)coco_problem_get_evaluations(PROBLEM) == evaluations_done) {
         printf("WARNING: Budget has not been exhausted (%lu/%lu evaluations done)!\n",
@@ -147,6 +132,8 @@ void experimentHybrid(HybridAlgorithm ha) {
         coco_error("Something unexpected happened - function evaluations were decreased!");
       }
 
+      //printf("Best found fitness: %f\n", coco_problem_get_best_observed_fvalue1(PROBLEM));
+     // printf("Optimum: %f\n", depreciated_coco_problem_get_final_target_fvalue1(PROBLEM));
       timing_data_time_problem(timing_data, PROBLEM);
   }
 
@@ -157,10 +144,9 @@ void experimentHybrid(HybridAlgorithm ha) {
 
 }
 
-void experimentDE(DifferentialEvolution de) {
-  double const Cr = 0.7;
-  double const F = 0.5;
-  
+void experimentDE(DifferentialEvolution& de) {
+  double const Cr = 0.9;
+  double const F = 0.9;  
 
   size_t run;
   coco_suite_t *suite;
@@ -180,7 +166,7 @@ void experimentDE(DifferentialEvolution de) {
   while ((PROBLEM = coco_suite_get_next_problem(suite, observer)) != NULL) {
     
     size_t dimension = coco_problem_get_dimension(PROBLEM);
-    int const popSize = dimension * 8; 
+    int const popSize = dimension * 10; 
 
     for (run = 1; run <= 1 + INDEPENDENT_RESTARTS; run++) {
 
@@ -205,6 +191,7 @@ void experimentDE(DifferentialEvolution de) {
         coco_error("Something unexpected happened - function evaluations were decreased!");
       }
 
+
       timing_data_time_problem(timing_data, PROBLEM);
   }
 
@@ -214,7 +201,7 @@ void experimentDE(DifferentialEvolution de) {
   coco_suite_free(suite);  
 }
 
-void experimentPSO(ParticleSwarm ps) {  
+void experimentPSO(ParticleSwarm & ps) {
   std::map<int, double> updateSettings;
   //Add settings like this
   //updateSettings[S_INER_W] = 0.8;
@@ -229,7 +216,7 @@ void experimentPSO(ParticleSwarm ps) {
                    "algorithm_name: %s "
                    "", ps.getIdString().c_str(), ps.getIdString().c_str());
 
-  suite = coco_suite("bbob", "", "dimensions: 5");
+  suite = coco_suite("bbob", "", "dimensions: 20");
   observer = coco_observer("bbob", observer_options);
   coco_free_memory(observer_options);
 
@@ -238,7 +225,7 @@ void experimentPSO(ParticleSwarm ps) {
   while ((PROBLEM = coco_suite_get_next_problem(suite, observer)) != NULL) {
     
     size_t dimension = coco_problem_get_dimension(PROBLEM);
-    int const popSize = dimension * 6; 
+    int const popSize = dimension * 5; 
 
     for (run = 1; run <= 1 + INDEPENDENT_RESTARTS; run++) {
 
@@ -269,15 +256,13 @@ void experimentPSO(ParticleSwarm ps) {
   timing_data_finalize(timing_data);
 
   coco_observer_free(observer);
-  coco_suite_free(suite);
-  
+  coco_suite_free(suite);  
 }
 
 /**
  * Allocates memory for the timing_data_t object and initializes it.
  */
 static timing_data_t *timing_data_initialize(coco_suite_t *suite) {
-
 	timing_data_t *timing_data = (timing_data_t *) coco_allocate_memory(sizeof(*timing_data));
 	size_t function_idx, dimension_idx, instance_idx, i;
 

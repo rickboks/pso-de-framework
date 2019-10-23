@@ -7,7 +7,6 @@
 
 DEInitializer::DEInitializer(InitializationType const initializationType, Problem problem)
 	: initializationType(initializationType), problem(problem){
-
 }
 
 void DEInitializer::initialize(std::vector<Genome*>& genomes) const{
@@ -44,7 +43,7 @@ void DEInitializer::initOpposition(std::vector<Genome*>& genomes) const {
 	std::vector<Genome*> random = genomes;
 	for (Genome* g : random){
 		g->randomize(problem.smallestValues, problem.largestValues);
-		g->evaluate(problem.evalFunc);		
+		g->evaluate(problem.evalFunc);
 	}
 
 	std::vector<Genome*> opposite;

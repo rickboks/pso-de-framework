@@ -5,6 +5,7 @@
 #include "particleupdatesettings.h"
 #include "vectoroperations.h"
 #include "coco.h"
+#include "mutationmanager.h"
 #include <limits>
 #include <iostream>
 #include <algorithm>   
@@ -13,21 +14,14 @@
 constexpr double DOUBLE_MIN = std::numeric_limits<double>::min();
 constexpr double DOUBLE_MAX = std::numeric_limits<double>::max();
 
-void printVector(std::vector<double> v){
-	std::cout << "{";
-	for (unsigned int i = 0; i < v.size() -1; i++){
-		std::cout << v[i] << " ";
-	}
-
-	std::cout << v[v.size() -1] << "}" << std::endl;
-}
-
 HybridAlgorithm::HybridAlgorithm(UpdateManagerType const updateManagerType, 
 			Topology topologyManagerType, Synchronicity const synchronicity, MutationType const mutationType, 
-			CrossoverType const crossoverType):
+			CrossoverType const crossoverType, SelectionType selection,DEAdaptationType adaptionType):
 
 	updateManagerType(updateManagerType),topologyManagerType(topologyManagerType), topologyManager(NULL), 
-	synchronicity(synchronicity), mutationType(mutationType), crossoverType(crossoverType), mutationManager(NULL), crossoverManager(NULL){
+	synchronicity(synchronicity), mutationType(mutationType), crossoverType(crossoverType), 
+	selectionType(selection), adaptationType(adaptionType), mutationManager(NULL), crossoverManager(NULL),
+	adaptationManager(NULL){
 }
 
 std::vector<Particle*> HybridAlgorithm::copyPopulation(std::vector<Particle*>& particles){
@@ -52,9 +46,11 @@ void HybridAlgorithm::reset(){
 	delete topologyManager;
 	delete mutationManager;
 	delete crossoverManager;
+	delete adaptationManager;
 	topologyManager = NULL;
 	mutationManager = NULL;
 	crossoverManager = NULL;
+	adaptationManager = NULL;
 	
 	for (Particle* const particle : particles)
 		delete particle;
@@ -69,6 +65,8 @@ HybridAlgorithm::~HybridAlgorithm(){
 		delete mutationManager;
 	if (crossoverManager != NULL)
 		delete crossoverManager;
+	if (adaptationManager != NULL)
+		delete adaptationManager;
 
 	if (!particles.empty())
 		for (Particle* const particle : particles)
@@ -82,16 +80,14 @@ void HybridAlgorithm::run(Problem const problem, int const evalBudget, int popSi
 	else if (synchronicity == ASYNCHRONOUS){
 		runAsynchronous(problem, evalBudget, popSize, particleUpdateParams, F, Cr);
 	}
-
 }
 
-void HybridAlgorithm::runSynchronous(Problem const problem, int const evalBudget, int popSize, std::map<int,double> particleUpdateParams,
-	double const F, double const Cr){
+void HybridAlgorithm::runSynchronous(Problem const problem, int const evalBudget, int popSize, 
+	std::map<int,double> particleUpdateParams, double const F, double const Cr){
 
-	std::vector<Genome*> p0;
 	std::vector<Particle*> p1;
-	std::vector<Genome*> p2;
-	std::vector<Genome*> p3;
+	std::vector<Particle*> p2;
+	std::vector<Particle*> p3;
 		
 	topologyManager = TopologyManagerFactory::createTopologyManager(topologyManagerType, particles);
 	popSize = topologyManager->getClosestValidPopulationSize(popSize);	
@@ -119,14 +115,19 @@ void HybridAlgorithm::runSynchronous(Problem const problem, int const evalBudget
 		p->updateGbest();
 
 	topologyManager->initialize();
-	mutationManager = MutationManagerFactory::createMutationManager(mutationType, p0, F, D);
-	
-	int iterations = 0;
+	mutationManager = MutationManagerFactory::createMutationManager<Particle>(mutationType, D);
+	crossoverManager = CrossoverManagerFactory::createCrossoverManager<Particle>(crossoverType, D);
+	adaptationManager = DEAdaptationManagerFactory::createDEAdaptationManager(adaptationType);
+	selectionManager = SelectionManagerFactory::createSelectionManager(selectionType, D, adaptationManager);
 
+	int iterations = 0;
 	double bestFitness = DOUBLE_MAX;
 	int notImproved = 0;
 	bool improved;
 	int evaluations = 0;
+
+	std::vector<double> Fs(popSize);
+	std::vector<double> Crs(popSize);	
 
 	while (	
 			notImproved < 100 && 
@@ -134,6 +135,11 @@ void HybridAlgorithm::runSynchronous(Problem const problem, int const evalBudget
 			!coco_problem_final_target_hit(problem.PROBLEM)){
 		
 		improved = false;
+
+		adaptationManager->nextF(Fs);
+		adaptationManager->nextCr(Crs);
+		adaptationManager->reset();
+
 		for (int i = 0; i < popSize; i++){
 			double y = particles[i]->evaluate(problem.evalFunc);
 			evaluations++;
@@ -155,39 +161,34 @@ void HybridAlgorithm::runSynchronous(Problem const problem, int const evalBudget
 		for (int i = 0; i < popSize; i++)
 			p1[i]->updateVelocityAndPosition(double(evaluations)/double(evalBudget));
 
-		p0 = toGenomes(particles);
-		p2 = mutationManager->mutate();	
+		p2 = mutationManager->mutate(particles, Fs);
+		p3 = crossoverManager->crossover(particles,p2, Crs);
 			
 		improved = false;
-		for (unsigned int i = 0; i < p2.size(); i++){
+		for (unsigned int i = 0; i < p3.size(); i++){
 			p1[i]->evaluate(problem.evalFunc);
-			p2[i]->evaluate(problem.evalFunc);
+			p3[i]->evaluate(problem.evalFunc);
 			evaluations+=2;
 
-			if (p1[i]->getFitness() < p2[i]->getFitness()){
-				particles[i]->setPosition(p1[i]->getPosition(), p1[i]->getFitness());
-				particles[i]->setVelocity(p1[i]->getVelocity());
-			} else {
-				std::vector<double> new_velocity(D);
-				//reverse engineer velocity
-				subtract(p2[i]->getPosition(), particles[i]->getPosition(), new_velocity);
-				particles[i]->setVelocity(new_velocity);
-				particles[i]->setPosition(p2[i]->getPosition(), p2[i]->getFitness());								
-			}
-
-			double minF = std::min(p1[i]->getFitness(), p2[i]->getFitness());	
+			double minF = std::min(p1[i]->getFitness(), p3[i]->getFitness());	
 			if (minF < bestFitness){
 				improved = true;
 				bestFitness = minF;
 			}
 		}
 
+		selectionManager->selection(particles, p1, p3);
+		adaptationManager->update();
+
 		improved ? notImproved = 0 : notImproved++;
 
+
+
 		for (int i = 0; i < popSize; i++) {
-			delete p0[i];  
+			//delete p0[i];  
 			delete p1[i]; 
 			delete p2[i];
+			delete p3[i];
 		}
 
 		iterations++;	
@@ -197,13 +198,14 @@ void HybridAlgorithm::runSynchronous(Problem const problem, int const evalBudget
 	reset();
 }
 
-void HybridAlgorithm::runAsynchronous(Problem const problem, int const evalBudget, int popSize, std::map<int,double> particleUpdateParams,
+void HybridAlgorithm::runAsynchronous(Problem const problem, int const evalBudget, 
+	int popSize, std::map<int,double> particleUpdateParams,
 	double const F, double const Cr){
 
-	std::vector<Genome*> p0;
+	//std::vector<Particle*> p0;
 	std::vector<Particle*> p1;
-	std::vector<Genome*> p2;
-	std::vector<Genome*> p3;
+	std::vector<Particle*> p2;
+	std::vector<Particle*> p3;
 		
 	topologyManager = TopologyManagerFactory::createTopologyManager(topologyManagerType, particles);
 	popSize = topologyManager->getClosestValidPopulationSize(popSize);	
@@ -231,8 +233,11 @@ void HybridAlgorithm::runAsynchronous(Problem const problem, int const evalBudge
 		p->updateGbest();
 
 	topologyManager->initialize();
-	mutationManager = MutationManagerFactory::createMutationManager(mutationType, p0, F, D);
-	
+	mutationManager = MutationManagerFactory::createMutationManager<Particle>(mutationType,D);
+	crossoverManager = CrossoverManagerFactory::createCrossoverManager<Particle>(crossoverType, D);
+	adaptationManager = DEAdaptationManagerFactory::createDEAdaptationManager(adaptationType);
+	selectionManager = SelectionManagerFactory::createSelectionManager(selectionType, D, adaptationManager);
+
 	int iterations = 0;
 
 	double bestFitness = DOUBLE_MAX;
@@ -240,9 +245,16 @@ void HybridAlgorithm::runAsynchronous(Problem const problem, int const evalBudge
 	bool improved;
 	int evaluations = 0;
 
-	while (	notImproved < 100 && 
+	std::vector<double> Fs(popSize);
+	std::vector<double> Crs(popSize);
+
+	while (	notImproved < 100 &&
 			evaluations <= evalBudget &&
 			!coco_problem_final_target_hit(problem.PROBLEM)){
+
+		adaptationManager->nextF(Fs);
+		adaptationManager->nextCr(Crs);
+		adaptationManager->reset();
 		
 		improved = false;
 		p1 = copyPopulation(particles);
@@ -262,40 +274,32 @@ void HybridAlgorithm::runAsynchronous(Problem const problem, int const evalBudge
 
 		improved ? notImproved = 0 : notImproved++;
 
-
-		p0 = toGenomes(particles);
-		p2 = mutationManager->mutate();	
+		p2 = mutationManager->mutate(particles, Fs);
+		p3 = crossoverManager->crossover(particles,p2, Crs);
 			
 		improved = false;
-		for (unsigned int i = 0; i < p2.size(); i++){
+		for (unsigned int i = 0; i < p3.size(); i++){
 			p1[i]->evaluate(problem.evalFunc);
-			p2[i]->evaluate(problem.evalFunc);
+			p3[i]->evaluate(problem.evalFunc);
 			evaluations+=2;
 
-			if (p1[i]->getFitness() < p2[i]->getFitness()){
-				particles[i]->setPosition(p1[i]->getPosition(), p1[i]->getFitness());
-				particles[i]->setVelocity(p1[i]->getVelocity());
-			} else {
-				std::vector<double> new_velocity(D);
-				//reverse engineer velocity
-				subtract(p2[i]->getPosition(), particles[i]->getPosition(), new_velocity);
-				particles[i]->setVelocity(new_velocity);
-				particles[i]->setPosition(p2[i]->getPosition(), p2[i]->getFitness());								
-			}
-
-			double minF = std::min(p1[i]->getFitness(), p2[i]->getFitness());	
+			double minF = std::min(p1[i]->getFitness(), p3[i]->getFitness());	
 			if (minF < bestFitness){
 				improved = true;
 				bestFitness = minF;
 			}
 		}
 
+		selectionManager->selection(particles, p1, p3);
+		adaptationManager->update();
+
 		improved ? notImproved = 0 : notImproved++;
 
 		for (int i = 0; i < popSize; i++) {
-			delete p0[i];  
+			//delete p0[i];  
 			delete p1[i]; 
 			delete p2[i];
+			delete p3[i];
 		}
 
 		iterations++;	
@@ -305,111 +309,78 @@ void HybridAlgorithm::runAsynchronous(Problem const problem, int const evalBudge
 	reset();
 }
 
-std::vector<Genome*> HybridAlgorithm::toGenomes(std::vector<Particle*>& particles){
-	std::vector<Genome*> genomes;
-	genomes.reserve(particles.size());
-	for (Particle* p : particles){
-		genomes.push_back(new Genome(p));
-	}
-
-	return genomes;
-}
 std::string HybridAlgorithm::getIdString() const{
-	std::string id = "H_";
+	//std::string id = "H_";
+	std::string id = "";
 
 	switch (updateManagerType){
-		case UpdateManagerType::INERTIA_WEIGHT:
-		id += "I";
-		break;
-		case UpdateManagerType::DECR_INERTIA_WEIGHT:
-		id += "D";
-		break;
-		case UpdateManagerType::VMAX:
-		id += "V";
-		break;
-		case UpdateManagerType::CONSTRICTION_COEFFICIENT:
-		id += "C";
-		break;
-		case UpdateManagerType::FIPS:
-		id += "F";
-		break;
-		case UpdateManagerType::BARE_BONES:
-		id += "B";
-		break;
-		default:
-		id+="ERR";
-		break;
+		case UpdateManagerType::INERTIA_WEIGHT: id += "I"; break;
+		case UpdateManagerType::DECR_INERTIA_WEIGHT: id += "D"; break;
+		case UpdateManagerType::VMAX: id += "V"; break;
+		case UpdateManagerType::CONSTRICTION_COEFFICIENT: id += "C"; break;
+		case UpdateManagerType::FIPS: id += "F"; break;
+		case UpdateManagerType::BARE_BONES: id += "B"; break;
+		default: id+="ERR";	break;
 	};
 
-	id += "_";
+	//id += "_";
 	
 	switch (topologyManagerType){
-		case Topology::LBEST:
-		id += "L";
-		break;
-		case Topology::GBEST:
-		id += "G";
-		break;
-		case Topology::RANDOM_GRAPH:
-		id += "R";
-		break;
-		case Topology::VON_NEUMANN:
-		id += "N";
-		break;
-		case Topology::WHEEL:
-		id += "W";
-		break;
-		case Topology::INCREASING:
-		id += "I";
-		break;
-		case Topology::DECREASING:
-		id += "D";
-		break;
-		case Topology::MULTI_SWARM:
-		id += "M";
-		break;
-		default:
-		id+="ERR";
-		break;
+		case Topology::LBEST: id += "L"; break;
+		case Topology::GBEST: id += "G"; break;
+		case Topology::RANDOM_GRAPH: id += "R";	break;
+		case Topology::VON_NEUMANN:	id += "N";	break;
+		case Topology::WHEEL: id += "W"; break;
+		case Topology::INCREASING: id += "I"; break;
+		case Topology::DECREASING: id += "D"; break;
+		case Topology::MULTI_SWARM: id += "M"; break;
+		default: id+="ERR";	break;
 	};
 
-	id += "_";
-
-	switch (mutationType){
-		case MutationType::RAND_1:
-			id += "R1";
-			break;
-		case MutationType::BEST_1:
-			id += "B1";
-			break;
-		case MutationType::TTB_1:
-			id += "TTB1";
-			break;
-		case MutationType::BEST_2:
-			id += "B2";
-			break;
-		case MutationType::RAND_2:
-			id += "R2";
-			break;
-		case MutationType::RAND_2_DIR:
-			id += "R2D";
-			break;
-		case MutationType::NSDE:
-			id += "NS";
-			break;
-		case MutationType::TOPOLOGY:
-			id += "TOP";
-			break;
-		default:
-			id += "ERR";
-			break;
-	}
-
-	id += "_";
 	if (synchronicity == SYNCHRONOUS){
 		id += "S";
 	} else {
 		id += "A";
+	}
+
+	//id += ".";
+
+	switch (mutationType){
+		case MutationType::RAND_1: id += "R1"; break;
+		case MutationType::BEST_1: id += "B1"; break;
+		case MutationType::TTB_1: id += "T1"; break;
+		case MutationType::BEST_2: id += "B2"; break;
+		case MutationType::RAND_2: id += "R2"; break;
+		case MutationType::RAND_2_DIR: id += "RD"; break;
+		case MutationType::NSDE: id += "NS"; break;
+		case MutationType::TOPOLOGY: id += "TOP"; break;
+		case MutationType::TRIGONOMETRIC: id += "TR"; break;
+		case MutationType::TTPB_1: id+= "PB"; break;
+		case MutationType::TO1: id+= "O1"; break;
+		case MutationType::TO2: id+= "O2"; break;
+		default: id += "ERR"; break;
+	}
+
+	//id += ".";
+
+	switch (crossoverType){
+		case CrossoverType::BINOMIAL: id += "B"; break;
+		case CrossoverType::EXPONENTIAL: id += "E"; break;
+		default: id += "ERR"; break;
+	}
+
+	switch(selectionType){
+		case SelectionType::P2: id+= "P2"; break;
+		case SelectionType::P3: id+= "P3"; break;
+		case SelectionType::U2: id+= "U2"; break;
+		case SelectionType::U3: id+= "U3"; break;
+		default: id += "ERR"; break;
+	}
+
+	switch (adaptationType){
+		case DEAdaptationType::JADE: id += "J"; break;
+		case DEAdaptationType::NO: id += "N"; break;
+		default: id += "ERR"; break;
 	}
 
 	return id;

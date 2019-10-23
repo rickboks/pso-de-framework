@@ -1,7 +1,7 @@
 #include "vectoroperations.h"
 #include "rng.h"
 
-void multiply(std::vector<double> & vec, double x){
+void scale(std::vector<double> & vec, double x){
 	std::transform(vec.begin(), vec.end(), vec.begin(),
            std::bind(std::multiplies<double>(), std::placeholders::_1, x));
 }

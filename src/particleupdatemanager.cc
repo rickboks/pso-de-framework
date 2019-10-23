@@ -103,7 +103,7 @@ void InertiaWeightManager::update(double progress) {
 
 	randomMult(pMinx, 0, phi1);
 	randomMult(gMinx, 0, phi2);	
-	multiply(v, w);
+	scale(v, w);
 	add(v,pMinx, v);
 	add(v,gMinx, v);
 
@@ -132,7 +132,7 @@ void DecrInertiaWeightManager::update(double progress) {
 	subtract(g,x,gMinx);
 	randomMult(pMinx, 0, phi1);
 	randomMult(gMinx, 0, phi2);
-	multiply(v,w);
+	scale(v,w);
 	add(v,pMinx, v);
 	add(v,gMinx,v);
 
@@ -163,7 +163,7 @@ void ConstrictionCoefficientManager::update(double progress){
 	randomMult(gMinx, 0, phi2);
 	add(v,pMinx,v);
 	add(v,gMinx,v);
-	multiply(v, chi);
+	scale(v, chi);
 	
 	if (useVMax)
 		applyVMax();
@@ -195,13 +195,13 @@ void FIPSManager::update(double progress){
 
 	for (int i = 0; i < (int) neighborhood.size(); i++){
 		subtract(p_n[i], x, pMinx);
-		multiply(pMinx, rng.randDouble(0,phi));
+		scale(pMinx, rng.randDouble(0,phi));
 		add(sum, pMinx, sum);		
 	}
 
-	multiply(sum, oneOverK);
+	scale(sum, oneOverK);
 	add(v,sum,v);
-	multiply(v, chi);
+	scale(v, chi);
 
 	if (useVMax)
 		applyVMax();

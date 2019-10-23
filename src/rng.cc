@@ -1,9 +1,10 @@
 #include "rng.h"
+#include <algorithm>
 
 RNG::RNG()
 : rng(dev()), boolDist(0.5){
 
-}
+} 
 
 bool RNG::randBool(){
 	return boolDist(rng);
@@ -28,4 +29,9 @@ double RNG::cauchyDistribution(double a, double b){
 	std::cauchy_distribution<double> C(a,b);
 	return C(rng);
 }
+
+void RNG::shuffle(std::vector<double>::iterator first, std::vector<double>::iterator last){
+			std::shuffle(first, last, rng);
+}
+
 RNG rng; //Global Random Number Generator

@@ -47,6 +47,9 @@ struct ParticleUpdateSettings {
 	: managerType(copy.managerType), parameters(copy.parameters), xMin(copy.xMin), xMax(copy.xMax), vMax(copy.vMax) {
 	}
 
+	ParticleUpdateSettings(){	
+	}
+
 	void initVMax(){
 		vMax.reserve(xMin.size());
 		for (int i = 0; i < (int)xMin.size(); i++){

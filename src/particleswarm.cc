@@ -6,6 +6,7 @@
 #include <limits>
 #include <iostream>
 #include <problem.h>
+#include <fstream>
 
 constexpr double DOUBLE_MAX = std::numeric_limits<double>::max();
 
@@ -13,7 +14,8 @@ ParticleSwarm::ParticleSwarm(UpdateManagerType const updateManagerType,
 	Topology topologyManagerType, Synchronicity const synchronicity):
 
 	updateManagerType(updateManagerType),
-	topologyManagerType(topologyManagerType), topologyManager(NULL), synchronicity(synchronicity){
+	topologyManagerType(topologyManagerType), topologyManager(NULL), synchronicity(synchronicity), 
+	outfile(new std::ofstream()){
 }
 
 void ParticleSwarm::reset(){
@@ -27,22 +29,29 @@ void ParticleSwarm::reset(){
 }
 
 ParticleSwarm::~ParticleSwarm(){
+
+	if (outfile->is_open())
+		outfile->close();
+	delete outfile;
+	outfile = NULL;
+	
 	if (topologyManager != NULL)
 		delete topologyManager;
 
 	if (!particles.empty())
-	for (Particle* const particle : particles)
-		delete particle;
+		for (Particle* const particle : particles)
+			delete particle;
+
 }
 
-void ParticleSwarm::run(Problem const problem, int const evalBudget, int popSize, std::map<int,double> particleUpdateParams){
+void ParticleSwarm::run(Problem problem, int const evalBudget, int popSize, std::map<int,double> particleUpdateParams){
 	if (synchronicity == SYNCHRONOUS)
 		runSynchronous(problem, evalBudget, popSize, particleUpdateParams);
 	else if (synchronicity == ASYNCHRONOUS)
 		runAsynchronous(problem, evalBudget, popSize, particleUpdateParams);
 }
 
-void ParticleSwarm::runAsynchronous(Problem const problem, int const evalBudget, 
+void ParticleSwarm::runAsynchronous(Problem problem, int const evalBudget, 
 	int popSize, std::map<int,double> particleUpdateParams){
 	this->topologyManager = TopologyManagerFactory::createTopologyManager(topologyManagerType, particles);
 	popSize = this->topologyManager->getClosestValidPopulationSize(popSize);
@@ -54,12 +63,6 @@ void ParticleSwarm::runAsynchronous(Problem const problem, int const evalBudget,
 	ParticleUpdateSettings settings(updateManagerType, particleUpdateParams, 
 				std::vector<double>(smallest, smallest + dimension), 
 				std::vector<double>(largest, largest + dimension));
-
-	double maxResV = 0;
-	for (double d : settings.vMax)
-		maxResV += d*d;
-
-	maxResV = sqrt(maxResV);
 
 	for (int i = 0; i < popSize; i++){
 		Particle* p = new Particle(coco_problem_get_dimension(problem.PROBLEM), settings);
@@ -81,6 +84,8 @@ void ParticleSwarm::runAsynchronous(Problem const problem, int const evalBudget,
 			notImproved < 100 && 
 			evaluations <= evalBudget &&
 			!coco_problem_final_target_hit(problem.PROBLEM)){
+
+		printParticles();
 		
 		improved = false;
 
@@ -90,10 +95,10 @@ void ParticleSwarm::runAsynchronous(Problem const problem, int const evalBudget,
 			double y = particles[i]->evaluate(problem.evalFunc);
 			evaluations++;
 
-			if (evaluations >= evalBudget || coco_problem_final_target_hit(problem.PROBLEM)){
-				reset();
-				return;
-			}
+			// if (evaluations >= evalBudget || coco_problem_final_target_hit(problem.PROBLEM)){
+			// 	reset();
+			// 	return;
+			// }
 
 			if (y < bestFitness){
 				improved = true;
@@ -114,23 +119,19 @@ void ParticleSwarm::runAsynchronous(Problem const problem, int const evalBudget,
 	reset();
 }
 
-void ParticleSwarm::runSynchronous(Problem const problem, int const evalBudget, int popSize, std::map<int,double> particleUpdateParams){
+void ParticleSwarm::runSynchronous(Problem problem, int const evalBudget, int popSize, 
+	std::map<int,double> particleUpdateParams){
+
 	this->topologyManager = TopologyManagerFactory::createTopologyManager(topologyManagerType, particles);
 	popSize = this->topologyManager->getClosestValidPopulationSize(popSize);
 
 	int const dimension = coco_problem_get_dimension(problem.PROBLEM);
-	double const* smallest = coco_problem_get_smallest_values_of_interest(problem.PROBLEM);
-	double const* largest = coco_problem_get_largest_values_of_interest(problem.PROBLEM);
+	double const *smallest = coco_problem_get_smallest_values_of_interest(problem.PROBLEM);
+	double const *largest = coco_problem_get_largest_values_of_interest(problem.PROBLEM);
 
 	ParticleUpdateSettings settings(updateManagerType, particleUpdateParams, 
 				std::vector<double>(smallest, smallest + dimension), 
 				std::vector<double>(largest, largest + dimension));
-
-	double maxResV = 0;
-	for (double d : settings.vMax)
-		maxResV += d*d;
-
-	maxResV = sqrt(maxResV);
 
 	for (int i = 0; i < popSize; i++){
 		Particle* p = new Particle(coco_problem_get_dimension(problem.PROBLEM), settings);
@@ -150,7 +151,7 @@ void ParticleSwarm::runSynchronous(Problem const problem, int const evalBudget, 
 	int evaluations = 0;
 
 	while (	notImproved < 100 && 
-			// evaluations <= evalBudget &&
+			evaluations <= evalBudget &&
 			!coco_problem_final_target_hit(problem.PROBLEM)){
 		
 		improved = false;
@@ -161,10 +162,10 @@ void ParticleSwarm::runSynchronous(Problem const problem, int const evalBudget, 
 			double y = particles[i]->evaluate(problem.evalFunc);
 			evaluations++;
 
-			if (evaluations >= evalBudget || coco_problem_final_target_hit(problem.PROBLEM)){
-				reset();
-				return;
-			}
+			// if (evaluations >= evalBudget || coco_problem_final_target_hit(problem.PROBLEM)){
+			// 	reset();
+			// 	return;
+			// }
 
 			if (y < bestFitness){
 				improved = true;
@@ -195,59 +196,27 @@ std::string ParticleSwarm::getIdString() const {
 	std::string id = "PS_";
 
 	switch (updateManagerType){
-		case UpdateManagerType::INERTIA_WEIGHT:
-		id += "I";
-		break;
-		case UpdateManagerType::DECR_INERTIA_WEIGHT:
-		id += "D";
-		break;
-		case UpdateManagerType::VMAX:
-		id += "V";
-		break;
-		case UpdateManagerType::CONSTRICTION_COEFFICIENT:
-		id += "C";
-		break;
-		case UpdateManagerType::FIPS:
-		id += "F";
-		break;
-		case UpdateManagerType::BARE_BONES:
-		id += "B";
-		break;
-		default:
-		id+="ERR";
-		break;
+		case UpdateManagerType::INERTIA_WEIGHT: id += "I"; break;
+		case UpdateManagerType::DECR_INERTIA_WEIGHT: id += "D"; break;
+		case UpdateManagerType::VMAX: id += "V"; break;
+		case UpdateManagerType::CONSTRICTION_COEFFICIENT: id += "C"; break;
+		case UpdateManagerType::FIPS: id += "F"; break;
+		case UpdateManagerType::BARE_BONES: id += "B"; break;
+		default: id+="ERR"; break;
 	};
 
 	id += "_";
 	
 	switch (topologyManagerType){
-		case Topology::LBEST:
-		id += "L";
-		break;
-		case Topology::GBEST:
-		id += "G";
-		break;
-		case Topology::RANDOM_GRAPH:
-		id += "R";
-		break;
-		case Topology::VON_NEUMANN:
-		id += "N";
-		break;
-		case Topology::WHEEL:
-		id += "W";
-		break;
-		case Topology::INCREASING:
-		id += "I";
-		break;
-		case Topology::DECREASING:
-		id += "D";
-		break;
-		case Topology::MULTI_SWARM:
-		id += "M";
-		break;
-		default:
-		id+="ERR";
-		break;
+		case Topology::LBEST: id += "L"; break;
+		case Topology::GBEST: id += "G"; break;
+		case Topology::RANDOM_GRAPH: id += "R"; break;
+		case Topology::VON_NEUMANN: id += "N"; break;
+		case Topology::WHEEL: id += "W"; break;
+		case Topology::INCREASING: id += "I"; break;
+		case Topology::DECREASING: id += "D"; break;
+		case Topology::MULTI_SWARM: id += "M"; break;
+		default: id+="ERR"; break;
 	};
 
 	id += "_";
@@ -258,4 +227,18 @@ std::string ParticleSwarm::getIdString() const {
 		id+= "A";
 
 	return id;
+}
+
+void ParticleSwarm::log(std::string file){
+	outfile->open(file);
+}
+
+void ParticleSwarm::printParticles(){
+	if (outfile != NULL && outfile->is_open()){
+		for(unsigned int i = 0; i < particles.size(); i++){
+			*outfile << particles[i]->positionString() << std::endl;
+		}
+
+		*outfile << std::endl;
+	}
 }

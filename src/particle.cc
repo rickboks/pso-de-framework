@@ -12,49 +12,33 @@ constexpr double DOUBLE_MAX = std::numeric_limits<double>::max();
 constexpr double DOUBLE_MIN = std::numeric_limits<double>::min();
 
 Particle::Particle(int const D, ParticleUpdateSettings& particleUpdateSettings)
-	: D(D) , x(D), v(D), p(D), pbest(DOUBLE_MAX), g(D), gbest(DOUBLE_MAX), settings(particleUpdateSettings),
-	vMax(particleUpdateSettings.vMax), evaluated(false){
+	: Solution(D), v(D), p(D), pbest(DOUBLE_MAX), g(D), gbest(DOUBLE_MAX), settings(particleUpdateSettings),
+	vMax(particleUpdateSettings.vMax){
 
 	particleUpdateManager = ParticleUpdateManagerFactory::createParticleUpdateManager(x,v,p,g,particleUpdateSettings,neighborhood);
 }
 
 Particle::Particle(const Particle& other)
-: D(other.D), x(other.x), v(other.v), p(other.p),
-fitness(other.fitness), pbest(other.pbest), g(other.g), gbest(other.gbest), neighborhood(other.neighborhood),
-settings(other.settings), vMax(other.vMax), evaluated(other.evaluated){
+: 	Solution(other.x, other.fitness), v(other.v), p(other.p),
+	pbest(other.pbest), g(other.g), gbest(other.gbest), neighborhood(other.neighborhood),
+	settings(other.settings), vMax(other.vMax){
 	particleUpdateManager = ParticleUpdateManagerFactory::createParticleUpdateManager(x,v,p,g,settings,neighborhood);
+}
+
+//When using this construtor, note that only the position is initialized
+Particle::Particle(std::vector<double> x)
+: 	Solution(x), particleUpdateManager(NULL) {
 }
 
 
 Particle::~Particle(){
-	delete particleUpdateManager;
-}
-
-void Particle::randomize(std::vector<double> lowerBounds, std::vector<double> upperBounds){
-	for (int i = 0; i < D; i++){
-		x[i] = rng.randDouble(lowerBounds[i], upperBounds[i]);
-		v[i] = 0;
-	}
-	p = x;
-	g = x;
-
-	evaluated = false;
-}
-
-std::vector<double> Particle::getPosition() const {
-	return x;
+	if (particleUpdateManager != NULL)
+		delete particleUpdateManager;
 }
 
 std::vector<double> Particle::getVelocity() const {
 	return v;
 }
-
-void Particle::setPosition(std::vector<double> position, double fitness){
-	evaluated = true;
-	this->fitness = fitness;
-	this->x = position;
-}
-
 void Particle::setVelocity(std::vector<double> v){
 	this->v = v;
 }
@@ -125,7 +109,8 @@ void Particle::updatePbest(){
 }
 
 bool Particle::isNeighbor(Particle* particle) const {
-	return std::find(neighborhood.begin(), neighborhood.end(), particle) != neighborhood.end();
+	bool temp =std::find(neighborhood.begin(), neighborhood.end(), particle) != neighborhood.end();
+	return temp;
 }
 
 double Particle::getResultingVelocity() const{
@@ -138,24 +123,14 @@ double Particle::getResultingVelocity() const{
 	return velocity;
 }
 
-double Particle::getFitness() const{
-	return fitness;
-}
-
-double Particle::evaluate(evaluate_function_t evalFunc){
-	if (!evaluated){
-		evaluated = true;
-		double f;
-		evalFunc(&x[0], &f);
-		this->fitness = f;
-		return f;
-	} else {
-		return fitness;
-	}
-}
 
 void Particle::replaceNeighbors(std::map<Particle*, Particle*> mapping){
 	for (int i = 0; i < (int) neighborhood.size(); i++){
 		neighborhood[i] = mapping[neighborhood[i]];
 	}
+}
+
+int Particle::getAmountOfNeighbors(){
+	return neighborhood.size();
+
 }

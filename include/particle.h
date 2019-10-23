@@ -2,40 +2,34 @@
 #include <vector>
 #include <map>
 #include <particleupdatesettings.h>
+#include "solution.h"
 typedef void (*evaluate_function_t)(const double *x, double *y);
 
 class ParticleUpdateManager;
 
-class Particle {
-	private:
-		int const D;
-		std::vector<double> x;
+class Particle : public Solution{
+	private:		
 		std::vector<double> v;
-		std::vector<double> p;
-		double fitness;
+		std::vector<double> p;		
 		double pbest;
 		std::vector<double> g;
 		double gbest;
 		std::vector<Particle*> neighborhood;
 		ParticleUpdateManager* particleUpdateManager;
-		ParticleUpdateSettings const settings;
-		std::vector<double> const vMax;
-		bool evaluated;
+		ParticleUpdateSettings settings;
+		std::vector<double> vMax;		
 	public:
 		Particle(int const D, ParticleUpdateSettings& particleUpdateSettings);
 		Particle(const Particle& other);
+		Particle(std::vector<double> x); 
 		~Particle();
-		void randomize(std::vector<double> lowerBounds, std::vector<double> upperBounds);
-		std::vector<double> getPosition() const;
 		std::vector<double> getVelocity() const;
-		void setPosition(std::vector<double> position, double fitness);
 		void setVelocity(std::vector<double> v);
 		void addNeighbor(Particle* const neighbor);
 		void removeNeighbor(Particle* const neighbor);
 		void removeAllNeighbors();
 		double getGbest() const;
 		double getPbest() const;
-		double getFitness() const;
 		std::vector<double> getG() const;
 		std::vector<double> getP() const;
 		void updatePbest();
@@ -43,7 +37,7 @@ class Particle {
 		void updateVelocityAndPosition(double progress);
 		bool isNeighbor(Particle* particle) const;
 		double getResultingVelocity() const;
-		double evaluate(evaluate_function_t evalFunc);
 		void replaceNeighbors(std::map<Particle*, Particle*> mapping);
 
+		int getAmountOfNeighbors();
 };

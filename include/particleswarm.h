@@ -1,8 +1,10 @@
 #pragma once
 #include <vector>
+#include <fstream>
 #include "problem.h"
 #include "particleupdatesettings.h"
 #include "topologymanager.h"
+#include "logger.h"
 
 enum Synchronicity {
 	SYNCHRONOUS,
@@ -20,17 +22,19 @@ class ParticleSwarm {
 		std::vector<Particle*> particles;
 		TopologyManager* topologyManager;
 		Synchronicity const synchronicity;
-		void runSynchronous(Problem const problem, int const evalBudget, int const popSize, std::map<int,double> particleUpdateParams);
-		void runAsynchronous(Problem const problem, int const evalBudget, int const popSize, std::map<int,double> particleUpdateParams);
-
+		std::ofstream* outfile;
+		
+		void runSynchronous(Problem problem, int const evalBudget, int const popSize, std::map<int,double> particleUpdateParams);
+		void runAsynchronous(Problem problem, int const evalBudget, int const popSize, std::map<int,double> particleUpdateParams);
 		public:
 		ParticleSwarm(UpdateManagerType const updateManagerType, 
 			Topology topologyManager, Synchronicity const synchronous);
 
 		~ParticleSwarm();
 
-		void run(Problem const problem, int const evalBudget, int const popSize, std::map<int,double> particleUpdateParams);
+		void run(Problem problem, int const evalBudget, int const popSize, std::map<int,double> particleUpdateParams);
 		void reset();
-		
+		void printParticles();
+		void log(std::string filename);
 		std::string getIdString() const;
 };

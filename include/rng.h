@@ -1,5 +1,6 @@
 #pragma once
 #include <random>
+#include <algorithm>
 class RNG {
 	private:
 		std::random_device dev;
@@ -12,6 +13,7 @@ class RNG {
 		int randInt(int start, int end);
 		double normalDistribution(double mean, double stdDev);
 		double cauchyDistribution(double a, double b);
+		void shuffle(std::vector<double>::iterator first, std::vector<double>::iterator last);
 };
 
 extern RNG rng;

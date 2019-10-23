@@ -190,6 +190,7 @@ IncreasingTopologyManager::IncreasingTopologyManager(std::vector<Particle*> cons
 
 void IncreasingTopologyManager::initialize(){
 	maxConnectivity = particles.size() -1;
+
 	int const popSize = particles.size();
 	for (int i = 0; i < popSize; i++){
 		if (i ==0)
@@ -202,9 +203,12 @@ void IncreasingTopologyManager::initialize(){
 		else
 			particles[i]->addNeighbor(particles[i+1]);
 	}
+
+
 }
 
 void IncreasingTopologyManager::update(double progress){
+	progress = std::min(1.0, progress);
 	int const popSize = particles.size();
 	int const newConnectivity = minConnectivity + progress * (maxConnectivity - minConnectivity);
 
@@ -213,9 +217,11 @@ void IncreasingTopologyManager::update(double progress){
 		std::vector<Particle*> possibilities;
 
 		for (int i = 0; i < popSize; i++){
-			for (int k = 0; k < popSize; k++)
-				if (k != i && !particles[i]->isNeighbor(particles[k]))
+			for (int k = 0; k < popSize; k++){
+				if (k != i && !particles[i]->isNeighbor(particles[k])){
 					possibilities.push_back(particles[k]);
+				}
+			}
 
 			for (int j = 0; j < newNeighbors; j++){
 				int randIndex = rng.randInt(0,possibilities.size()-1);
@@ -248,6 +254,7 @@ void DecreasingTopologyManager::initialize(){
 }
 
 void DecreasingTopologyManager::update(double progress){
+	progress = std::min(1.0, progress);
 	int const popSize = particles.size();
 	int const newConnectivity = maxConnectivity - progress * (maxConnectivity - 2);
 

@@ -69,15 +69,7 @@ static void timing_data_time_problem(timing_data_t *timing_data, coco_problem_t 
 static void timing_data_finalize(timing_data_t *timing_data);
 
 int main(int argc, char **argv) {
-	/*Example MPI experiments*/
-	//std::map<int,double> updateSettings;
-	//Add settings like this
-  	//updateSettings[S_INER_W] = 0.8;
-
-  	HybridAlgorithm ha1(FIPS, MULTI_SWARM, ASYNCHRONOUS, BEST_1, BINOMIAL, P3);
-  	//experimentHybrid(ha1);
-
-	std::vector<double> Fs({0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9});
+	DESuite s;
 
 	coco_set_log_level("warning");	
 	int id;
@@ -87,49 +79,15 @@ int main(int argc, char **argv) {
 	if (id == 0)
 		coco_set_log_level("info");
 
-	experimentHybrid(ha1, Fs[id%10] , Fs[int(id/10)]);
-
+	if (id < s.size()){
+		DifferentialEvolution de = s.getDE(id);
+		experimentDE(de);
+	} else {
+		std::cout << "Error: suite does not contain " << id << std::endl;
+	}
 	MPI_Finalize();
 
-
-  	// coco_set_log_level("warning");	
-	// int id;
-	// MPI_Init(&argc, &argv);
-	// MPI_Comm_rank(MPI_COMM_WORLD, &id);
-
-	// if (id == 0)
-	// 	coco_set_log_level("info");
-
-	// if (id < s.size()){
-	// 	ParticleSwarm pso = s.getParticleSwarm(id);
-	// 	experimentPSO(pso, updateSettings);
-	// } else {
-	// 	std::cout << "Error: suite does not contain " << id << std::endl;
-	// }
-	// MPI_Finalize();
-
-
-	// ParticleSwarmSuite s;
-	// s.setUpdateManagers(std::vector<UpdateManagerType>({INERTIA_WEIGHT, DECR_INERTIA_WEIGHT, BARE_BONES, FIPS}));
-
-	/* DE experiment */
-	// DESuite s;
-
-	// coco_set_log_level("warning");	
-	// int id;
-	// MPI_Init(&argc, &argv);
-	// MPI_Comm_rank(MPI_COMM_WORLD, &id);
-
-	// if (id == 0)
-	// 	coco_set_log_level("info");
-
-	// if (id < s.size()){
-	// 	DifferentialEvolution de = s.getDE(id);
-	// 	experimentDE(de);
-	// } else {
-	// 	std::cout << "Error: suite does not contain " << id << std::endl;
-	// }
-	// MPI_Finalize();
+	return 1;
 }
 
 void experimentPSO(ParticleSwarm swarm, std::map<int,double> updateSettings) {

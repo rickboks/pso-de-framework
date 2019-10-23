@@ -67,18 +67,6 @@ static void timing_data_time_problem(timing_data_t *timing_data, coco_problem_t 
 static void timing_data_finalize(timing_data_t *timing_data);
 
 int main(void) {
-  /* Single algorithm experiment examples */
-  HybridSuite suite;
-
-  suite.setTopologyManagers(std::vector<Topology>({GBEST, LBEST}));
-  suite.setUpdateManagers(std::vector<UpdateManagerType>({INERTIA_WEIGHT, FIPS}));
-
-  for (int i = 0 ; i < suite.size(); i++){
-    HybridAlgorithm ha = suite.getHybrid(i);
-    std::cout << ha.getIdString() << std::endl;
-  }
-
-  return 1;
   DifferentialEvolution de1 (RANDOM, BEST_1, BINOMIAL, JADE, false);
   experimentDE(de1);
   return 0;
@@ -132,8 +120,6 @@ void experimentHybrid(HybridAlgorithm& ha, double const F, double const Cr) {
         coco_error("Something unexpected happened - function evaluations were decreased!");
       }
 
-      //printf("Best found fitness: %f\n", coco_problem_get_best_observed_fvalue1(PROBLEM));
-     // printf("Optimum: %f\n", depreciated_coco_problem_get_final_target_fvalue1(PROBLEM));
       timing_data_time_problem(timing_data, PROBLEM);
   }
 

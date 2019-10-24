@@ -67,8 +67,7 @@ static void timing_data_time_problem(timing_data_t *timing_data, coco_problem_t 
 static void timing_data_finalize(timing_data_t *timing_data);
 
 int main(void) {
-  DifferentialEvolution de1 (RANDOM, BEST_1, BINOMIAL, JADE, false);
-  experimentDE(de1);
+  
   return 0;
 }
 

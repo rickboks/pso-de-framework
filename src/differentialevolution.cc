@@ -4,6 +4,7 @@
 #include "rng.h"
 #include "utilities.h"
 #include "deadaptationmanager.h"
+#include "instancenamer.h"
 #include <random>
 #include <algorithm>
 #include <iostream>
@@ -12,7 +13,7 @@
 
 bool comparePtrs(Genome* a, Genome* b);
 
-DifferentialEvolution::DifferentialEvolution(InitializationType initializationType, 
+DifferentialEvolution::DifferentialEvolution(DEInitializationType initializationType, 
 	MutationType const mutationType, CrossoverType const crossoverType, 
 	DEAdaptationType const adaptationType, bool const jumpOpposition)
 	: mutationType(mutationType), crossoverType(crossoverType), 
@@ -126,52 +127,7 @@ void DifferentialEvolution::run(Problem const problem, int const evalBudget, int
 }
 
 std::string DifferentialEvolution::getIdString() const {
-	std::string id = "";
-
-	switch(initializationType){
-		case InitializationType::RANDOM: id += "R";	break;
-		case InitializationType::OPPOSITION: id += "O";	break;
-		default: id += "ERR"; break;
-	}
-
-	// id += "_"; 
-
-	switch (mutationType){
-		case MutationType::RAND_1: id += "R1"; break;
-		case MutationType::BEST_1: id += "B1"; break;
-		case MutationType::TTB_1: id += "T1"; break;
-		case MutationType::BEST_2: id += "B2"; break;
-		case MutationType::RAND_2: id += "R2"; break;
-		case MutationType::RAND_2_DIR: id += "RD"; break;
-		case MutationType::NSDE: id += "NS"; break;
-		case MutationType::TOPOLOGY: id += "TOP"; break;
-		case MutationType::TRIGONOMETRIC: id += "TR"; break;
-		case MutationType::TTPB_1: id+= "PB"; break;
-		case MutationType::TO1: id+= "O1"; break;
-		case MutationType::TO2: id+= "O2"; break;
-		default: id += "ERR"; break;
-	}
-
-	// id += "_";
-
-	switch (crossoverType){
-		case CrossoverType::BINOMIAL: id += "B"; break;
-		case CrossoverType::EXPONENTIAL: id += "E"; break;
-		default: id += "ERR"; break;
-	}
-
-	switch (adaptationType){
-		case DEAdaptationType::JADE: id += "J"; break;
-		case DEAdaptationType::NO: id += "N"; break;
-		default: id += "ERR"; break;
-	}
-
-	// id += "_";
-
-	jumpOpposition ? id += "1" : id += "0";
-
-	return id;
-
+	return InstanceNamer::getName(initializationType, mutationType, crossoverType, adaptationType);
 }
 
 void DifferentialEvolution::oppositionGenerationJump(Problem const problem){

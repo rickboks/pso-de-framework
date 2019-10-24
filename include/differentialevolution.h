@@ -10,7 +10,7 @@ class DifferentialEvolution {
 		std::vector<Genome*> genomes;
 		MutationType const mutationType;
 		CrossoverType const crossoverType;
-		InitializationType const initializationType;
+		DEInitializationType const initializationType;
 		DEAdaptationType const adaptationType;
 		bool const jumpOpposition;
 		MutationManager<Genome>* mutationManager;
@@ -22,7 +22,7 @@ class DifferentialEvolution {
 		void oppositionGenerationJump(Problem const problem);
 
 	public:
-		DifferentialEvolution(InitializationType initializationType, MutationType const mutationType, 
+		DifferentialEvolution(DEInitializationType initializationType, MutationType const mutationType, 
 			CrossoverType const crossoverType, DEAdaptationType adaptationType, bool const jumpOpposition);
 		void run(Problem const problem, int const evalBudget, int const popSize, double const F, double const Cr);
 		std::string getIdString() const;

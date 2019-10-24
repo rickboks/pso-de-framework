@@ -5,7 +5,7 @@
 class Genome;
 
 typedef void (*evaluate_function_t)(const double *x, double *y);
-enum InitializationType {
+enum DEInitializationType {
 	RANDOM,
 	OPPOSITION,
 	INIT_END
@@ -13,13 +13,13 @@ enum InitializationType {
 
 class DEInitializer {
 	private:
-		InitializationType const initializationType;
+		DEInitializationType const initializationType;
 		Problem problem;
 
 		void initRandom(std::vector<Genome*>& genomes) const;
 		void initOpposition(std::vector<Genome*>& genomes) const;
 
 	public:
-		DEInitializer(InitializationType const type, Problem problem);
+		DEInitializer(DEInitializationType const type, Problem problem);
 		void initialize(std::vector<Genome*>& genomes) const;
 };

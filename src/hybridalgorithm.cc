@@ -6,6 +6,7 @@
 #include "vectoroperations.h"
 #include "coco.h"
 #include "mutationmanager.h"
+#include "instancenamer.h"
 #include <limits>
 #include <iostream>
 #include <algorithm>   
@@ -202,7 +203,6 @@ void HybridAlgorithm::runAsynchronous(Problem const problem, int const evalBudge
 	int popSize, std::map<int,double> particleUpdateParams,
 	double const F, double const Cr){
 
-	//std::vector<Particle*> p0;
 	std::vector<Particle*> p1;
 	std::vector<Particle*> p2;
 	std::vector<Particle*> p3;
@@ -311,77 +311,6 @@ void HybridAlgorithm::runAsynchronous(Problem const problem, int const evalBudge
 
 std::string HybridAlgorithm::getIdString() const{
 	//std::string id = "H_";
-	std::string id = "";
-
-	switch (updateManagerType){
-		case UpdateManagerType::INERTIA_WEIGHT: id += "I"; break;
-		case UpdateManagerType::DECR_INERTIA_WEIGHT: id += "D"; break;
-		case UpdateManagerType::VMAX: id += "V"; break;
-		case UpdateManagerType::CONSTRICTION_COEFFICIENT: id += "C"; break;
-		case UpdateManagerType::FIPS: id += "F"; break;
-		case UpdateManagerType::BARE_BONES: id += "B"; break;
-		default: id+="ERR";	break;
-	};
-
-	//id += "_";
-	
-	switch (topologyManagerType){
-		case Topology::LBEST: id += "L"; break;
-		case Topology::GBEST: id += "G"; break;
-		case Topology::RANDOM_GRAPH: id += "R";	break;
-		case Topology::VON_NEUMANN:	id += "N";	break;
-		case Topology::WHEEL: id += "W"; break;
-		case Topology::INCREASING: id += "I"; break;
-		case Topology::DECREASING: id += "D"; break;
-		case Topology::MULTI_SWARM: id += "M"; break;
-		default: id+="ERR";	break;
-	};
-
-	if (synchronicity == SYNCHRONOUS){
-		id += "S";
-	} else {
-		id += "A";
-	}
-
-	//id += ".";
-
-	switch (mutationType){
-		case MutationType::RAND_1: id += "R1"; break;
-		case MutationType::BEST_1: id += "B1"; break;
-		case MutationType::TTB_1: id += "T1"; break;
-		case MutationType::BEST_2: id += "B2"; break;
-		case MutationType::RAND_2: id += "R2"; break;
-		case MutationType::RAND_2_DIR: id += "RD"; break;
-		case MutationType::NSDE: id += "NS"; break;
-		case MutationType::TOPOLOGY: id += "TOP"; break;
-		case MutationType::TRIGONOMETRIC: id += "TR"; break;
-		case MutationType::TTPB_1: id+= "PB"; break;
-		case MutationType::TO1: id+= "O1"; break;
-		case MutationType::TO2: id+= "O2"; break;
-		default: id += "ERR"; break;
-	}
-
-	//id += ".";
-
-	switch (crossoverType){
-		case CrossoverType::BINOMIAL: id += "B"; break;
-		case CrossoverType::EXPONENTIAL: id += "E"; break;
-		default: id += "ERR"; break;
-	}
-
-	switch(selectionType){
-		case SelectionType::P2: id+= "P2"; break;
-		case SelectionType::P3: id+= "P3"; break;
-		case SelectionType::U2: id+= "U2"; break;
-		case SelectionType::U3: id+= "U3"; break;
-		default: id += "ERR"; break;
-	}
-
-	switch (adaptationType){
-		case DEAdaptationType::JADE: id += "J"; break;
-		case DEAdaptationType::NO: id += "N"; break;
-		default: id += "ERR"; break;
-	}
-
-	return id;
+	return InstanceNamer::getName(updateManagerType, topologyManagerType, synchronicity, mutationType, crossoverType,
+		selectionType, adaptationType);
 }

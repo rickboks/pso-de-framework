@@ -5,7 +5,7 @@
 #include <vector>
 #include <algorithm>
 
-DEInitializer::DEInitializer(InitializationType const initializationType, Problem problem)
+DEInitializer::DEInitializer(DEInitializationType const initializationType, Problem problem)
 	: initializationType(initializationType), problem(problem){
 }
 

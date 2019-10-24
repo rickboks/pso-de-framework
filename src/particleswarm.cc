@@ -2,6 +2,7 @@
 #include "particle.h"
 #include "topologymanager.h"
 #include "particleupdatesettings.h"
+#include "instancenamer.h"
 #include "coco.h"
 #include <limits>
 #include <iostream>
@@ -193,40 +194,7 @@ void ParticleSwarm::runSynchronous(Problem problem, int const evalBudget, int po
 }
 
 std::string ParticleSwarm::getIdString() const {
-	std::string id = "PS_";
-
-	switch (updateManagerType){
-		case UpdateManagerType::INERTIA_WEIGHT: id += "I"; break;
-		case UpdateManagerType::DECR_INERTIA_WEIGHT: id += "D"; break;
-		case UpdateManagerType::VMAX: id += "V"; break;
-		case UpdateManagerType::CONSTRICTION_COEFFICIENT: id += "C"; break;
-		case UpdateManagerType::FIPS: id += "F"; break;
-		case UpdateManagerType::BARE_BONES: id += "B"; break;
-		default: id+="ERR"; break;
-	};
-
-	id += "_";
-	
-	switch (topologyManagerType){
-		case Topology::LBEST: id += "L"; break;
-		case Topology::GBEST: id += "G"; break;
-		case Topology::RANDOM_GRAPH: id += "R"; break;
-		case Topology::VON_NEUMANN: id += "N"; break;
-		case Topology::WHEEL: id += "W"; break;
-		case Topology::INCREASING: id += "I"; break;
-		case Topology::DECREASING: id += "D"; break;
-		case Topology::MULTI_SWARM: id += "M"; break;
-		default: id+="ERR"; break;
-	};
-
-	id += "_";
-
-	if(synchronicity == SYNCHRONOUS)
-		id+= "S";
-	else
-		id+= "A";
-
-	return id;
+	return InstanceNamer::getName(updateManagerType, topologyManagerType, synchronicity);
 }
 
 void ParticleSwarm::log(std::string file){

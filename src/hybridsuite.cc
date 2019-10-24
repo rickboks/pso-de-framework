@@ -18,6 +18,11 @@ HybridSuite::HybridSuite(){
 	for (int i = 0; i < DEA_END; i++)
 		adaptationManagers.push_back((DEAdaptationType)i);
 
+	generateConfigurations();
+}
+
+void HybridSuite::generateConfigurations(){
+	configurations.clear();
 	for (auto mutation : mutationManagers)
 		for (auto crossover : crossoverManagers)
 			for (auto update : updateManagers)
@@ -28,8 +33,8 @@ HybridSuite::HybridSuite(){
 								configurations.push_back(
 									std::make_tuple(update, topology, synchronicity, mutation, 
 										crossover, selection, adaptation));
-}
 
+}
 
 HybridAlgorithm HybridSuite::getHybrid(int const i) {
 	auto [update, topology, sync, mutation, crossover, selection, adapt] = configurations[i];
@@ -40,30 +45,37 @@ HybridAlgorithm HybridSuite::getHybrid(int const i) {
 
 void HybridSuite::setMutationManagers(std::vector<MutationType> mutationManagers){
 	this->mutationManagers = mutationManagers;
+	generateConfigurations();
 }
 
 void HybridSuite::setCrossoverManagers(std::vector<CrossoverType> crossoverManagers){
 	this->crossoverManagers = crossoverManagers;
+	generateConfigurations();
 }
 
 void HybridSuite::setUpdateManagers(std::vector<UpdateManagerType> updateManagers){
 	this->updateManagers = updateManagers;
+	generateConfigurations();
 }
 
 void HybridSuite::setTopologyManagers(std::vector<Topology> topologyManagers){
 	this->topologyManagers = topologyManagers;
+	generateConfigurations();
 }
 
 void HybridSuite::setSynchronicities(std::vector<Synchronicity> synchronicities){
 	this->synchronicities = synchronicities;
+	generateConfigurations();
 }
 
 void HybridSuite::setSelectionManagers(std::vector<SelectionType> selectionManagers){
 	this->selectionManagers = selectionManagers;
+	generateConfigurations();
 }
 
 void HybridSuite::setDEAdaptationManagers(std::vector<DEAdaptationType> adaptationManagers){
 	this->adaptationManagers = adaptationManagers;
+	generateConfigurations();
 }
 
 int HybridSuite::size() const {

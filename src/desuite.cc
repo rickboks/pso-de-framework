@@ -12,6 +12,10 @@ DESuite::DESuite(){
 	for (int i = 0; i < INIT_END; i++)
 		initializationManagers.push_back((InitializationType)i);
 
+	generateConfigurations();
+}
+
+void DESuite::generateConfigurations(){
 	for (auto mutation : mutationManagers)
 		for (auto crossover : crossoverManagers)
 				for (auto adaptation : adaptationManagers)
@@ -19,9 +23,8 @@ DESuite::DESuite(){
 						configurations.push_back(std::make_tuple(initialization, mutation, crossover, adaptation, false));
 						configurations.push_back(std::make_tuple(initialization, mutation, crossover, adaptation, true));
 					}
+
 }
-
-
 DifferentialEvolution DESuite::getDE(int const i) {
 	auto [initialization, mutation, crossover, adapt, jump] = configurations[i];
 
@@ -30,18 +33,22 @@ DifferentialEvolution DESuite::getDE(int const i) {
 
 void DESuite::setMutationManagers(std::vector<MutationType> mutationManagers){
 	this->mutationManagers = mutationManagers;
+	generateConfigurations();
 }
 
 void DESuite::setCrossoverManagers(std::vector<CrossoverType> crossoverManagers){
 	this->crossoverManagers = crossoverManagers;
+	generateConfigurations();
 }
 
 void DESuite::setDEAdaptationManagers(std::vector<DEAdaptationType> adaptationManagers){
 	this->adaptationManagers = adaptationManagers;
+	generateConfigurations();
 }
 
 void DESuite::setInitializationManagers(std::vector<InitializationType> initialziationManagers){
 	this->initializationManagers = initialziationManagers;
+	generateConfigurations();
 }
 
 int DESuite::size() const {

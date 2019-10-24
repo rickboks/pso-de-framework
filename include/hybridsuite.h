@@ -29,6 +29,7 @@ class HybridSuite {
 		void setSynchronicities(std::vector<Synchronicity> synchronicities);
 		void setSelectionManagers(std::vector<SelectionType> selectionManagers);
 		void setDEAdaptationManagers(std::vector<DEAdaptationType> adaptationManagers);
+		void generateConfigurations();
 		HybridAlgorithm getHybrid(int const i);	
 		int size() const;
 };

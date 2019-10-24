@@ -18,6 +18,7 @@ class DESuite {
 		std::vector<de_configuration> configurations;
 	public:
 		DESuite();
+		void generateConfigurations();
 		void setMutationManagers(std::vector<MutationType> mutationManagers);
 		void setCrossoverManagers(std::vector<CrossoverType> crossoverManagers);
 		void setInitializationManagers(std::vector<InitializationType> initializationManagers);

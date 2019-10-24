@@ -19,6 +19,7 @@ class ParticleSwarmSuite {
 		void setUpdateManagers(std::vector<UpdateManagerType> updateManagers);
 		void setTopologyManagers(std::vector<Topology> topologyManagers);
 		void setSynchronicities(std::vector<Synchronicity> synchronicities);
+		void generateConfigurations();
 		ParticleSwarm getParticleSwarm(int const i);	
 		int size() const;
 };

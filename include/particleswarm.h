@@ -4,8 +4,7 @@
 #include "particleupdatesettings.h"
 #include "topologymanager.h"
 #include <memory>
-#include "iohsrc/Template/IOHprofiler_problem.hpp"
-#include "iohsrc/Template/Loggers/IOHprofiler_csv_logger.h"
+
 
 enum Synchronicity {
 	SYNCHRONOUS,
@@ -16,6 +15,9 @@ enum Synchronicity {
 struct Problem;
 class Particle;
 class ParticleUpdateSettings;
+template <typename T> 
+class IOHprofiler_problem;
+class IOHprofiler_csv_logger;
 class ParticleSwarm {
 	private:
 		UpdateManagerType const updateManagerType;
@@ -24,12 +26,12 @@ class ParticleSwarm {
 		TopologyManager* topologyManager;
 		Synchronicity const synchronicity;
 		std::ofstream* outfile;
+		std::shared_ptr<IOHprofiler_problem<double> > problem;
+    	std::shared_ptr<IOHprofiler_csv_logger> logger;
 		
-		void runSynchronous(std::shared_ptr<IOHprofiler_problem<double> > problem, 
-    		std::shared_ptr<IOHprofiler_csv_logger> logger, int const evalBudget, int const popSize, 
+		void runSynchronous(int const evalBudget, int const popSize, 
     		std::map<int,double> particleUpdateParams);
-		void runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > problem, 
-    		std::shared_ptr<IOHprofiler_csv_logger> logger, int const evalBudget, int const popSize, 
+		void runAsynchronous(int const evalBudget, int const popSize, 
     		std::map<int,double> particleUpdateParams);
 		public:
 		ParticleSwarm(UpdateManagerType const updateManagerType, 

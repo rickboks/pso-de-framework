@@ -3,8 +3,11 @@
 #include "mutationmanager.h"
 #include "deinitializer.h"
 #include "deadaptationmanager.h"
-#include "iohsrc/Template/IOHprofiler_problem.hpp"
-#include "iohsrc/Template/Loggers/IOHprofiler_csv_logger.h"
+
+template <typename T>
+class IOHprofiler_problem;
+
+class IOHprofiler_csv_logger;
 
 class DifferentialEvolution {
 	private:
@@ -20,8 +23,9 @@ class DifferentialEvolution {
 		int dimension;
 		int popSize;
 		std::shared_ptr<IOHprofiler_csv_logger> logger;
+		std::shared_ptr<IOHprofiler_problem<double> > problem;
 
-		void oppositionGenerationJump(std::shared_ptr<IOHprofiler_problem<double> > problem);
+		void oppositionGenerationJump();
 
 	public:
 		DifferentialEvolution(DEInitializationType initializationType, MutationType const mutationType, 

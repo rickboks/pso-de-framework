@@ -1,3 +1,5 @@
+#include "iohsrc/Template/IOHprofiler_problem.hpp"
+#include "iohsrc/Template/Loggers/IOHprofiler_csv_logger.h"
 #include "hybridalgorithm.h"
 #include "particle.h"
 #include "topologymanager.h"
@@ -9,9 +11,6 @@
 #include <limits>
 #include <iostream>
 #include <algorithm> 
-
-constexpr double DOUBLE_MIN = std::numeric_limits<double>::min();
-constexpr double DOUBLE_MAX = std::numeric_limits<double>::max();
 
 HybridAlgorithm::HybridAlgorithm(UpdateManagerType const updateManagerType, 
 			Topology topologyManagerType, Synchronicity const synchronicity, MutationType const mutationType, 
@@ -76,15 +75,17 @@ void HybridAlgorithm::run(std::shared_ptr<IOHprofiler_problem<double> > problem,
     		std::shared_ptr<IOHprofiler_csv_logger> logger,
     		int const evalBudget, int popSize, std::map<int,double> particleUpdateParams, 
 	double const F, double const Cr){
+
+	this->problem=problem;
+	this->logger=logger;
 	if (synchronicity == SYNCHRONOUS)
-		runSynchronous(problem, logger, evalBudget, popSize, particleUpdateParams, F, Cr);
+		runSynchronous(evalBudget, popSize, particleUpdateParams, F, Cr);
 	else if (synchronicity == ASYNCHRONOUS){
-		runAsynchronous(problem, logger, evalBudget, popSize, particleUpdateParams, F, Cr);
+		runAsynchronous(evalBudget, popSize, particleUpdateParams, F, Cr);
 	}
 }
 
-void HybridAlgorithm::runSynchronous(std::shared_ptr<IOHprofiler_problem<double> > problem, 
-    		std::shared_ptr<IOHprofiler_csv_logger> logger, int const evalBudget, int popSize, 
+void HybridAlgorithm::runSynchronous(int const evalBudget, int popSize, 
 	std::map<int,double> particleUpdateParams, double const F, double const Cr){
 
 	std::vector<Particle*> p1;
@@ -122,7 +123,7 @@ void HybridAlgorithm::runSynchronous(std::shared_ptr<IOHprofiler_problem<double>
 	selectionManager = SelectionManagerFactory::createSelectionManager(selectionType, D, adaptationManager);
 
 	int iterations = 0;
-	double bestFitness = DOUBLE_MAX;
+	double bestFitness = std::numeric_limits<double>::max();
 	int notImproved = 0;
 	bool improved;
 	int evaluations = 0;
@@ -130,8 +131,7 @@ void HybridAlgorithm::runSynchronous(std::shared_ptr<IOHprofiler_problem<double>
 	std::vector<double> Fs(popSize);
 	std::vector<double> Crs(popSize);	
 
-	while (	
-			evaluations <= evalBudget &&
+	while (	evaluations <= evalBudget &&
 			!problem->IOHprofiler_hit_optimal()){
 		
 		improved = false;
@@ -198,8 +198,7 @@ void HybridAlgorithm::runSynchronous(std::shared_ptr<IOHprofiler_problem<double>
 	reset();
 }
 
-void HybridAlgorithm::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > problem, 
-    		std::shared_ptr<IOHprofiler_csv_logger> logger, int const evalBudget, 
+void HybridAlgorithm::runAsynchronous(int const evalBudget, 
 	int popSize, std::map<int,double> particleUpdateParams,
 	double const F, double const Cr){
 
@@ -233,7 +232,7 @@ void HybridAlgorithm::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double
 
 	int iterations = 0;
 
-	double bestFitness = DOUBLE_MAX;
+	double bestFitness = std::numeric_limits<double>::max();
 	int notImproved = 0;
 	bool improved;
 	int evaluations = 0;

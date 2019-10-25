@@ -1,3 +1,5 @@
+#include "iohsrc/Template/IOHprofiler_problem.hpp"
+#include "iohsrc/Template/Loggers/IOHprofiler_csv_logger.h"
 #include "solution.h"
 #include "rng.h"
 #include <iostream>

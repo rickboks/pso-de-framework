@@ -1,3 +1,5 @@
+#include "iohsrc/Template/IOHprofiler_problem.hpp"
+#include "iohsrc/Template/Loggers/IOHprofiler_csv_logger.h"
 #include "particleswarm.h"
 #include "particle.h"
 #include "topologymanager.h"
@@ -7,8 +9,6 @@
 #include <iostream>
 
 #include <fstream>
-
-constexpr double DOUBLE_MAX = std::numeric_limits<double>::max();
 
 ParticleSwarm::ParticleSwarm(UpdateManagerType const updateManagerType,
 	Topology topologyManagerType, Synchronicity const synchronicity):
@@ -48,14 +48,16 @@ void ParticleSwarm::run(std::shared_ptr<IOHprofiler_problem<double> > problem,
     		std::shared_ptr<IOHprofiler_csv_logger> logger,
     		int const evalBudget, int popSize, std::map<int,double> particleUpdateParams){
 
+	this->problem=problem;
+	this->logger=logger;
+
 	if (synchronicity == SYNCHRONOUS)
-		runSynchronous(problem, logger, evalBudget, popSize, particleUpdateParams);
+		runSynchronous(evalBudget, popSize, particleUpdateParams);
 	else if (synchronicity == ASYNCHRONOUS)
-		runAsynchronous(problem, logger, evalBudget, popSize, particleUpdateParams);
+		runAsynchronous(evalBudget, popSize, particleUpdateParams);
 }
 
-void ParticleSwarm::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > problem, 
-    		std::shared_ptr<IOHprofiler_csv_logger> logger, int const evalBudget, 
+void ParticleSwarm::runAsynchronous(int const evalBudget, 
 			int popSize, std::map<int,double> particleUpdateParams){
 	this->topologyManager = TopologyManagerFactory::createTopologyManager(topologyManagerType, particles);
 	popSize = this->topologyManager->getClosestValidPopulationSize(popSize);
@@ -78,13 +80,13 @@ void ParticleSwarm::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> 
 	topologyManager->initialize();
 	
 	int iterations = 0;
-	double bestFitness = DOUBLE_MAX;
+	double bestFitness = std::numeric_limits<double>::max();
 	int notImproved = 0;
 	bool improved;
 	int evaluations = 0;
 
 	while (	
-			notImproved < 100 && 
+			//notImproved < 100 && 
 			evaluations <= evalBudget &&
 			!problem->IOHprofiler_hit_optimal()){
 
@@ -122,8 +124,7 @@ void ParticleSwarm::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> 
 	reset();
 }
 
-void ParticleSwarm::runSynchronous(std::shared_ptr<IOHprofiler_problem<double> > problem, 
-    		std::shared_ptr<IOHprofiler_csv_logger> logger, int const evalBudget, int popSize, 
+void ParticleSwarm::runSynchronous(int const evalBudget, int popSize, 
 			std::map<int,double> particleUpdateParams){
 
 	this->topologyManager = TopologyManagerFactory::createTopologyManager(topologyManagerType, particles);
@@ -148,12 +149,12 @@ void ParticleSwarm::runSynchronous(std::shared_ptr<IOHprofiler_problem<double> >
 	
 	int iterations = 0;
 	
-	double bestFitness = DOUBLE_MAX;
+	double bestFitness = std::numeric_limits<double>::max();
 	int notImproved = 0;
 	bool improved;
 	int evaluations = 0;
 
-	while (	notImproved < 100 && 
+	while (	//notImproved < 100 && 
 			evaluations <= evalBudget &&
 			!problem->IOHprofiler_hit_optimal()){
 		

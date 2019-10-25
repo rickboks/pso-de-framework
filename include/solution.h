@@ -1,10 +1,14 @@
 #pragma once
 #include <vector>
 #include <string>
-#include "iohsrc/Template/IOHprofiler_problem.hpp"
-#include "iohsrc/Template/Loggers/IOHprofiler_csv_logger.h"
+#include <memory>
+
 
 class Particle;
+template <typename T>
+class IOHprofiler_problem;
+class IOHprofiler_csv_logger;
+
 class Solution {
 	public:
 		Solution();

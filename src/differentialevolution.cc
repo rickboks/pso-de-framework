@@ -1,3 +1,5 @@
+#include "iohsrc/Template/IOHprofiler_problem.hpp"
+#include "iohsrc/Template/Loggers/IOHprofiler_csv_logger.h"
 #include "differentialevolution.h"
 #include "deinitializer.h"
 #include "rng.h"
@@ -24,6 +26,7 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > pr
     		int const evalBudget, int const popSize, double const F, double const Cr){
 
 	this->logger = logger;
+	this->problem = problem;
 
 	this->popSize = popSize;
 	dimension = problem->IOHprofiler_get_number_of_variables();
@@ -59,7 +62,7 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > pr
 	std::vector<double> Crs(popSize);
 
 	while (
-		noImprovement < 100 && 
+		//noImprovement < 100 && 
 		evaluations < evalBudget && 
 		!problem->IOHprofiler_hit_optimal()){
 
@@ -108,7 +111,7 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > pr
 		oldPopulation.clear();
 
 		if (jumpOpposition)
-			oppositionGenerationJump(problem);
+			oppositionGenerationJump();
 
 		adaptationManager->update();
 		improved ? noImprovement=0 : noImprovement++;
@@ -134,7 +137,7 @@ std::string DifferentialEvolution::getIdString() const {
 	return InstanceNamer::getName(initializationType, mutationType, crossoverType, adaptationType, jumpOpposition);
 }
 
-void DifferentialEvolution::oppositionGenerationJump(std::shared_ptr<IOHprofiler_problem<double> > problem){
+void DifferentialEvolution::oppositionGenerationJump(){
 
 	if (rng.randDouble(0,1) > 0.3){
 		return;

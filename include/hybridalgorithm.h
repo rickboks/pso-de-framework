@@ -22,13 +22,13 @@ class HybridAlgorithm {
 		CrossoverManager<Particle>* crossoverManager;
 		DEAdaptationManager* adaptationManager;
 		SelectionManager* selectionManager;
-		void runSynchronous(std::shared_ptr<IOHprofiler_problem<double> > problem, 
-    		std::shared_ptr<IOHprofiler_csv_logger> logger, int const evalBudget, int const popSize, 
+		std::shared_ptr<IOHprofiler_problem<double> > problem; 
+    	std::shared_ptr<IOHprofiler_csv_logger> logger;
+		void runSynchronous(int const evalBudget, int const popSize, 
 			std::map<int,double> particleUpdateParams,
 			double const F, double const Cr);
 
-		void runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > problem, 
-    		std::shared_ptr<IOHprofiler_csv_logger> logger, int const evalBudget, int const popSize, 
+		void runAsynchronous(int const evalBudget, int const popSize, 
 			std::map<int,double> particleUpdateParams,
 			double const F, double const Cr);
 

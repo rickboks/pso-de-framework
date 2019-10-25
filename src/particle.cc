@@ -8,12 +8,10 @@
 #include <random>
 #include <cmath>
 
-constexpr double DOUBLE_MAX = std::numeric_limits<double>::max();
-constexpr double DOUBLE_MIN = std::numeric_limits<double>::min();
 
 Particle::Particle(int const D, ParticleUpdateSettings& particleUpdateSettings)
-	: Solution(D), v(D), p(D), pbest(DOUBLE_MAX), g(D), gbest(DOUBLE_MAX), settings(particleUpdateSettings),
-	vMax(particleUpdateSettings.vMax){
+	: Solution(D), v(D), p(D), pbest(std::numeric_limits<double>::max()), g(D), gbest(std::numeric_limits<double>::max()), 
+		settings(particleUpdateSettings), vMax(particleUpdateSettings.vMax){
 
 	particleUpdateManager = ParticleUpdateManagerFactory::createParticleUpdateManager(x,v,p,g,particleUpdateSettings,neighborhood);
 }

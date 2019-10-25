@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-#include "coco.h"
 typedef void (*evaluate_function_t)(const double *x, double *y);
 #include "crossovermanager.h"
 #include "solution.h"

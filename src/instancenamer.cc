@@ -16,9 +16,9 @@ std::string InstanceNamer::getName(UpdateManagerType const update, Topology cons
 
 //For DE
 std::string InstanceNamer::getName(DEInitializationType const init, MutationType const mutation, 
-	CrossoverType const crossover, DEAdaptationType const adaptation){
+	CrossoverType const crossover, DEAdaptationType const adaptation, bool jump){
 
-	return deInitializationID(init) + mutationID(mutation) + crossoverID(crossover) + adaptationID(adaptation);
+	return deInitializationID(init) + mutationID(mutation) + crossoverID(crossover) + adaptationID(adaptation) + (jump? "1":"0");
 }
 
 std::string InstanceNamer::updateID(UpdateManagerType const update){

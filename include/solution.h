@@ -1,7 +1,8 @@
 #pragma once
 #include <vector>
 #include <string>
-typedef void (*evaluate_function_t)(const double *x, double *y);
+#include "iohsrc/Template/IOHprofiler_problem.hpp"
+#include "iohsrc/Template/Loggers/IOHprofiler_csv_logger.h"
 
 class Particle;
 class Solution {
@@ -13,7 +14,7 @@ class Solution {
 		Solution(std::vector<double> x, double fitness);
 		//~Solution();
 		std::vector<double> getPosition() const;
-		double evaluate (evaluate_function_t evalFunc);
+		double evaluate (std::shared_ptr<IOHprofiler_problem<double> > problem, std::shared_ptr<IOHprofiler_csv_logger> logger);
 		double getFitness() const;
 		std::string positionString() const;
 		void setPosition(std::vector<double> position, double fitness);

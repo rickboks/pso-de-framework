@@ -4,7 +4,6 @@
 #include <iostream>
 #include "rng.h"
 
-
 //JADE
 JADEManager::JADEManager()
  : DEAdaptationManager(), MuCr(0.5), MuF(0.6), c(0.5){

@@ -29,6 +29,6 @@ class InstanceNamer {
 
 		//For DE
 		static std::string getName(DEInitializationType const init, MutationType const mutation, CrossoverType const crossover, 
-			DEAdaptationType const adaptation);
+			DEAdaptationType const adaptation, bool jump);
 
 };

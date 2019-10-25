@@ -1,9 +1,10 @@
 #pragma once
 #include "genome.h"
-#include "problem.h"
 #include "mutationmanager.h"
 #include "deinitializer.h"
 #include "deadaptationmanager.h"
+#include "iohsrc/Template/IOHprofiler_problem.hpp"
+#include "iohsrc/Template/Loggers/IOHprofiler_csv_logger.h"
 
 class DifferentialEvolution {
 	private:
@@ -18,12 +19,15 @@ class DifferentialEvolution {
 		DEAdaptationManager* adaptationManager;
 		int dimension;
 		int popSize;
+		std::shared_ptr<IOHprofiler_csv_logger> logger;
 
-		void oppositionGenerationJump(Problem const problem);
+		void oppositionGenerationJump(std::shared_ptr<IOHprofiler_problem<double> > problem);
 
 	public:
 		DifferentialEvolution(DEInitializationType initializationType, MutationType const mutationType, 
 			CrossoverType const crossoverType, DEAdaptationType adaptationType, bool const jumpOpposition);
-		void run(Problem const problem, int const evalBudget, int const popSize, double const F, double const Cr);
+		void run(std::shared_ptr<IOHprofiler_problem<double> > problem, 
+    		std::shared_ptr<IOHprofiler_csv_logger> logger,
+    		int const evalBudget, int const popSize, double const F, double const Cr);
 		std::string getIdString() const;
 };

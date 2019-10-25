@@ -1,19 +1,16 @@
 EXE  = experiment
 MPI_EXE = mpi_experiment
 SRC_DIR = src
-COCO_SRC_DIR = src/coco
 OBJ_DIR = obj
 INC_DIR = include
-LDFLAGS += -lm
+LDFLAGS += -lboost_system -lboost_filesystem -lm 
 
-SRC = $(wildcard $(SRC_DIR)/*.cc)
+SRC:= $(shell find src/ ! -name "experiment.cc" ! -name "mpi_experiment.cc" -name "*.cc")
 OBJ = $(SRC:$(SRC_DIR)/%.cc=$(OBJ_DIR)/%.o)
-INC = -I $(INC_DIR)/
+INC = -I $(INC_DIR)/ -I.
 
 CC      = g++
-CFLAGS  = -Wall -std=c++17 -g -O2
-
-COCOFLAGS = -g -ggdb -std=c89 -pedantic -Wall -Wextra -Wstrict-prototypes -Wshadow -Wno-sign-compare -Wconversion -O2
+CFLAGS  = -Wall -Wno-sign-compare -Wno-unused-function -Wno-unused-variable -std=c++17 -g -O2
 
 .PHONY: all
 all: $(EXE)
@@ -21,20 +18,14 @@ all: $(EXE)
 .PHONY: mpi
 mpi: $(MPI_EXE)
 
-$(EXE): $(OBJ) $(OBJ_DIR)/coco.o $(OBJ_DIR)/experiment.o
-	${CC} ${CFLAGS} -o $(EXE) $(OBJ) $(OBJ_DIR)/coco.o $(OBJ_DIR)/experiment.o ${LDFLAGS}
+$(EXE): $(OBJ) $(OBJ_DIR)/experiment.o
+	${CC} ${CFLAGS} -o $(EXE) $(OBJ) $(OBJ_DIR)/experiment.o -L./lib -l iohexperimenter ${LDFLAGS}
 
-$(MPI_EXE): $(OBJ) $(OBJ_DIR)/coco.o $(OBJ_DIR)/mpi.o
-	mpiCC ${CFLAGS} -o $(MPI_EXE) $(OBJ) $(OBJ_DIR)/coco.o $(OBJ_DIR)/mpi_experiment.o $(LDFLAGS)
+$(MPI_EXE): $(OBJ) $(OBJ_DIR)/mpi_experiment.o | $(OBJ_DIR)
+	mpiCC ${CFLAGS} -o $(EXE) $(OBJ) $(OBJ_DIR)/mpi_experiment.o -L./lib -l iohexperimenter ${LDFLAGS}
 
-$(OBJ_DIR)/mpi.o: $(INC_DIR)/coco.h $(COCO_SRC_DIR)/coco.c $(COCO_SRC_DIR)/mpi_experiment.cc | $(OBJ_DIR)
-	mpiCC -c $(CFLAGS) $(INC) -o $(OBJ_DIR)/mpi_experiment.o $(COCO_SRC_DIR)/mpi_experiment.cc
-
-$(OBJ_DIR)/coco.o: $(INC_DIR)/coco.h $(COCO_SRC_DIR)/coco.c | $(OBJ_DIR)
-	gcc -c $(COCOFLAGS) $(INC) -o $(OBJ_DIR)/coco.o $(COCO_SRC_DIR)/coco.c
-
-$(OBJ_DIR)/experiment.o: $(INC_DIR)/coco.h $(COCO_SRC_DIR)/coco.c $(COCO_SRC_DIR)/experiment.cc | $(OBJ_DIR)
-	${CC} -c $(CFLAGS) $(INC) -o $(OBJ_DIR)/experiment.o $(COCO_SRC_DIR)/experiment.cc
+$(OBJ_DIR)/mpi_experiment.o: $(SRC_DIR)/mpi_experiment.cc | $(OBJ_DIR)
+	mpiCC -c $(CFLAGS) $(INC) -o $(OBJ_DIR)/mpi_experiment.o $(SRC_DIR)/mpi_experiment.cc
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cc $(INC_DIR)/* | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(INC) -c -o $@ $<

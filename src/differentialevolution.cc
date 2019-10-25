@@ -1,6 +1,5 @@
 #include "differentialevolution.h"
 #include "deinitializer.h"
-#include "coco.h"
 #include "rng.h"
 #include "utilities.h"
 #include "deadaptationmanager.h"
@@ -20,16 +19,21 @@ DifferentialEvolution::DifferentialEvolution(DEInitializationType initialization
 	initializationType(initializationType), adaptationType(adaptationType), jumpOpposition(jumpOpposition){
 }
 
-void DifferentialEvolution::run(Problem const problem, int const evalBudget, int const popSize, double const F, double const Cr){
+void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > problem, 
+    		std::shared_ptr<IOHprofiler_csv_logger> logger, 
+    		int const evalBudget, int const popSize, double const F, double const Cr){
+
+	this->logger = logger;
+
 	this->popSize = popSize;
-	dimension = coco_problem_get_dimension(problem.PROBLEM);
+	dimension = problem->IOHprofiler_get_number_of_variables();
 	for (int i = 0; i < popSize; i++)
 		genomes.push_back(new Genome(dimension));
 
-	int evaluationsBefore = coco_problem_get_evaluations(problem.PROBLEM);
-	DEInitializer initializer(initializationType, problem);
+	int evaluationsBefore = problem->IOHprofiler_get_evaluations();
+	DEInitializer initializer(initializationType, problem, logger);
 	initializer.initialize(genomes);
-	int evaluations = coco_problem_get_evaluations(problem.PROBLEM) - evaluationsBefore;
+	int evaluations = problem->IOHprofiler_get_evaluations() - evaluationsBefore;
 
 	double bestFitness = std::numeric_limits<double>::max();
 
@@ -57,7 +61,7 @@ void DifferentialEvolution::run(Problem const problem, int const evalBudget, int
 	while (
 		noImprovement < 100 && 
 		evaluations < evalBudget && 
-		!coco_problem_final_target_hit(problem.PROBLEM)){
+		!problem->IOHprofiler_hit_optimal()){
 
 		adaptationManager->nextF(Fs);
 		adaptationManager->nextCr(Crs);
@@ -71,14 +75,14 @@ void DifferentialEvolution::run(Problem const problem, int const evalBudget, int
 			delete m;
 		
 		for (int i = 0; i < popSize; i++){
-			double parentF = genomes[i]->evaluate(problem.evalFunc);
+			double parentF = genomes[i]->evaluate(problem,logger);
 			if (parentF < bestFitness){
 				improved = true;
 				bestFitness = parentF;
 			}
 			evaluations++;
 
-			double trialF = trials[i]->evaluate(problem.evalFunc);
+			double trialF = trials[i]->evaluate(problem,logger);
 			if (trialF < bestFitness){
 				improved = true;
 				bestFitness = trialF;
@@ -127,10 +131,10 @@ void DifferentialEvolution::run(Problem const problem, int const evalBudget, int
 }
 
 std::string DifferentialEvolution::getIdString() const {
-	return InstanceNamer::getName(initializationType, mutationType, crossoverType, adaptationType);
+	return InstanceNamer::getName(initializationType, mutationType, crossoverType, adaptationType, jumpOpposition);
 }
 
-void DifferentialEvolution::oppositionGenerationJump(Problem const problem){
+void DifferentialEvolution::oppositionGenerationJump(std::shared_ptr<IOHprofiler_problem<double> > problem){
 
 	if (rng.randDouble(0,1) > 0.3){
 		return;
@@ -160,7 +164,8 @@ void DifferentialEvolution::oppositionGenerationJump(Problem const problem){
 		}
 
 		Genome* genome = new Genome(x);
-		genome->evaluate(problem.evalFunc);
+		genome->evaluate(problem,logger);
+
 		combined.push_back(genome);
 	}
 

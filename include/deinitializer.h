@@ -1,5 +1,4 @@
 #pragma once
-#include "problem.h"
 #include "solution.h"
 #include <vector>
 class Genome;
@@ -14,12 +13,13 @@ enum DEInitializationType {
 class DEInitializer {
 	private:
 		DEInitializationType const initializationType;
-		Problem problem;
+		std::shared_ptr<IOHprofiler_problem<double> > problem;
+		std::shared_ptr<IOHprofiler_csv_logger> logger;
 
 		void initRandom(std::vector<Genome*>& genomes) const;
 		void initOpposition(std::vector<Genome*>& genomes) const;
 
 	public:
-		DEInitializer(DEInitializationType const type, Problem problem);
+		DEInitializer(DEInitializationType const type, std::shared_ptr<IOHprofiler_problem<double> > problem,std::shared_ptr<IOHprofiler_csv_logger> logger);
 		void initialize(std::vector<Genome*>& genomes) const;
 };

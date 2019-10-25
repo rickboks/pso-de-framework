@@ -4,13 +4,11 @@
 #include "genome.h"
 #include "particleupdatesettings.h"
 #include "vectoroperations.h"
-#include "coco.h"
 #include "mutationmanager.h"
 #include "instancenamer.h"
 #include <limits>
 #include <iostream>
-#include <algorithm>   
-#include <problem.h>
+#include <algorithm> 
 
 constexpr double DOUBLE_MIN = std::numeric_limits<double>::min();
 constexpr double DOUBLE_MAX = std::numeric_limits<double>::max();
@@ -19,9 +17,9 @@ HybridAlgorithm::HybridAlgorithm(UpdateManagerType const updateManagerType,
 			Topology topologyManagerType, Synchronicity const synchronicity, MutationType const mutationType, 
 			CrossoverType const crossoverType, SelectionType selection,DEAdaptationType adaptionType):
 
-	updateManagerType(updateManagerType),topologyManagerType(topologyManagerType), topologyManager(NULL), 
+	updateManagerType(updateManagerType),topologyManagerType(topologyManagerType), 
 	synchronicity(synchronicity), mutationType(mutationType), crossoverType(crossoverType), 
-	selectionType(selection), adaptationType(adaptionType), mutationManager(NULL), crossoverManager(NULL),
+	selectionType(selection), adaptationType(adaptionType), topologyManager(NULL), mutationManager(NULL), crossoverManager(NULL),
 	adaptationManager(NULL){
 }
 
@@ -74,16 +72,19 @@ HybridAlgorithm::~HybridAlgorithm(){
 			delete particle;
 }
 
-void HybridAlgorithm::run(Problem const problem, int const evalBudget, int popSize, std::map<int,double> particleUpdateParams, 
+void HybridAlgorithm::run(std::shared_ptr<IOHprofiler_problem<double> > problem, 
+    		std::shared_ptr<IOHprofiler_csv_logger> logger,
+    		int const evalBudget, int popSize, std::map<int,double> particleUpdateParams, 
 	double const F, double const Cr){
 	if (synchronicity == SYNCHRONOUS)
-		runSynchronous(problem, evalBudget, popSize, particleUpdateParams, F, Cr);
+		runSynchronous(problem, logger, evalBudget, popSize, particleUpdateParams, F, Cr);
 	else if (synchronicity == ASYNCHRONOUS){
-		runAsynchronous(problem, evalBudget, popSize, particleUpdateParams, F, Cr);
+		runAsynchronous(problem, logger, evalBudget, popSize, particleUpdateParams, F, Cr);
 	}
 }
 
-void HybridAlgorithm::runSynchronous(Problem const problem, int const evalBudget, int popSize, 
+void HybridAlgorithm::runSynchronous(std::shared_ptr<IOHprofiler_problem<double> > problem, 
+    		std::shared_ptr<IOHprofiler_csv_logger> logger, int const evalBudget, int popSize, 
 	std::map<int,double> particleUpdateParams, double const F, double const Cr){
 
 	std::vector<Particle*> p1;
@@ -93,13 +94,12 @@ void HybridAlgorithm::runSynchronous(Problem const problem, int const evalBudget
 	topologyManager = TopologyManagerFactory::createTopologyManager(topologyManagerType, particles);
 	popSize = topologyManager->getClosestValidPopulationSize(popSize);	
 
-	int const D = coco_problem_get_dimension(problem.PROBLEM);
-	double const* smallest = coco_problem_get_smallest_values_of_interest(problem.PROBLEM);
-	double const* largest = coco_problem_get_largest_values_of_interest(problem.PROBLEM);
+	int const D = problem->IOHprofiler_get_number_of_variables(); /// dimension
+	std::vector<double> smallest = problem->IOHprofiler_get_lowerbound(); //??
+	std::vector<double> largest = problem->IOHprofiler_get_upperbound(); //??
 
 	ParticleUpdateSettings settings(updateManagerType, particleUpdateParams, 
-				std::vector<double>(smallest, smallest + D), 
-				std::vector<double>(largest, largest + D));
+				smallest, largest);
 
 	double maxResV = 0;
 	for (double d : settings.vMax)
@@ -108,7 +108,7 @@ void HybridAlgorithm::runSynchronous(Problem const problem, int const evalBudget
 	maxResV = sqrt(maxResV);
 
 	for (int i = 0; i < popSize; i++)
-		particles.push_back(new Particle(coco_problem_get_dimension(problem.PROBLEM), settings));
+		particles.push_back(new Particle(D, settings));
 
 	for (Particle* const p : particles)
 		p->randomize(settings.xMax, settings.xMin);
@@ -131,9 +131,8 @@ void HybridAlgorithm::runSynchronous(Problem const problem, int const evalBudget
 	std::vector<double> Crs(popSize);	
 
 	while (	
-			notImproved < 100 && 
 			evaluations <= evalBudget &&
-			!coco_problem_final_target_hit(problem.PROBLEM)){
+			!problem->IOHprofiler_hit_optimal()){
 		
 		improved = false;
 
@@ -142,7 +141,7 @@ void HybridAlgorithm::runSynchronous(Problem const problem, int const evalBudget
 		adaptationManager->reset();
 
 		for (int i = 0; i < popSize; i++){
-			double y = particles[i]->evaluate(problem.evalFunc);
+			double y = particles[i]->evaluate(problem,logger);
 			evaluations++;
 
 			if (y < bestFitness){
@@ -167,8 +166,8 @@ void HybridAlgorithm::runSynchronous(Problem const problem, int const evalBudget
 			
 		improved = false;
 		for (unsigned int i = 0; i < p3.size(); i++){
-			p1[i]->evaluate(problem.evalFunc);
-			p3[i]->evaluate(problem.evalFunc);
+			p1[i]->evaluate(problem,logger);
+			p3[i]->evaluate(problem,logger);
 			evaluations+=2;
 
 			double minF = std::min(p1[i]->getFitness(), p3[i]->getFitness());	
@@ -183,8 +182,6 @@ void HybridAlgorithm::runSynchronous(Problem const problem, int const evalBudget
 
 		improved ? notImproved = 0 : notImproved++;
 
-
-
 		for (int i = 0; i < popSize; i++) {
 			//delete p0[i];  
 			delete p1[i]; 
@@ -196,10 +193,13 @@ void HybridAlgorithm::runSynchronous(Problem const problem, int const evalBudget
 		topologyManager->update(double(evaluations)/double(evalBudget));	
 	}
 
+
+
 	reset();
 }
 
-void HybridAlgorithm::runAsynchronous(Problem const problem, int const evalBudget, 
+void HybridAlgorithm::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > problem, 
+    		std::shared_ptr<IOHprofiler_csv_logger> logger, int const evalBudget, 
 	int popSize, std::map<int,double> particleUpdateParams,
 	double const F, double const Cr){
 
@@ -210,22 +210,15 @@ void HybridAlgorithm::runAsynchronous(Problem const problem, int const evalBudge
 	topologyManager = TopologyManagerFactory::createTopologyManager(topologyManagerType, particles);
 	popSize = topologyManager->getClosestValidPopulationSize(popSize);	
 
-	int const D = coco_problem_get_dimension(problem.PROBLEM);
-	double const* smallest = coco_problem_get_smallest_values_of_interest(problem.PROBLEM);
-	double const* largest = coco_problem_get_largest_values_of_interest(problem.PROBLEM);
+	int const D = problem->IOHprofiler_get_number_of_variables(); /// dimension
+	std::vector<double> smallest = problem->IOHprofiler_get_lowerbound(); //??
+	std::vector<double> largest = problem->IOHprofiler_get_upperbound(); //??
 
 	ParticleUpdateSettings settings(updateManagerType, particleUpdateParams, 
-				std::vector<double>(smallest, smallest + D), 
-				std::vector<double>(largest, largest + D));
-
-	double maxResV = 0;
-	for (double d : settings.vMax)
-		maxResV += d*d;
-
-	maxResV = sqrt(maxResV);
+				smallest, largest);
 
 	for (int i = 0; i < popSize; i++)
-		particles.push_back(new Particle(coco_problem_get_dimension(problem.PROBLEM), settings));
+		particles.push_back(new Particle(D, settings));
 
 	for (Particle* const p : particles)
 		p->randomize(settings.xMax, settings.xMin);
@@ -248,9 +241,8 @@ void HybridAlgorithm::runAsynchronous(Problem const problem, int const evalBudge
 	std::vector<double> Fs(popSize);
 	std::vector<double> Crs(popSize);
 
-	while (	notImproved < 100 &&
-			evaluations <= evalBudget &&
-			!coco_problem_final_target_hit(problem.PROBLEM)){
+	while (	evaluations <= evalBudget &&
+			!problem->IOHprofiler_hit_optimal()){
 
 		adaptationManager->nextF(Fs);
 		adaptationManager->nextCr(Crs);
@@ -259,7 +251,7 @@ void HybridAlgorithm::runAsynchronous(Problem const problem, int const evalBudge
 		improved = false;
 		p1 = copyPopulation(particles);
 		for (int i = 0; i < popSize; i++){
-			double y = particles[i]->evaluate(problem.evalFunc);
+			double y = particles[i]->evaluate(problem,logger);
 			evaluations++;
 
 			if (y < bestFitness){
@@ -279,8 +271,9 @@ void HybridAlgorithm::runAsynchronous(Problem const problem, int const evalBudge
 			
 		improved = false;
 		for (unsigned int i = 0; i < p3.size(); i++){
-			p1[i]->evaluate(problem.evalFunc);
-			p3[i]->evaluate(problem.evalFunc);
+			p1[i]->evaluate(problem,logger);
+			p3[i]->evaluate(problem,logger);
+
 			evaluations+=2;
 
 			double minF = std::min(p1[i]->getFitness(), p3[i]->getFitness());	

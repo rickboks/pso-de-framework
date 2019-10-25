@@ -26,13 +26,12 @@ double Solution::getFitness() const{
 	return fitness;
 }
 
-double Solution::evaluate(evaluate_function_t evalFunc) {
+double Solution::evaluate(std::shared_ptr<IOHprofiler_problem<double> > problem, std::shared_ptr<IOHprofiler_csv_logger> logger) {
 	if (!evaluated){
-		evaluated = true;
-		double f;
-		evalFunc(&x[0], &f);
-		this->fitness = f;
-		return f;
+		evaluated = true;		
+		fitness = problem->evaluate(x);
+		logger->write_line(problem->loggerInfo());
+		return fitness;
 	} else {
 		return fitness;
 	}

@@ -3,10 +3,9 @@
 #include "topologymanager.h"
 #include "particleupdatesettings.h"
 #include "instancenamer.h"
-#include "coco.h"
 #include <limits>
 #include <iostream>
-#include <problem.h>
+
 #include <fstream>
 
 constexpr double DOUBLE_MAX = std::numeric_limits<double>::max();
@@ -45,28 +44,31 @@ ParticleSwarm::~ParticleSwarm(){
 
 }
 
-void ParticleSwarm::run(Problem problem, int const evalBudget, int popSize, std::map<int,double> particleUpdateParams){
+void ParticleSwarm::run(std::shared_ptr<IOHprofiler_problem<double> > problem, 
+    		std::shared_ptr<IOHprofiler_csv_logger> logger,
+    		int const evalBudget, int popSize, std::map<int,double> particleUpdateParams){
+
 	if (synchronicity == SYNCHRONOUS)
-		runSynchronous(problem, evalBudget, popSize, particleUpdateParams);
+		runSynchronous(problem, logger, evalBudget, popSize, particleUpdateParams);
 	else if (synchronicity == ASYNCHRONOUS)
-		runAsynchronous(problem, evalBudget, popSize, particleUpdateParams);
+		runAsynchronous(problem, logger, evalBudget, popSize, particleUpdateParams);
 }
 
-void ParticleSwarm::runAsynchronous(Problem problem, int const evalBudget, 
-	int popSize, std::map<int,double> particleUpdateParams){
+void ParticleSwarm::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > problem, 
+    		std::shared_ptr<IOHprofiler_csv_logger> logger, int const evalBudget, 
+			int popSize, std::map<int,double> particleUpdateParams){
 	this->topologyManager = TopologyManagerFactory::createTopologyManager(topologyManagerType, particles);
 	popSize = this->topologyManager->getClosestValidPopulationSize(popSize);
 
-	int const dimension = coco_problem_get_dimension(problem.PROBLEM);
-	double const* smallest = coco_problem_get_smallest_values_of_interest(problem.PROBLEM);
-	double const* largest = coco_problem_get_largest_values_of_interest(problem.PROBLEM);
+	int const D = problem->IOHprofiler_get_number_of_variables(); /// dimension
+	std::vector<double> smallest = problem->IOHprofiler_get_lowerbound(); //??
+	std::vector<double> largest = problem->IOHprofiler_get_upperbound(); //??
 
 	ParticleUpdateSettings settings(updateManagerType, particleUpdateParams, 
-				std::vector<double>(smallest, smallest + dimension), 
-				std::vector<double>(largest, largest + dimension));
+				smallest, largest);
 
 	for (int i = 0; i < popSize; i++){
-		Particle* p = new Particle(coco_problem_get_dimension(problem.PROBLEM), settings);
+		Particle* p = new Particle(D, settings);
 		p->randomize(settings.xMax, settings.xMin);
 		particles.push_back(p);
 	}
@@ -84,7 +86,7 @@ void ParticleSwarm::runAsynchronous(Problem problem, int const evalBudget,
 	while (	
 			notImproved < 100 && 
 			evaluations <= evalBudget &&
-			!coco_problem_final_target_hit(problem.PROBLEM)){
+			!problem->IOHprofiler_hit_optimal()){
 
 		printParticles();
 		
@@ -93,7 +95,7 @@ void ParticleSwarm::runAsynchronous(Problem problem, int const evalBudget,
 		for (int i = 0; i < popSize; i++){
 			std::vector<double> position = particles[i]->getPosition();			
 
-			double y = particles[i]->evaluate(problem.evalFunc);
+			double y = particles[i]->evaluate(problem,logger);
 			evaluations++;
 
 			// if (evaluations >= evalBudget || coco_problem_final_target_hit(problem.PROBLEM)){
@@ -120,22 +122,22 @@ void ParticleSwarm::runAsynchronous(Problem problem, int const evalBudget,
 	reset();
 }
 
-void ParticleSwarm::runSynchronous(Problem problem, int const evalBudget, int popSize, 
-	std::map<int,double> particleUpdateParams){
+void ParticleSwarm::runSynchronous(std::shared_ptr<IOHprofiler_problem<double> > problem, 
+    		std::shared_ptr<IOHprofiler_csv_logger> logger, int const evalBudget, int popSize, 
+			std::map<int,double> particleUpdateParams){
 
 	this->topologyManager = TopologyManagerFactory::createTopologyManager(topologyManagerType, particles);
 	popSize = this->topologyManager->getClosestValidPopulationSize(popSize);
 
-	int const dimension = coco_problem_get_dimension(problem.PROBLEM);
-	double const *smallest = coco_problem_get_smallest_values_of_interest(problem.PROBLEM);
-	double const *largest = coco_problem_get_largest_values_of_interest(problem.PROBLEM);
+	int const D = problem->IOHprofiler_get_number_of_variables(); /// dimension
+	std::vector<double> smallest = problem->IOHprofiler_get_lowerbound(); //??
+	std::vector<double> largest = problem->IOHprofiler_get_upperbound(); //??
 
 	ParticleUpdateSettings settings(updateManagerType, particleUpdateParams, 
-				std::vector<double>(smallest, smallest + dimension), 
-				std::vector<double>(largest, largest + dimension));
+				smallest, largest);
 
 	for (int i = 0; i < popSize; i++){
-		Particle* p = new Particle(coco_problem_get_dimension(problem.PROBLEM), settings);
+		Particle* p = new Particle(D, settings);
 		p->randomize(settings.xMax, settings.xMin);
 		particles.push_back(p);
 	}
@@ -153,14 +155,14 @@ void ParticleSwarm::runSynchronous(Problem problem, int const evalBudget, int po
 
 	while (	notImproved < 100 && 
 			evaluations <= evalBudget &&
-			!coco_problem_final_target_hit(problem.PROBLEM)){
+			!problem->IOHprofiler_hit_optimal()){
 		
 		improved = false;
 
 		for (int i = 0; i < popSize; i++){		
 			std::vector<double> position = particles[i]->getPosition();			
 
-			double y = particles[i]->evaluate(problem.evalFunc);
+			double y = particles[i]->evaluate(problem,logger);
 			evaluations++;
 
 			// if (evaluations >= evalBudget || coco_problem_final_target_hit(problem.PROBLEM)){

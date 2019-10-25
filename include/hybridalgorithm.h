@@ -1,33 +1,34 @@
 #pragma once
-#include "problem.h"
 #include "particleupdatesettings.h"
 #include "topologymanager.h"
 #include "particleswarm.h"
 #include "mutationmanager.h"
 #include "crossovermanager.h"
 #include "selectionmanager.h"
-
+#include <memory>
 
 class HybridAlgorithm {
 	private:
 		UpdateManagerType const updateManagerType;
 		Topology topologyManagerType;
-		std::vector<Particle*> particles;
-		TopologyManager* topologyManager;
+		std::vector<Particle*> particles;		
 		Synchronicity const synchronicity;
 		MutationType const mutationType;
 		CrossoverType const crossoverType;
 		SelectionType const selectionType;
 		DEAdaptationType const adaptationType;
+		TopologyManager* topologyManager;
 		MutationManager<Particle>* mutationManager;
 		CrossoverManager<Particle>* crossoverManager;
 		DEAdaptationManager* adaptationManager;
 		SelectionManager* selectionManager;
-		void runSynchronous(Problem const problem, int const evalBudget, int const popSize, 
+		void runSynchronous(std::shared_ptr<IOHprofiler_problem<double> > problem, 
+    		std::shared_ptr<IOHprofiler_csv_logger> logger, int const evalBudget, int const popSize, 
 			std::map<int,double> particleUpdateParams,
 			double const F, double const Cr);
 
-		void runAsynchronous(Problem const problem, int const evalBudget, int const popSize, 
+		void runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > problem, 
+    		std::shared_ptr<IOHprofiler_csv_logger> logger, int const evalBudget, int const popSize, 
 			std::map<int,double> particleUpdateParams,
 			double const F, double const Cr);
 
@@ -39,8 +40,9 @@ class HybridAlgorithm {
 
 		~HybridAlgorithm();
 
-		void run(Problem const problem, int const evalBudget, int const popSize, 
-			std::map<int,double> particleUpdateParams, 
+		void run(std::shared_ptr<IOHprofiler_problem<double> > problem, 
+    		std::shared_ptr<IOHprofiler_csv_logger> logger, int const evalBudget, 
+    		int const popSize, std::map<int,double> particleUpdateParams, 
 			double const F, double const Cr);
 
 		void reset();
@@ -51,6 +53,4 @@ class HybridAlgorithm {
 		template <class T>
 		std::vector<Solution*> toSolutions(std::vector<T*> vec);
 		std::vector<Particle*> toParticles(std::vector<Solution*> sol);
-	
-
 };

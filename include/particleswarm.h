@@ -1,10 +1,11 @@
 #pragma once
 #include <vector>
 #include <fstream>
-#include "problem.h"
 #include "particleupdatesettings.h"
 #include "topologymanager.h"
-#include "logger.h"
+#include <memory>
+#include "iohsrc/Template/IOHprofiler_problem.hpp"
+#include "iohsrc/Template/Loggers/IOHprofiler_csv_logger.h"
 
 enum Synchronicity {
 	SYNCHRONOUS,
@@ -24,15 +25,22 @@ class ParticleSwarm {
 		Synchronicity const synchronicity;
 		std::ofstream* outfile;
 		
-		void runSynchronous(Problem problem, int const evalBudget, int const popSize, std::map<int,double> particleUpdateParams);
-		void runAsynchronous(Problem problem, int const evalBudget, int const popSize, std::map<int,double> particleUpdateParams);
+		void runSynchronous(std::shared_ptr<IOHprofiler_problem<double> > problem, 
+    		std::shared_ptr<IOHprofiler_csv_logger> logger, int const evalBudget, int const popSize, 
+    		std::map<int,double> particleUpdateParams);
+		void runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > problem, 
+    		std::shared_ptr<IOHprofiler_csv_logger> logger, int const evalBudget, int const popSize, 
+    		std::map<int,double> particleUpdateParams);
 		public:
 		ParticleSwarm(UpdateManagerType const updateManagerType, 
 			Topology topologyManager, Synchronicity const synchronous);
 
 		~ParticleSwarm();
 
-		void run(Problem problem, int const evalBudget, int const popSize, std::map<int,double> particleUpdateParams);
+		void run(std::shared_ptr<IOHprofiler_problem<double> > problem, 
+    		std::shared_ptr<IOHprofiler_csv_logger> logger,
+    		int const evalBudget, int const popSize, std::map<int,double> particleUpdateParams);
+
 		void reset();
 		void printParticles();
 		void log(std::string filename);

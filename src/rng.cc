@@ -31,7 +31,7 @@ double RNG::cauchyDistribution(double a, double b){
 }
 
 void RNG::shuffle(std::vector<double>::iterator first, std::vector<double>::iterator last){
-			std::shuffle(first, last, rng);
+	std::shuffle(first, last, rng);
 }
 
 RNG rng; //Global Random Number Generator

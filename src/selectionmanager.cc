@@ -85,8 +85,7 @@ Union2SelectionManager::Union2SelectionManager(int const D, DEAdaptationManager*
 }
 
 bool sortbyFirstElement(const std::tuple<Particle*, int, int>& a,  
-               const std::tuple<Particle*, int, int>& b) 
-{ 
+               const std::tuple<Particle*, int, int>& b) { 
     return (*std::get<0>(a) < *std::get<0>(b)); 
 } 
   

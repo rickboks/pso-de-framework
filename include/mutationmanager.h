@@ -406,6 +406,12 @@ class NSDEMutationManager : public MutationManager<T> {
 
 				add(mutant, subtraction, mutant);
 
+				// std::cout << "{";
+				// for (double d : mutant){
+				// 	std::cout << d << ", ";
+				// }
+
+				// std::cout << "}" << std::endl;
 				T* m = new T(mutant);
 
 				mutants.push_back(m);
@@ -413,7 +419,6 @@ class NSDEMutationManager : public MutationManager<T> {
 
 			return mutants;
 		}
-
 };
 
 // class TopologyMutationManager : public MutationManager {

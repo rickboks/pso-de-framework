@@ -29,7 +29,6 @@ void ParticleSwarm::reset(){
 }
 
 ParticleSwarm::~ParticleSwarm(){
-
 	if (outfile->is_open())
 		outfile->close();
 	delete outfile;
@@ -89,8 +88,6 @@ void ParticleSwarm::runAsynchronous(int const evalBudget,
 			//notImproved < 100 && 
 			evaluations <= evalBudget &&
 			!problem->IOHprofiler_hit_optimal()){
-
-		printParticles();
 		
 		improved = false;
 
@@ -99,11 +96,6 @@ void ParticleSwarm::runAsynchronous(int const evalBudget,
 
 			double y = particles[i]->evaluate(problem,logger);
 			evaluations++;
-
-			// if (evaluations >= evalBudget || coco_problem_final_target_hit(problem.PROBLEM)){
-			// 	reset();
-			// 	return;
-			// }
 
 			if (y < bestFitness){
 				improved = true;
@@ -166,11 +158,6 @@ void ParticleSwarm::runSynchronous(int const evalBudget, int popSize,
 			double y = particles[i]->evaluate(problem,logger);
 			evaluations++;
 
-			// if (evaluations >= evalBudget || coco_problem_final_target_hit(problem.PROBLEM)){
-			// 	reset();
-			// 	return;
-			// }
-
 			if (y < bestFitness){
 				improved = true;
 				bestFitness = y;
@@ -198,18 +185,4 @@ void ParticleSwarm::runSynchronous(int const evalBudget, int popSize,
 
 std::string ParticleSwarm::getIdString() const {
 	return InstanceNamer::getName(updateManagerType, topologyManagerType, synchronicity);
-}
-
-void ParticleSwarm::log(std::string file){
-	outfile->open(file);
-}
-
-void ParticleSwarm::printParticles(){
-	if (outfile != NULL && outfile->is_open()){
-		for(unsigned int i = 0; i < particles.size(); i++){
-			*outfile << particles[i]->positionString() << std::endl;
-		}
-
-		*outfile << std::endl;
-	}
 }

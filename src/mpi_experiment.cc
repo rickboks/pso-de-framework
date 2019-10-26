@@ -15,8 +15,6 @@ void experiment
 	int id;
 	MPI_Comm_rank(MPI_COMM_WORLD, &id);
 
-
-
 	HybridAlgorithm h = s.getHybrid(id);
   	h.run(problem, logger, D*10000, D*10, std::map<int,double>(), 0.9,0.9);
 }

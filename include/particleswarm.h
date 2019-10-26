@@ -44,7 +44,5 @@ class ParticleSwarm {
     		int const evalBudget, int const popSize, std::map<int,double> particleUpdateParams);
 
 		void reset();
-		void printParticles();
-		void log(std::string filename);
 		std::string getIdString() const;
 };

@@ -2,6 +2,7 @@ EXE  = experiment
 MPI_EXE = mpi_experiment
 SRC_DIR = src
 OBJ_DIR = obj
+RESULT_DIR=results
 INC_DIR = include
 LDFLAGS += -lboost_system -lboost_filesystem -lm 
 
@@ -13,26 +14,28 @@ CC      = g++
 CFLAGS  = -Wall -Wno-sign-compare -Wno-unused-function -Wno-unused-variable -std=c++17 -g -O2
 
 .PHONY: all
-all: $(EXE)
+all: $(OBJ_DIR) $(RESULT_DIR) $(EXE)
 
 .PHONY: mpi
-mpi: $(MPI_EXE)
+mpi: $(OBJ_DIR) $(RESULT_DIR) $(MPI_EXE)
 
 $(EXE): $(OBJ) $(OBJ_DIR)/experiment.o
 	${CC} ${CFLAGS} -o $(EXE) $(OBJ) $(OBJ_DIR)/experiment.o -L./lib -l iohexperimenter ${LDFLAGS}
 
-$(MPI_EXE): $(OBJ) $(OBJ_DIR)/mpi_experiment.o | $(OBJ_DIR)
+$(MPI_EXE): $(OBJ) $(OBJ_DIR)/mpi_experiment.o
 	mpiCC ${CFLAGS} -o $(EXE) $(OBJ) $(OBJ_DIR)/mpi_experiment.o -L./lib -l iohexperimenter ${LDFLAGS}
 
-$(OBJ_DIR)/mpi_experiment.o: $(SRC_DIR)/mpi_experiment.cc | $(OBJ_DIR)
+$(OBJ_DIR)/mpi_experiment.o: $(SRC_DIR)/mpi_experiment.cc
 	mpiCC -c $(CFLAGS) $(INC) -o $(OBJ_DIR)/mpi_experiment.o $(SRC_DIR)/mpi_experiment.cc
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cc $(INC_DIR)/* | $(OBJ_DIR)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cc $(INC_DIR)/*
 	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
 
 
 $(OBJ_DIR):
 	mkdir $(OBJ_DIR)
+$(RESULT_DIR):
+	mkdir $(RESULT_DIR)
 
 .PHONY:  clean
 clean:
@@ -40,4 +43,4 @@ clean:
 
 .PHONY: cleanall
 cleanall:
-	rm -rf $(OBJ_DIR) $(EXE) $(MPI_EXE) exdata
+	rm -rf $(OBJ_DIR) $(EXE) $(MPI_EXE) results

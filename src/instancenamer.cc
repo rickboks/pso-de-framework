@@ -4,21 +4,21 @@
 std::string InstanceNamer::getName(UpdateManagerType const update, Topology const topology, 
 			Synchronicity const sync, MutationType const mutation, CrossoverType const crossover, 
 			SelectionType const selection, DEAdaptationType const adaptation){
-	return updateID(update) + topologyID(topology) + synchronicityID(sync) + mutationID(mutation)
+	return "H" + updateID(update) + topologyID(topology) + synchronicityID(sync) + mutationID(mutation)
 			+ crossoverID(crossover) + selectionID(selection) + adaptationID(adaptation); 
 }
 
 //For PSO
 std::string InstanceNamer::getName(UpdateManagerType const update, Topology const topology, 
 			Synchronicity const sync){
-	return updateID(update) + topologyID(topology) + synchronicityID(sync);
+	return "P" + updateID(update) + topologyID(topology) + synchronicityID(sync);
 }
 
 //For DE
 std::string InstanceNamer::getName(DEInitializationType const init, MutationType const mutation, 
 	CrossoverType const crossover, DEAdaptationType const adaptation, bool jump){
 
-	return deInitializationID(init) + mutationID(mutation) + crossoverID(crossover) + adaptationID(adaptation) + (jump? "1":"0");
+	return "D" + deInitializationID(init) + mutationID(mutation) + crossoverID(crossover) + adaptationID(adaptation) + (jump?"1":"0");
 }
 
 std::string InstanceNamer::updateID(UpdateManagerType const update){
@@ -48,11 +48,7 @@ std::string InstanceNamer::topologyID(Topology const topology){
 }
 
 std::string InstanceNamer::synchronicityID(Synchronicity const synchronicity){
-	if (synchronicity == SYNCHRONOUS){
-		return "S";
-	} else {
-		return "A";
-	}
+	return (synchronicity == SYNCHRONOUS ? "S" : "A");
 }
 
 std::string InstanceNamer::mutationID(MutationType const mutation){
@@ -75,11 +71,7 @@ std::string InstanceNamer::mutationID(MutationType const mutation){
 }
 
 std::string InstanceNamer::crossoverID(CrossoverType const crossover){
-	switch (crossover){
-		case CrossoverType::BINOMIAL: return "B";
-		case CrossoverType::EXPONENTIAL: return  "E";
-		default: return  "ERR";
-	}	
+	return (crossover == BINOMIAL ? "B" : "E");
 }
 
 std::string InstanceNamer::selectionID(SelectionType const selection){
@@ -93,17 +85,9 @@ std::string InstanceNamer::selectionID(SelectionType const selection){
 }
 
 std::string InstanceNamer::adaptationID(DEAdaptationType const adaptation){
-	switch (adaptation){
-		case DEAdaptationType::JADE: return  "J";
-		case DEAdaptationType::NO: return  "N";
-		default: return  "ERR";
-	}	
+	return (adaptation == JADE ? "J" : "N");
 }
 
 std::string InstanceNamer::deInitializationID(DEInitializationType const deinit){
-	switch(deinit){
-		case DEInitializationType::RANDOM: return "R";
-		case DEInitializationType::OPPOSITION: return "O";
-		default: return "ERR";
-	}
+	return (deinit == RANDOM ? "R" : "O");
 }

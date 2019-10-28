@@ -53,7 +53,7 @@ struct ParticleUpdateSettings {
 	void initVMax(){
 		vMax.reserve(xMin.size());
 		for (int i = 0; i < (int)xMin.size(); i++){
-			vMax.push_back(xMax[i] + fabs(xMin[i]));
+			vMax.push_back(xMax[i] - xMin[i]);
 		}
 	}
 

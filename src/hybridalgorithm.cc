@@ -87,9 +87,9 @@ void HybridAlgorithm::run(std::shared_ptr<IOHprofiler_problem<double> > problem,
 void HybridAlgorithm::runSynchronous(int const evalBudget, int popSize, 
 	std::map<int,double> particleUpdateParams){
 
+	std::vector<Particle*> p0;
 	std::vector<Particle*> p1;
 	std::vector<Particle*> p2;
-	std::vector<Particle*> p3;
 		
 	topologyManager = TopologyManagerFactory::createTopologyManager(topologyManagerType, particles);
 	popSize = topologyManager->getClosestValidPopulationSize(popSize);	
@@ -149,40 +149,40 @@ void HybridAlgorithm::runSynchronous(int const evalBudget, int popSize,
 
 		improved ? notImproved = 0 : notImproved++;
 
-		p1 = copyPopulation(particles);
+		p0 = copyPopulation(particles);
 		
 		for (int i = 0; i < popSize; i++)
-			p1[i]->updatePbest();
+			p0[i]->updatePbest();
 		for (int i = 0; i < popSize; i++)
-			p1[i]->updateGbest();
+			p0[i]->updateGbest();
 		for (int i = 0; i < popSize; i++)
-			p1[i]->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));
+			p0[i]->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));
 
-		p2 = mutationManager->mutate(particles, Fs);
-		p3 = crossoverManager->crossover(particles,p2, Crs);
+		p1 = mutationManager->mutate(particles, Fs);
+		p2 = crossoverManager->crossover(particles,p1, Crs);
 			
 		improved = false;
-		for (unsigned int i = 0; i < p3.size(); i++){
-			p1[i]->evaluate(problem,logger);
-			p3[i]->evaluate(problem,logger);
+		for (unsigned int i = 0; i < p2.size(); i++){
+			p0[i]->evaluate(problem,logger);
+			p2[i]->evaluate(problem,logger);
 			
-			double minF = std::min(p1[i]->getFitness(), p3[i]->getFitness());	
+			double minF = std::min(p0[i]->getFitness(), p2[i]->getFitness());	
 			if (minF < bestFitness){
 				improved = true;
 				bestFitness = minF;
 			}
 		}
 
-		selectionManager->selection(particles, p1, p3);
+		selectionManager->selection(particles, p0, p2);
 		adaptationManager->update();
 
 		improved ? notImproved = 0 : notImproved++;
 
 		for (int i = 0; i < popSize; i++) {
 			//delete p0[i];  
-			delete p1[i]; 
+			delete p0[i]; 
+			delete p1[i];
 			delete p2[i];
-			delete p3[i];
 		}
 
 		iterations++;	
@@ -197,9 +197,9 @@ void HybridAlgorithm::runSynchronous(int const evalBudget, int popSize,
 void HybridAlgorithm::runAsynchronous(int const evalBudget, 
 	int popSize, std::map<int,double> particleUpdateParams){
 
+	std::vector<Particle*> p0;
 	std::vector<Particle*> p1;
 	std::vector<Particle*> p2;
-	std::vector<Particle*> p3;
 		
 	topologyManager = TopologyManagerFactory::createTopologyManager(topologyManagerType, particles);
 	popSize = topologyManager->getClosestValidPopulationSize(popSize);	
@@ -242,7 +242,7 @@ void HybridAlgorithm::runAsynchronous(int const evalBudget,
 		adaptationManager->reset();
 		
 		improved = false;
-		p1 = copyPopulation(particles);
+		p0 = copyPopulation(particles);
 		for (int i = 0; i < popSize; i++){
 			double y = particles[i]->evaluate(problem,logger);
 
@@ -251,39 +251,39 @@ void HybridAlgorithm::runAsynchronous(int const evalBudget,
 				bestFitness = y;
 			}
 
-			p1[i]->updatePbest();
-			p1[i]->updateGbest();			
-			p1[i]->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));
+			p0[i]->updatePbest();
+			p0[i]->updateGbest();			
+			p0[i]->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));
 		}
 
 		improved ? notImproved = 0 : notImproved++;
 
-		p2 = mutationManager->mutate(particles, Fs);
-		p3 = crossoverManager->crossover(particles,p2, Crs);
+		p1 = mutationManager->mutate(particles, Fs);
+		p2 = crossoverManager->crossover(particles,p1, Crs);
 			
 		improved = false;
-		for (unsigned int i = 0; i < p3.size(); i++){
-			p1[i]->evaluate(problem,logger);
-			p3[i]->evaluate(problem,logger);
+		for (unsigned int i = 0; i < p2.size(); i++){
+			p0[i]->evaluate(problem,logger);
+			p2[i]->evaluate(problem,logger);
 
 
-			double minF = std::min(p1[i]->getFitness(), p3[i]->getFitness());	
+			double minF = std::min(p0[i]->getFitness(), p2[i]->getFitness());	
 			if (minF < bestFitness){
 				improved = true;
 				bestFitness = minF;
 			}
 		}
 
-		selectionManager->selection(particles, p1, p3);
+		selectionManager->selection(particles, p0, p2);
 		adaptationManager->update();
 
 		improved ? notImproved = 0 : notImproved++;
 
 		for (int i = 0; i < popSize; i++) {
 			//delete p0[i];  
-			delete p1[i]; 
+			delete p0[i]; 
+			delete p1[i];
 			delete p2[i];
-			delete p3[i];
 		}
 
 		iterations++;	

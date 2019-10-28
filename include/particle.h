@@ -3,7 +3,6 @@
 #include <map>
 #include <particleupdatesettings.h>
 #include "solution.h"
-typedef void (*evaluate_function_t)(const double *x, double *y);
 
 class ParticleUpdateManager;
 

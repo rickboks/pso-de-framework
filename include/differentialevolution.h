@@ -32,6 +32,6 @@ class DifferentialEvolution {
 			CrossoverType const crossoverType, DEAdaptationType adaptationType, bool const jumpOpposition);
 		void run(std::shared_ptr<IOHprofiler_problem<double> > problem, 
     		std::shared_ptr<IOHprofiler_csv_logger> logger,
-    		int const evalBudget, int const popSize, double const F, double const Cr);
+    		int const evalBudget, int const popSize);
 		std::string getIdString() const;
 };

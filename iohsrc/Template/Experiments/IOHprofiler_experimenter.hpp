@@ -12,36 +12,7 @@ public:
   typedef void _algorithm(std::shared_ptr<IOHprofiler_problem<InputType>>, std::shared_ptr<IOHprofiler_csv_logger> logger);
 
   IOHprofiler_experimenter() {};
-  // IOHprofiler_experimenter(std::string configFileName, _algorithm *algorithm) {
-  //     this->conf.readcfg(configFileName);
-    
-  //   configSuite = genericGenerator<IOHprofiler_suite<InputType>>::instance().create(conf.get_suite_name());
-  //   if (configSuite == nullptr) {
-  //     IOH_error("Creating suite fails, please check your configuration");
-  //   }
-    
-  //   configSuite->IOHprofiler_set_suite_problem_id(conf.get_problem_id());
-  //   configSuite->IOHprofiler_set_suite_instance_id(conf.get_instance_id());
-  //   configSuite->IOHprofiler_set_suite_dimension(conf.get_dimension());
-  //   configSuite->loadProblem();
-
-  //   std::shared_ptr<IOHprofiler_csv_logger> logger(new IOHprofiler_csv_logger(conf.get_output_directory(),conf.get_result_folder(),conf.get_algorithm_name(),conf.get_algorithm_info()));
-  //   if (logger == nullptr) {
-  //     IOH_error("Creating logger fails, please check your configuration");
-  //   }
-    
-  //   logger->set_complete_flag(conf.get_complete_triggers());
-  //   logger->set_interval(conf.get_number_interval_triggers());
-  //   logger->set_time_points(conf.get_base_evaluation_triggers(),conf.get_number_target_triggers());
-  //   logger->set_update_flag(conf.get_update_triggers());
-    
-  //   config_csv_logger = logger;
-  //   config_csv_logger->activate_logger();
-    
-  //   this->algorithm = algorithm;
-  // };
-
-  IOHprofiler_experimenter(std::string configFileName, std::string dirname, _algorithm *algorithm) {
+  IOHprofiler_experimenter(std::string configFileName, std::string algoname, _algorithm *algorithm) {
       this->conf.readcfg(configFileName);
     
     configSuite = genericGenerator<IOHprofiler_suite<InputType>>::instance().create(conf.get_suite_name());
@@ -53,9 +24,10 @@ public:
     configSuite->IOHprofiler_set_suite_instance_id(conf.get_instance_id());
     configSuite->IOHprofiler_set_suite_dimension(conf.get_dimension());
     configSuite->loadProblem();
-    
-    std::string result_folder = (dirname == "" ? conf.get_result_folder():dirname);
-      std::shared_ptr<IOHprofiler_csv_logger> logger(new IOHprofiler_csv_logger(conf.get_output_directory(),result_folder,result_folder,conf.get_algorithm_info()));
+
+
+    std::string name = (algoname == "" ? conf.get_result_folder() : algoname);
+    std::shared_ptr<IOHprofiler_csv_logger> logger(new IOHprofiler_csv_logger(conf.get_output_directory(),algoname,algoname,algoname));
     if (logger == nullptr) {
       IOH_error("Creating logger fails, please check your configuration");
     }
@@ -70,7 +42,6 @@ public:
     
     this->algorithm = algorithm;
   };
-
 
   IOHprofiler_experimenter(IOHprofiler_suite<InputType> suite, std::shared_ptr<IOHprofiler_csv_logger> csv_logger, _algorithm * algorithm) {
     configSuite = suite;

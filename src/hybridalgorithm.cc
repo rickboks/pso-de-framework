@@ -73,20 +73,19 @@ HybridAlgorithm::~HybridAlgorithm(){
 
 void HybridAlgorithm::run(std::shared_ptr<IOHprofiler_problem<double> > problem, 
     		std::shared_ptr<IOHprofiler_csv_logger> logger,
-    		int const evalBudget, int popSize, std::map<int,double> particleUpdateParams, 
-	double const F, double const Cr){
+    		int const evalBudget, int popSize, std::map<int,double> particleUpdateParams){
 
 	this->problem=problem;
 	this->logger=logger;
 	if (synchronicity == SYNCHRONOUS)
-		runSynchronous(evalBudget, popSize, particleUpdateParams, F, Cr);
+		runSynchronous(evalBudget, popSize, particleUpdateParams);
 	else if (synchronicity == ASYNCHRONOUS){
-		runAsynchronous(evalBudget, popSize, particleUpdateParams, F, Cr);
+		runAsynchronous(evalBudget, popSize, particleUpdateParams);
 	}
 }
 
 void HybridAlgorithm::runSynchronous(int const evalBudget, int popSize, 
-	std::map<int,double> particleUpdateParams, double const F, double const Cr){
+	std::map<int,double> particleUpdateParams){
 
 	std::vector<Particle*> p1;
 	std::vector<Particle*> p2;
@@ -126,12 +125,11 @@ void HybridAlgorithm::runSynchronous(int const evalBudget, int popSize,
 	double bestFitness = std::numeric_limits<double>::max();
 	int notImproved = 0;
 	bool improved;
-	int evaluations = 0;
 
 	std::vector<double> Fs(popSize);
 	std::vector<double> Crs(popSize);	
 
-	while (	evaluations <= evalBudget &&
+	while (	problem->IOHprofiler_get_evaluations() < evalBudget &&
 			!problem->IOHprofiler_hit_optimal()){
 		
 		improved = false;
@@ -142,7 +140,6 @@ void HybridAlgorithm::runSynchronous(int const evalBudget, int popSize,
 
 		for (int i = 0; i < popSize; i++){
 			double y = particles[i]->evaluate(problem,logger);
-			evaluations++;
 
 			if (y < bestFitness){
 				improved = true;
@@ -159,7 +156,7 @@ void HybridAlgorithm::runSynchronous(int const evalBudget, int popSize,
 		for (int i = 0; i < popSize; i++)
 			p1[i]->updateGbest();
 		for (int i = 0; i < popSize; i++)
-			p1[i]->updateVelocityAndPosition(double(evaluations)/double(evalBudget));
+			p1[i]->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));
 
 		p2 = mutationManager->mutate(particles, Fs);
 		p3 = crossoverManager->crossover(particles,p2, Crs);
@@ -168,8 +165,7 @@ void HybridAlgorithm::runSynchronous(int const evalBudget, int popSize,
 		for (unsigned int i = 0; i < p3.size(); i++){
 			p1[i]->evaluate(problem,logger);
 			p3[i]->evaluate(problem,logger);
-			evaluations+=2;
-
+			
 			double minF = std::min(p1[i]->getFitness(), p3[i]->getFitness());	
 			if (minF < bestFitness){
 				improved = true;
@@ -190,7 +186,7 @@ void HybridAlgorithm::runSynchronous(int const evalBudget, int popSize,
 		}
 
 		iterations++;	
-		topologyManager->update(double(evaluations)/double(evalBudget));	
+		topologyManager->update(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));	
 	}
 
 
@@ -199,8 +195,7 @@ void HybridAlgorithm::runSynchronous(int const evalBudget, int popSize,
 }
 
 void HybridAlgorithm::runAsynchronous(int const evalBudget, 
-	int popSize, std::map<int,double> particleUpdateParams,
-	double const F, double const Cr){
+	int popSize, std::map<int,double> particleUpdateParams){
 
 	std::vector<Particle*> p1;
 	std::vector<Particle*> p2;
@@ -235,12 +230,11 @@ void HybridAlgorithm::runAsynchronous(int const evalBudget,
 	double bestFitness = std::numeric_limits<double>::max();
 	int notImproved = 0;
 	bool improved;
-	int evaluations = 0;
 
 	std::vector<double> Fs(popSize);
 	std::vector<double> Crs(popSize);
 
-	while (	evaluations <= evalBudget &&
+	while (	problem->IOHprofiler_get_evaluations() < evalBudget &&
 			!problem->IOHprofiler_hit_optimal()){
 
 		adaptationManager->nextF(Fs);
@@ -251,7 +245,6 @@ void HybridAlgorithm::runAsynchronous(int const evalBudget,
 		p1 = copyPopulation(particles);
 		for (int i = 0; i < popSize; i++){
 			double y = particles[i]->evaluate(problem,logger);
-			evaluations++;
 
 			if (y < bestFitness){
 				improved = true;
@@ -260,7 +253,7 @@ void HybridAlgorithm::runAsynchronous(int const evalBudget,
 
 			p1[i]->updatePbest();
 			p1[i]->updateGbest();			
-			p1[i]->updateVelocityAndPosition(double(evaluations)/double(evalBudget));
+			p1[i]->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));
 		}
 
 		improved ? notImproved = 0 : notImproved++;
@@ -273,7 +266,6 @@ void HybridAlgorithm::runAsynchronous(int const evalBudget,
 			p1[i]->evaluate(problem,logger);
 			p3[i]->evaluate(problem,logger);
 
-			evaluations+=2;
 
 			double minF = std::min(p1[i]->getFitness(), p3[i]->getFitness());	
 			if (minF < bestFitness){
@@ -295,7 +287,7 @@ void HybridAlgorithm::runAsynchronous(int const evalBudget,
 		}
 
 		iterations++;	
-		topologyManager->update(double(evaluations)/double(evalBudget));	
+		topologyManager->update(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));	
 	}
 
 	reset();

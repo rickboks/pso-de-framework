@@ -25,12 +25,10 @@ class HybridAlgorithm {
 		std::shared_ptr<IOHprofiler_problem<double> > problem; 
     	std::shared_ptr<IOHprofiler_csv_logger> logger;
 		void runSynchronous(int const evalBudget, int const popSize, 
-			std::map<int,double> particleUpdateParams,
-			double const F, double const Cr);
+			std::map<int,double> particleUpdateParams);
 
 		void runAsynchronous(int const evalBudget, int const popSize, 
-			std::map<int,double> particleUpdateParams,
-			double const F, double const Cr);
+			std::map<int,double> particleUpdateParams);
 
 		public:
 		HybridAlgorithm(UpdateManagerType const updateManagerType, 
@@ -42,8 +40,7 @@ class HybridAlgorithm {
 
 		void run(std::shared_ptr<IOHprofiler_problem<double> > problem, 
     		std::shared_ptr<IOHprofiler_csv_logger> logger, int const evalBudget, 
-    		int const popSize, std::map<int,double> particleUpdateParams, 
-			double const F, double const Cr);
+    		int const popSize, std::map<int,double> particleUpdateParams);
 
 		void reset();
 		std::string getIdString() const;

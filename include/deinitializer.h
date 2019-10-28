@@ -3,7 +3,7 @@
 #include <vector>
 class Genome;
 
-typedef void (*evaluate_function_t)(const double *x, double *y);
+
 enum DEInitializationType {
 	RANDOM,
 	OPPOSITION,

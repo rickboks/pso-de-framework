@@ -82,11 +82,10 @@ void ParticleSwarm::runAsynchronous(int const evalBudget,
 	double bestFitness = std::numeric_limits<double>::max();
 	int notImproved = 0;
 	bool improved;
-	int evaluations = 0;
 
 	while (	
 			//notImproved < 100 && 
-			evaluations <= evalBudget &&
+			problem->IOHprofiler_get_evaluations() < evalBudget &&
 			!problem->IOHprofiler_hit_optimal()){
 		
 		improved = false;
@@ -95,7 +94,6 @@ void ParticleSwarm::runAsynchronous(int const evalBudget,
 			std::vector<double> position = particles[i]->getPosition();			
 
 			double y = particles[i]->evaluate(problem,logger);
-			evaluations++;
 
 			if (y < bestFitness){
 				improved = true;
@@ -104,13 +102,13 @@ void ParticleSwarm::runAsynchronous(int const evalBudget,
 
 			particles[i]->updatePbest();
 			particles[i]->updateGbest();
-			particles[i]->updateVelocityAndPosition(double(evaluations)/double(evalBudget));			
+			particles[i]->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));			
 		}
 
 		improved ? notImproved=0 : notImproved++;
 
 		iterations++;	
-		topologyManager->update(double(evaluations)/double(evalBudget));	
+		topologyManager->update(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));	
 	}
 
 	reset();
@@ -144,10 +142,9 @@ void ParticleSwarm::runSynchronous(int const evalBudget, int popSize,
 	double bestFitness = std::numeric_limits<double>::max();
 	int notImproved = 0;
 	bool improved;
-	int evaluations = 0;
 
 	while (	//notImproved < 100 && 
-			evaluations <= evalBudget &&
+			problem->IOHprofiler_get_evaluations() < evalBudget &&
 			!problem->IOHprofiler_hit_optimal()){
 		
 		improved = false;
@@ -156,13 +153,11 @@ void ParticleSwarm::runSynchronous(int const evalBudget, int popSize,
 			std::vector<double> position = particles[i]->getPosition();			
 
 			double y = particles[i]->evaluate(problem,logger);
-			evaluations++;
 
 			if (y < bestFitness){
 				improved = true;
 				bestFitness = y;
-			}
-	
+			}	
 		}		
 
 		improved ? notImproved=0 : notImproved++;
@@ -174,10 +169,10 @@ void ParticleSwarm::runSynchronous(int const evalBudget, int popSize,
 			particles[i]->updateGbest();
 
 		for (int i = 0; i < popSize; i++)
-			particles[i]->updateVelocityAndPosition(double(evaluations)/double(evalBudget));
+			particles[i]->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));
 	
 		iterations++;	
-		topologyManager->update(double(evaluations)/double(evalBudget));	
+		topologyManager->update(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));	
 	}
 
 	reset();

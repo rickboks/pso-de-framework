@@ -28,7 +28,12 @@ void DESuite::generateConfigurations(){
 }
 
 DifferentialEvolution DESuite::getDE(int const i) {
-	auto [initialization, mutation, crossover, adapt, jump] = configurations[i];
+	//auto [initialization, mutation, crossover, adapt, jump] = configurations[i];
+	DEInitializationType initialization = std::get<0>(configurations[i]);
+	MutationType mutation = std::get<1>(configurations[i]);
+	CrossoverType crossover = std::get<2>(configurations[i]);
+	DEAdaptationType adapt = std::get<3>(configurations[i]);
+	bool jump = std::get<4>(configurations[i]);
 
 	return DifferentialEvolution (initialization, mutation, crossover, adapt, jump);
 }

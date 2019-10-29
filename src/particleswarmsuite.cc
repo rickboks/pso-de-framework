@@ -14,6 +14,7 @@ ParticleSwarmSuite::ParticleSwarmSuite(){
 }
 
 void ParticleSwarmSuite::generateConfigurations(){
+	configurations.clear();
 	for (auto update : updateManagers)
 		for (auto topology : topologyManagers)
 			for (auto synchronicity : synchronicities)

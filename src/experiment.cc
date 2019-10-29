@@ -3,9 +3,19 @@
 #include <set>
 #include "hybridalgorithm.h"
 #include "differentialevolution.h"
+
 HybridAlgorithm* ha;
 ParticleSwarm* pso;
 DifferentialEvolution* de;
+
+std::vector<MutationType> mutations ({
+  BEST_1,
+  BEST_2,
+  RAND_1,
+  RAND_2,
+  TTB_1,
+  TTPB_1, 
+});
 
 //5 dimensions for HA
 
@@ -21,22 +31,23 @@ void algorithm
 
 
 void _run_experiment() {
-    pso = new ParticleSwarm(DECR_INERTIA_WEIGHT, VON_NEUMANN, ASYNCHRONOUS);
-    ha = new HybridAlgorithm(DECR_INERTIA_WEIGHT, VON_NEUMANN, ASYNCHRONOUS, BEST_1, BINOMIAL, P3, JADE);
-    de = new DifferentialEvolution(OPPOSITION, BEST_1, BINOMIAL, JADE, false);
+      pso = new ParticleSwarm(DECR_INERTIA_WEIGHT, VON_NEUMANN, ASYNCHRONOUS);
+      //for (int i = 0; i < MUT_END; i++){
+      ha = new HybridAlgorithm(DECR_INERTIA_WEIGHT, VON_NEUMANN, ASYNCHRONOUS, TTPB_1, BINOMIAL, P3, JADE);
+      //std::cout << ha->getIdString() << std::endl;
+      //de = new DifferentialEvolution(OPPOSITION, BEST_1, BINOMIAL, JADE, false);
 
-    std::string configName = "./configuration.ini";
-    IOHprofiler_experimenter<double> experimenter(configName,pso->getIdString(),algorithm); 
-    experimenter._set_independent_runs(10);
-    experimenter._run();
-
-    delete pso;
-    delete ha;
-    delete de;
-  }
+      std::string configName = "./configuration.ini";
+      IOHprofiler_experimenter<double> experimenter(configName,pso->getIdString(),algorithm); 
+      experimenter._set_independent_runs(10);
+      experimenter._run();
+      delete ha;
+      delete pso;
+}
+  //}
 
 
 int main(){
   _run_experiment();
-  return 0;
+  return 0; 
 }

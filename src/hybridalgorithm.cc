@@ -216,8 +216,6 @@ void HybridAlgorithm::runAsynchronous(int const evalBudget,
 
 	for (Particle* const p : particles)
 		p->randomize(settings.xMax, settings.xMin);
-	for (Particle* const p : particles)
-		p->updateGbest();
 
 	topologyManager->initialize();
 	mutationManager = MutationManagerFactory::createMutationManager<Particle>(mutationType,D);
@@ -242,7 +240,7 @@ void HybridAlgorithm::runAsynchronous(int const evalBudget,
 		adaptationManager->reset();
 		
 		improved = false;
-		p0 = copyPopulation(particles);
+		
 		for (int i = 0; i < popSize; i++){
 			double y = particles[i]->evaluate(problem,logger);
 
@@ -250,13 +248,19 @@ void HybridAlgorithm::runAsynchronous(int const evalBudget,
 				improved = true;
 				bestFitness = y;
 			}
-
-			p0[i]->updatePbest();
-			p0[i]->updateGbest();			
-			p0[i]->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));
 		}
 
 		improved ? notImproved = 0 : notImproved++;
+
+		p0 = copyPopulation(particles);
+		
+		for (int i = 0; i < popSize; i++){
+			p0[i]->updatePbest();
+			p0[i]->updateGbest();			
+			p0[i]->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));
+		}		
+
+		
 
 		p1 = mutationManager->mutate(particles, Fs);
 		p2 = crossoverManager->crossover(particles,p1, Crs);

@@ -16,12 +16,13 @@ DESuite::DESuite(){
 }
 
 void DESuite::generateConfigurations(){
+	configurations.clear();
 	for (auto mutation : mutationManagers)
 		for (auto crossover : crossoverManagers)
 				for (auto adaptation : adaptationManagers)
 					for (auto initialization : initializationManagers){
 						configurations.push_back(std::make_tuple(initialization, mutation, crossover, adaptation, false));
-						configurations.push_back(std::make_tuple(initialization, mutation, crossover, adaptation, true));
+						//configurations.push_back(std::make_tuple(initialization, mutation, crossover, adaptation, true));
 					}
 
 }

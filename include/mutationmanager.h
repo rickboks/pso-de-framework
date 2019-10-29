@@ -15,12 +15,15 @@ enum MutationType {
 	BEST_2,
 	RAND_2,
 	RAND_2_DIR,
-	TOPOLOGY,
 	NSDE,
 	TRIGONOMETRIC,
 	TO1,
 	TO2,
-	MUT_END
+	MUT_END,
+
+
+	//Unused
+	TOPOLOGY
 };
 
 template<class T>

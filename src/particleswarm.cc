@@ -73,8 +73,6 @@ void ParticleSwarm::runAsynchronous(int const evalBudget,
 		p->randomize(settings.xMax, settings.xMin);
 		particles.push_back(p);
 	}
-	for (Particle* const p : particles)
-		p->updateGbest();
 
 	topologyManager->initialize();
 	
@@ -132,8 +130,6 @@ void ParticleSwarm::runSynchronous(int const evalBudget, int popSize,
 		p->randomize(settings.xMax, settings.xMin);
 		particles.push_back(p);
 	}
-	for (Particle* const p : particles)
-		p->updateGbest();
 
 	topologyManager->initialize();
 	

@@ -4,8 +4,8 @@
 std::string InstanceNamer::getName(UpdateManagerType const update, Topology const topology, 
 			Synchronicity const sync, MutationType const mutation, CrossoverType const crossover, 
 			SelectionType const selection, DEAdaptationType const adaptation){
-	return "H" + updateID(update) + topologyID(topology) + synchronicityID(sync) + mutationID(mutation)
-			+ crossoverID(crossover) + selectionID(selection) + adaptationID(adaptation); 
+	return "H_" + updateID(update) + "_" + topologyID(topology) + /*synchronicityID(sync) +*/ "_" + mutationID(mutation)
+			+ "_" + crossoverID(crossover) +"_"+ selectionID(selection)/* + adaptationID(adaptation)*/; 
 }
 
 //For PSO

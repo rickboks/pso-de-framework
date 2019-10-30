@@ -31,7 +31,7 @@ class MutationManager {
 	protected:
 		int const D;
 
-		T* getBest(std::vector<T*>& genomes){
+		T* getBest(std::vector<T*>const& genomes){
 			int best = 0;
 			double bestF = std::numeric_limits<double>::max();
 
@@ -70,7 +70,7 @@ class MutationManager {
 		virtual ~MutationManager(){
 		}
 
-		virtual std::vector<T*> mutate(std::vector<T*> genomes, std::vector<double>& Fs) = 0;
+		virtual std::vector<T*> mutate(std::vector<T*>const& genomes, std::vector<double>& Fs) = 0;
 };
 
 template<class T>
@@ -79,7 +79,7 @@ class Rand1MutationManager : public MutationManager<T> {
 
 	public:
 		Rand1MutationManager(int const D):MutationManager<T>(D){}
-		std::vector<T*> mutate(std::vector<T*> genomes, std::vector<double>& Fs){
+		std::vector<T*> mutate(std::vector<T*> const& genomes, std::vector<double>& Fs){
 			std::vector<T*> mutants;
 			mutants.reserve(genomes.size());
 
@@ -113,7 +113,7 @@ class TTB1MutationManager : public MutationManager<T> {
 
 	public:
 		TTB1MutationManager(int const D):MutationManager<T>(D){}
-		std::vector<T*> mutate(std::vector<T*> genomes, std::vector<double>& Fs){
+		std::vector<T*> mutate(std::vector<T*>const& genomes, std::vector<double>& Fs){
 			std::vector<double> best = this->getBest(genomes)->getPosition(); 
 			std::vector<T*> mutants;
 			mutants.reserve(genomes.size());
@@ -161,7 +161,7 @@ class TTPB1MutationManager : public MutationManager<T> {
 		TTPB1MutationManager(int const D)
 			:MutationManager<T>(D), p(0.1){}
 
-		std::vector<T*> mutate(std::vector<T*> genomes, std::vector<double>& Fs){
+		std::vector<T*> mutate(std::vector<T*>const& genomes, std::vector<double>& Fs){
 			std::vector<double> best = this->getPBest(genomes)->getPosition(); 
 			std::vector<T*> mutants;
 			mutants.reserve(genomes.size());
@@ -201,7 +201,7 @@ class Best1MutationManager: public MutationManager<T> {
 
 	public:
 		Best1MutationManager(int const D):MutationManager<T>(D){}
-		std::vector<T*> mutate(std::vector<T*> genomes, std::vector<double>& Fs){
+		std::vector<T*> mutate(std::vector<T*>const& genomes, std::vector<double>& Fs){
 			std::vector<T*> mutants;
 			mutants.reserve(genomes.size());
 			std::vector<double> best = this->getBest(genomes)->getPosition();
@@ -239,7 +239,7 @@ class Best2MutationManager: public MutationManager<T> {
 
 	public:
 		Best2MutationManager(int const D):MutationManager<T>(D){}
-		std::vector<T*> mutate(std::vector<T*> genomes, std::vector<double>& Fs){
+		std::vector<T*> mutate(std::vector<T*>const& genomes, std::vector<double>& Fs){
 			std::vector<double> best = this->getBest(genomes)->getPosition(); 
 			std::vector<T*> mutants;
 			mutants.reserve(genomes.size());
@@ -281,7 +281,7 @@ class Rand2MutationManager: public MutationManager<T> {
 
 	public:
 		Rand2MutationManager(int const D):MutationManager<T>(D){}
-		std::vector<T*> mutate(std::vector<T*> genomes, std::vector<double>& Fs){
+		std::vector<T*> mutate(std::vector<T*>const& genomes, std::vector<double>& Fs){
 			std::vector<T*> mutants;
 			mutants.reserve(genomes.size());
 
@@ -322,7 +322,7 @@ class Rand2DirMutationManager : public MutationManager<T> {
 
 	public:
 		Rand2DirMutationManager(int const D):MutationManager<T>(D){}
-		std::vector<T*> mutate(std::vector<T*> genomes, std::vector<double>& Fs){
+		std::vector<T*> mutate(std::vector<T*>const& genomes, std::vector<double>& Fs){
 			std::vector<T*> mutants;
 			mutants.reserve(genomes.size());
 
@@ -380,7 +380,7 @@ class NSDEMutationManager : public MutationManager<T> {
 
 	public:
 		NSDEMutationManager(int const D):MutationManager<T>(D){}
-		std::vector<T*> mutate(std::vector<T*> genomes, std::vector<double>& Fs){
+		std::vector<T*> mutate(std::vector<T*>const& genomes, std::vector<double>& Fs){
 			std::vector<T*> mutants;
 			mutants.reserve(genomes.size());
 
@@ -439,7 +439,7 @@ template<class T>
 class TrigonometricMutationManager : public MutationManager<T> {
 	private:
 		double const gamma;
-		std::vector<T*> trigonometricMutation(std::vector<T*> genomes, std::vector<double>& Fs){
+		std::vector<T*> trigonometricMutation(std::vector<T*>const& genomes, std::vector<double>& Fs){
 			std::vector<T*> mutants;
 			mutants.reserve(genomes.size());
 
@@ -488,7 +488,7 @@ class TrigonometricMutationManager : public MutationManager<T> {
 			return mutants;
 		}
 
-		std::vector<T*> rand1Mutation(std::vector<T*> genomes, std::vector<double>& Fs){
+		std::vector<T*> rand1Mutation(std::vector<T*>const& genomes, std::vector<double>& Fs){
 			std::vector<T*> mutants;
 			mutants.reserve(genomes.size());
 
@@ -517,7 +517,7 @@ class TrigonometricMutationManager : public MutationManager<T> {
 
 	public:
 		TrigonometricMutationManager(int const D): MutationManager<T>(D), gamma(0.05){}
-		std::vector<T*> mutate(std::vector<T*> genomes, std::vector<double>& Fs){
+		std::vector<T*> mutate(std::vector<T*>const& genomes, std::vector<double>& Fs){
 			return rng.randDouble(0,1) <= gamma ? trigonometricMutation(genomes,Fs) : rand1Mutation(genomes,Fs);
 		}
 };
@@ -527,7 +527,7 @@ class TwoOpt1MutationManager : public MutationManager<T> {
 	private:
 	public:
 		TwoOpt1MutationManager(int const D): MutationManager<T>(D){}
-		std::vector<T*> mutate(std::vector<T*> genomes, std::vector<double>& Fs){
+		std::vector<T*> mutate(std::vector<T*>const& genomes, std::vector<double>& Fs){
 			std::vector<T*> mutants;
 			mutants.reserve(genomes.size());
 
@@ -572,7 +572,7 @@ class TwoOpt2MutationManager : public MutationManager<T> {
 	private:
 	public:
 		TwoOpt2MutationManager(int const D): MutationManager<T>(D){}
-		std::vector<T*> mutate(std::vector<T*> genomes, std::vector<double>& Fs){
+		std::vector<T*> mutate(std::vector<T*>const& genomes, std::vector<double>& Fs){
 			std::vector<T*> mutants;
 			mutants.reserve(genomes.size());
 

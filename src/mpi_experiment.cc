@@ -71,13 +71,7 @@ int main(int argc, char **argv) {
 	suite.setSelectionManagers(selectionTypes);
 	suite.setSynchronicities(synchronicities);
 	suite.setDEAdaptationManagers(adaptationTypes);
-
-	for (int i = 0; i < suite.size(); i++){
-		std::cout << suite.getHybrid(i).getIdString() << std::endl;
-	}
-
-	return 1;
-
+	
 	// psSuite.setUpdateManagers(updateManagers);
 	// psSuite.setTopologyManagers(topologies);
 	// psSuite.setSynchronicities(synchronicities);

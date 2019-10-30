@@ -21,11 +21,11 @@ class CrossoverManager {
 		CrossoverManager(int const D): D(D){}
 		virtual ~CrossoverManager(){}
 
-		virtual std::vector<T*> crossover(std::vector<T*>& targets, 
-			std::vector<T*>& donors, std::vector<double>& Crs) = 0;
+		virtual std::vector<T*> crossover(std::vector<T*>const& targets, 
+			std::vector<T*>const& donors, std::vector<double>const& Crs) = 0;
 
-		virtual std::vector<double> singleCrossover(std::vector<double> target, 
-			std::vector<double> donor, double const Cr) =0;
+		virtual std::vector<double> singleCrossover(std::vector<double>const& target, 
+			std::vector<double>const& donor, double const Cr) =0;
 };
 
 template <class T>
@@ -34,7 +34,7 @@ class BinomialCrossoverManager : public CrossoverManager<T> {
 
 	public:
 		BinomialCrossoverManager(int const D) : CrossoverManager<T>(D){}
-		std::vector<T*> crossover(std::vector<T*>& genomes, std::vector<T*>& mutants, std::vector<double>& Crs){
+		std::vector<T*> crossover(std::vector<T*>const& genomes, std::vector<T*>const& mutants, std::vector<double>const& Crs){
 			std::vector<T*> trials;
 			trials.reserve(genomes.size());
 			std::vector<double> x(this->D);
@@ -48,7 +48,7 @@ class BinomialCrossoverManager : public CrossoverManager<T> {
 			return trials;
 		}
 
-		std::vector<double> singleCrossover(std::vector<double> target, std::vector<double> donor, double const Cr){
+		std::vector<double> singleCrossover(std::vector<double>const& target, std::vector<double>const& donor, double const Cr){
 			std::vector<double> x(this->D);
 			int const jrand = rng.randInt(0,this->D-1);
 			for (int j = 0; j < this->D; j++){
@@ -68,7 +68,7 @@ class ExponentialCrossoverManager : public CrossoverManager<T> {
 
 	public:
 		ExponentialCrossoverManager(int const D): CrossoverManager<T>(D){}
-		std::vector<T*> crossover(std::vector<T*>& genomes, std::vector<T*>& mutants, std::vector<double>& Crs){
+		std::vector<T*> crossover(std::vector<T*>const& genomes, std::vector<T*>const& mutants, std::vector<double>const& Crs){
 			std::vector<T*> trials;
 			for (unsigned int i = 0; i < genomes.size(); i++){
 				trials.push_back(new T(singleCrossover(genomes[i]->getPosition(), mutants[i]->getPosition(), Crs[i])));
@@ -76,7 +76,7 @@ class ExponentialCrossoverManager : public CrossoverManager<T> {
 
 			return trials;
 		}
-		std::vector<double> singleCrossover(std::vector<double> target, std::vector<double> donor, double const Cr){
+		std::vector<double> singleCrossover(std::vector<double>const& target, std::vector<double>const& donor, double const Cr){
 			std::vector<double> x(this->D);
 			std::vector<int> mutantIndices;
 			int const n = rng.randInt(0,this->D-1);

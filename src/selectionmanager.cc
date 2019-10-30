@@ -9,7 +9,7 @@ SelectionManager::SelectionManager(int const D, DEAdaptationManager* dam)
 }
 
 void SelectionManager::selection(std::vector<Particle*>& particles, 
-		std::vector<Particle*>& p0, std::vector<Particle*>& p2){
+		std::vector<Particle*>const& p0, std::vector<Particle*>const& p2){
 	//check sucessful indices
 
 	for (unsigned int i = 0; i < particles.size(); i++){
@@ -31,7 +31,7 @@ Pairwise2SelectionManager::Pairwise2SelectionManager(int const D, DEAdaptationMa
 }
 
 void Pairwise2SelectionManager::select(std::vector<Particle*>& particles, 
-		std::vector<Particle*>& p0, std::vector<Particle*>& p2){
+		std::vector<Particle*>const& p0, std::vector<Particle*>const& p2){
 	for (unsigned int i = 0 ; i < particles.size(); i++){
 		//PSO wins
 		if (p0[i]->getFitness() < p2[i]->getFitness()){
@@ -56,7 +56,7 @@ Pairwise3SelectionManager::Pairwise3SelectionManager(int const D, DEAdaptationMa
 }
 
 void Pairwise3SelectionManager::select(std::vector<Particle*>& particles, 
-		std::vector<Particle*>& p0, std::vector<Particle*>& p2){
+		std::vector<Particle*>const& p0, std::vector<Particle*>const& p2){
 
 	for (unsigned int i = 0 ; i < particles.size(); i++){
 		double Fparticle = particles[i]->getFitness();
@@ -90,7 +90,7 @@ bool sortbyFirstElement(const std::tuple<Particle*, int, int>& a,
 } 
   
 void Union2SelectionManager::select(std::vector<Particle*>& particles, 
-		std::vector<Particle*>& p0, std::vector<Particle*>& p2){
+		std::vector<Particle*>const& p0, std::vector<Particle*>const& p2){
 
 	int popSize = particles.size();
 
@@ -127,7 +127,7 @@ Union3SelectionManager::Union3SelectionManager(int const D, DEAdaptationManager*
 }
 
 void Union3SelectionManager::select(std::vector<Particle*>& particles, 
-		std::vector<Particle*>& p0, std::vector<Particle*>& p2){
+		std::vector<Particle*>const& p0, std::vector<Particle*>const& p2){
 	int popSize = particles.size();
 
 	std::vector< std::tuple<Particle*, int, int > >  allSolutions;

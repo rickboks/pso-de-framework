@@ -22,7 +22,7 @@ HybridAlgorithm::HybridAlgorithm(UpdateManagerType const updateManagerType,
 	adaptationManager(NULL){
 }
 
-std::vector<Particle*> HybridAlgorithm::copyPopulation(std::vector<Particle*>& particles){
+std::vector<Particle*> HybridAlgorithm::copyPopulation(std::vector<Particle*>const& particles){
 	std::vector<Particle*> copy;
 	copy.reserve(particles.size());
 
@@ -259,8 +259,6 @@ void HybridAlgorithm::runAsynchronous(int const evalBudget,
 			p0[i]->updateGbest();			
 			p0[i]->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));
 		}		
-
-		
 
 		p1 = mutationManager->mutate(particles, Fs);
 		p2 = crossoverManager->crossover(particles,p1, Crs);

@@ -6,12 +6,12 @@ void scale(std::vector<double> & vec, double x){
            std::bind(std::multiplies<double>(), std::placeholders::_1, x));
 }
 
-void add(std::vector<double> lhs, std::vector<double> rhs, std::vector<double>& store){
+void add(std::vector<double>const& lhs, std::vector<double>const& rhs, std::vector<double>& store){
 	std::transform( lhs.begin(), lhs.end(),
                 rhs.begin(), store.begin(), 
                 std::plus<double>());
 }
-void subtract(std::vector<double> lhs, std::vector<double> rhs, std::vector<double>& store){
+void subtract(std::vector<double>const& lhs, std::vector<double>const& rhs, std::vector<double>& store){
 	std::transform( lhs.begin(), lhs.end(),
 	                rhs.begin(), store.begin(), 
 	                std::minus<double>());

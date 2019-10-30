@@ -45,9 +45,5 @@ class HybridAlgorithm {
 		void reset();
 		std::string getIdString() const;
 
-		std::vector<Particle*> copyPopulation(std::vector<Particle*>& particles);
-
-		template <class T>
-		std::vector<Solution*> toSolutions(std::vector<T*> vec);
-		std::vector<Particle*> toParticles(std::vector<Solution*> sol);
+		std::vector<Particle*> copyPopulation(std::vector<Particle*>const& particles);
 };

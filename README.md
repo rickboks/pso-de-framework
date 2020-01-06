@@ -12,7 +12,7 @@ $ make mpi
 $ mpirun -np [# of instances in suite] mpi_experiment
 ```
 
-See experiment.c and mpi.c for example experiments.
+See experiment.c and mpi\_experiment.c for example experiments.
 
 This framework uses IOHexperimenter for benchmarking. Please consult:
 ```

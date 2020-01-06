@@ -8,17 +8,14 @@
 
 Genome::Genome(int const D): 
 	Solution(D){
-
 }
 
 Genome::Genome(Particle* particle) :
 	Solution(particle){
-
 }
 
 Genome::Genome(std::vector<double>x): 
 	Solution(x){
-
 }
 
 void Genome::setWeightFactor(double weightFactor){

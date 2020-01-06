@@ -34,7 +34,6 @@ DifferentialEvolution DESuite::getDE(int const i) {
 	CrossoverType crossover = std::get<2>(configurations[i]);
 	DEAdaptationType adapt = std::get<3>(configurations[i]);
 	bool jump = std::get<4>(configurations[i]);
-
 	return DifferentialEvolution (initialization, mutation, crossover, adapt, jump);
 }
 
@@ -55,6 +54,7 @@ void DESuite::setDEAdaptationManagers(std::vector<DEAdaptationType> adaptationMa
 
 void DESuite::setInitializationManagers(std::vector<DEInitializationType> initialziationManagers){
 	this->initializationManagers = initialziationManagers;
+
 	generateConfigurations();
 }
 

@@ -71,15 +71,6 @@ int main(int argc, char **argv) {
 	suite.setSelectionManagers(selectionTypes);
 	suite.setSynchronicities(synchronicities);
 	suite.setDEAdaptationManagers(adaptationTypes);
-	
-	// psSuite.setUpdateManagers(updateManagers);
-	// psSuite.setTopologyManagers(topologies);
-	// psSuite.setSynchronicities(synchronicities);
-
-	// deSuite.setMutationManagers(mutations);
-	// deSuite.setCrossoverManagers(crossovers);
-	// deSuite.setDEAdaptationManagers(adaptationTypes);
-	// deSuite.setInitializationManagers(std::vector<DEInitializationType>({RANDOM}));
 
 	std::string configName = "./configuration.ini";
 	int id;
@@ -97,8 +88,6 @@ int main(int argc, char **argv) {
 
 	return 0;
 }
-
-
 
 void _run_experiment() {
 

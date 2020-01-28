@@ -12,7 +12,7 @@ public:
   typedef void _algorithm(std::shared_ptr<IOHprofiler_problem<InputType>>, std::shared_ptr<IOHprofiler_csv_logger> logger);
 
   IOHprofiler_experimenter() {};
-  IOHprofiler_experimenter(std::string configFileName, std::string algoname, _algorithm *algorithm) {
+  IOHprofiler_experimenter(std::string configFileName, std::string algoname, _algorithm *algorithm, bool log) {
       this->conf.readcfg(configFileName);
     
     configSuite = genericGenerator<IOHprofiler_suite<InputType>>::instance().create(conf.get_suite_name());
@@ -41,12 +41,14 @@ public:
     config_csv_logger->activate_logger();
     
     this->algorithm = algorithm;
+    this->log=log;
   };
 
-  IOHprofiler_experimenter(IOHprofiler_suite<InputType> suite, std::shared_ptr<IOHprofiler_csv_logger> csv_logger, _algorithm * algorithm) {
+  IOHprofiler_experimenter(IOHprofiler_suite<InputType> suite, std::shared_ptr<IOHprofiler_csv_logger> csv_logger, _algorithm * algorithm, bool log) {
     configSuite = suite;
     config_csv_logger = csv_logger;
     this->algorithm = algorithm;
+    this->log = log;
   };
 
   ~IOHprofiler_experimenter(){};
@@ -109,7 +111,8 @@ public:
   }
 
   void print_info(std::string info) {
-    std::cout << info << std::flush;
+	  if (log) std::cout << info << std::flush;
+
   }
   
   std::string vectorToString(std::vector<int> v) {
@@ -132,6 +135,7 @@ private:
   std::shared_ptr<IOHprofiler_problem<InputType>> current_problem;
   std::shared_ptr<IOHprofiler_csv_logger> config_csv_logger;
   int independent_runs = 1;
+  bool log;
 
   _algorithm *algorithm;
 };

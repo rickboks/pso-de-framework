@@ -14,7 +14,7 @@ enum Synchronicity {
 
 struct Problem;
 class Particle;
-class ParticleUpdateSettings;
+struct ParticleUpdateSettings;
 template <typename T> 
 class IOHprofiler_problem;
 class IOHprofiler_csv_logger;
@@ -28,12 +28,13 @@ class ParticleSwarm {
 		std::ofstream* outfile;
 		std::shared_ptr<IOHprofiler_problem<double> > problem;
     	std::shared_ptr<IOHprofiler_csv_logger> logger;
-		
+		bool logging;
+
 		void runSynchronous(int const evalBudget, int const popSize, 
     		std::map<int,double> particleUpdateParams);
 		void runAsynchronous(int const evalBudget, int const popSize, 
     		std::map<int,double> particleUpdateParams);
-		public:
+	public:
 		ParticleSwarm(UpdateManagerType const updateManagerType, 
 			Topology topologyManager, Synchronicity const synchronous);
 
@@ -45,4 +46,8 @@ class ParticleSwarm {
 
 		void reset();
 		std::string getIdString() const;
+		void enableLogging();
+		void logStart();
+		void logEnd();
+		void logPositions();
 };

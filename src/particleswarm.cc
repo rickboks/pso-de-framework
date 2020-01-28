@@ -16,6 +16,8 @@ ParticleSwarm::ParticleSwarm(UpdateManagerType const updateManagerType,
 	updateManagerType(updateManagerType),
 	topologyManagerType(topologyManagerType), topologyManager(NULL), synchronicity(synchronicity), 
 	outfile(new std::ofstream()){
+
+	logging = false;
 }
 
 void ParticleSwarm::reset(){
@@ -73,6 +75,8 @@ void ParticleSwarm::runAsynchronous(int const evalBudget,
 		p->randomize(settings.xMax, settings.xMin);
 		particles.push_back(p);
 	}
+	logStart();
+	logPositions();
 
 	topologyManager->initialize();
 	
@@ -80,6 +84,7 @@ void ParticleSwarm::runAsynchronous(int const evalBudget,
 	double bestFitness = std::numeric_limits<double>::max();
 	int notImproved = 0;
 	bool improved;
+
 
 	while (	
 			//notImproved < 100 && 
@@ -102,6 +107,7 @@ void ParticleSwarm::runAsynchronous(int const evalBudget,
 			particles[i]->updateGbest();
 			particles[i]->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));			
 		}
+		logPositions();
 
 		improved ? notImproved=0 : notImproved++;
 
@@ -110,6 +116,7 @@ void ParticleSwarm::runAsynchronous(int const evalBudget,
 	}
 
 	reset();
+	logEnd();
 }
 
 void ParticleSwarm::runSynchronous(int const evalBudget, int popSize, 
@@ -130,6 +137,8 @@ void ParticleSwarm::runSynchronous(int const evalBudget, int popSize,
 		p->randomize(settings.xMax, settings.xMin);
 		particles.push_back(p);
 	}
+	logStart();
+	logPositions();
 
 	topologyManager->initialize();
 	
@@ -167,13 +176,46 @@ void ParticleSwarm::runSynchronous(int const evalBudget, int popSize,
 		for (int i = 0; i < popSize; i++)
 			particles[i]->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));
 	
+		logPositions();
+	
 		iterations++;	
 		topologyManager->update(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));	
 	}
 
 	reset();
+	logEnd();
 }
 
 std::string ParticleSwarm::getIdString() const {
 	return InstanceNamer::getName(updateManagerType, topologyManagerType, synchronicity);
+}
+
+void ParticleSwarm::enableLogging(){
+	logging=true;
+}
+
+void ParticleSwarm::logStart(){
+	if (logging){
+		std::cout << "START" << std::endl;
+		// TODO: information about run
+	}
+}
+
+void ParticleSwarm::logEnd(){
+	if (logging){
+		std::cout << "END" << std::endl;
+	}
+}
+
+void ParticleSwarm::logPositions(){
+	if (logging){
+		std::cout << std::endl;
+		for (int i = 0; i < particles.size(); i++){
+			std::vector<double> position = particles[i]->getPosition();
+			for (int j = 0; j < position.size()-1 ; j++){
+				std::cout << position[j] << " ";
+			}
+			std::cout << position[position.size()-1] << std::endl;
+		}
+	}
 }

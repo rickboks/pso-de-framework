@@ -18,16 +18,32 @@ void algorithm
 
 
 void _run_experiment() {
-       pso = new ParticleSwarm(INERTIA_WEIGHT, LBEST, ASYNCHRONOUS);
+	pso = new ParticleSwarm(INERTIA_WEIGHT, LBEST, ASYNCHRONOUS);
 
       std::string configName = "./configuration.ini";
-      IOHprofiler_experimenter<double> experimenter(configName,"PSO",algorithm); 
+      IOHprofiler_experimenter<double> experimenter(configName,"PSO",algorithm, true); 
       experimenter._set_independent_runs(5);
       experimenter._run();
       delete pso;
 }
 
-int main(){
-  _run_experiment();
-  return 0; 
+void visualize() {
+	pso = new ParticleSwarm(INERTIA_WEIGHT, VON_NEUMANN, ASYNCHRONOUS);
+	pso->enableLogging();
+
+	std::string configName = "./configuration.ini";
+	IOHprofiler_experimenter<double> experimenter(configName,"PSO",algorithm, false); 
+	experimenter._set_independent_runs(1);
+	experimenter._run();
+	delete pso;
+}
+
+int main(int argc, char** argv){
+	if (argc > 1 && strcmp(argv[1], "-v") == 0){
+		visualize();	
+		return 0;
+	} else {
+		_run_experiment();
+		return 0; 
+	}
 }

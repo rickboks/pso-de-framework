@@ -67,6 +67,7 @@ void ParticleSwarm::runAsynchronous(int const evalBudget,
 	std::vector<double> smallest = problem->IOHprofiler_get_lowerbound(); //??
 	std::vector<double> largest = problem->IOHprofiler_get_upperbound(); //??
 
+
 	ParticleUpdateSettings settings(updateManagerType, particleUpdateParams, 
 				smallest, largest);
 

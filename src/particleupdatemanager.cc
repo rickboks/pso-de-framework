@@ -31,6 +31,7 @@ void ParticleUpdateManager::applyVMax(){
 	}
 }
 
+
 void ParticleUpdateManager::updatePosition(){
 		std::transform (x.begin(), x.end(),
 				v.begin(), x.begin(),
@@ -140,6 +141,8 @@ void DecrInertiaWeightManager::update(double progress) {
 		applyVMax();
 
 	w = wMax - progress * (wMax - wMin);
+
+	std::cout << "w: " << w << std::endl;
 	
 	updatePosition();
 }

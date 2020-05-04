@@ -20,7 +20,6 @@ all: $(OBJ_DIR) $(RESULT_DIR) $(EXE)
 mpi: $(OBJ_DIR) $(RESULT_DIR) $(MPI_EXE)
 
 $(EXE): $(OBJ) $(OBJ_DIR)/experiment.o
-	#${CC} ${CFLAGS} -o $(EXE) $(OBJ) $(OBJ_DIR)/experiment.o -L./lib ${LDFLAGS}
 	${CC} ${CFLAGS} -o $(EXE) $(OBJ) $(OBJ_DIR)/experiment.o -L./lib -l iohexperimenter ${LDFLAGS}
 
 $(MPI_EXE): $(OBJ) $(OBJ_DIR)/mpi_experiment.o

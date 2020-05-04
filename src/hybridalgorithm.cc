@@ -79,9 +79,8 @@ void HybridAlgorithm::run(std::shared_ptr<IOHprofiler_problem<double> > problem,
 	this->logger=logger;
 	if (synchronicity == SYNCHRONOUS)
 		runSynchronous(evalBudget, popSize, particleUpdateParams);
-	else if (synchronicity == ASYNCHRONOUS){
+	else if (synchronicity == ASYNCHRONOUS)
 		runAsynchronous(evalBudget, popSize, particleUpdateParams);
-	}
 }
 
 void HybridAlgorithm::runSynchronous(int const evalBudget, int popSize, 
@@ -296,7 +295,6 @@ void HybridAlgorithm::runAsynchronous(int const evalBudget,
 }
 
 std::string HybridAlgorithm::getIdString() const{
-	//std::string id = "H_";
 	return InstanceNamer::getName(updateManagerType, topologyManagerType, synchronicity, mutationType, crossoverType,
 		selectionType, adaptationType);
 }

@@ -8,7 +8,7 @@ LDFLAGS += -lboost_system -lboost_filesystem -lm
 
 SRC:= $(shell find src/ ! -name "experiment.cc" ! -name "mpi_experiment.cc" -name "*.cc")
 OBJ = $(SRC:$(SRC_DIR)/%.cc=$(OBJ_DIR)/%.o)
-INC = -I $(INC_DIR)/ -I.
+INC = -I $(INC_DIR)/ -I. -I iohsrc
 
 CC      = g++
 CFLAGS  = -Wall -Wno-sign-compare -Wno-unused-function -Wno-unused-variable -std=c++17 -g -O2
@@ -20,6 +20,7 @@ all: $(OBJ_DIR) $(RESULT_DIR) $(EXE)
 mpi: $(OBJ_DIR) $(RESULT_DIR) $(MPI_EXE)
 
 $(EXE): $(OBJ) $(OBJ_DIR)/experiment.o
+	#${CC} ${CFLAGS} -o $(EXE) $(OBJ) $(OBJ_DIR)/experiment.o -L./lib ${LDFLAGS}
 	${CC} ${CFLAGS} -o $(EXE) $(OBJ) $(OBJ_DIR)/experiment.o -L./lib -l iohexperimenter ${LDFLAGS}
 
 $(MPI_EXE): $(OBJ) $(OBJ_DIR)/mpi_experiment.o

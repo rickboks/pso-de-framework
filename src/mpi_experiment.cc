@@ -9,8 +9,8 @@
 #include "particleswarmsuite.h"
 
 std::vector<UpdateManagerType> updateManagers ({
-	//FIPS,
-	//BARE_BONES,
+	FIPS,
+	BARE_BONES,
 	INERTIA_WEIGHT,
 	DECR_INERTIA_WEIGHT
 });
@@ -78,7 +78,9 @@ int main(int argc, char **argv) {
 	MPI_Comm_rank(MPI_COMM_WORLD, &id);
 
 	if (id < suite.size()){
-		IOHprofiler_experimenter<double> experimenter(configName,suite.getHybrid(id).getIdString(), experiment);
+		IOHprofiler_experimenter<double> experimenter(configName,suite.getHybrid(id).getIdString(), experiment
+				, true
+				);
 	  	experimenter._set_independent_runs(30);
 	  	experimenter._run();
 	} else {

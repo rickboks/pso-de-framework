@@ -37,7 +37,6 @@ void JADEManager::nextF(std::vector<double>& Fs){
 	std::iota(indices.begin(), indices.end(), 0);
 	rng.shuffle(indices.begin(), indices.end());
 
-
 	for (unsigned int i = 0; i < third; i++)
 		Fs[indices[i]] = std::max(rng.randDouble(0.0,1.2),0.0);
 

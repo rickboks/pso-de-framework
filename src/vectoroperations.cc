@@ -11,6 +11,7 @@ void add(std::vector<double>const& lhs, std::vector<double>const& rhs, std::vect
                 rhs.begin(), store.begin(), 
                 std::plus<double>());
 }
+
 void subtract(std::vector<double>const& lhs, std::vector<double>const& rhs, std::vector<double>& store){
 	std::transform( lhs.begin(), lhs.end(),
 	                rhs.begin(), store.begin(), 

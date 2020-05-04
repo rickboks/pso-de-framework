@@ -107,20 +107,8 @@ void Particle::updatePbest(){
 }
 
 bool Particle::isNeighbor(Particle* particle) const {
-	bool temp =std::find(neighborhood.begin(), neighborhood.end(), particle) != neighborhood.end();
-	return temp;
+	return std::find(neighborhood.begin(), neighborhood.end(), particle) != neighborhood.end();
 }
-
-double Particle::getResultingVelocity() const{
-	double velocity = 0;
-
-	for (int i = 0; i < (int)v.size(); i++){
-		velocity += v[i] * v[i];
-	}
-	velocity = sqrt(velocity);
-	return velocity;
-}
-
 
 void Particle::replaceNeighbors(std::map<Particle*, Particle*> mapping){
 	for (int i = 0; i < (int) neighborhood.size(); i++){
@@ -130,5 +118,4 @@ void Particle::replaceNeighbors(std::map<Particle*, Particle*> mapping){
 
 int Particle::getAmountOfNeighbors(){
 	return neighborhood.size();
-
 }

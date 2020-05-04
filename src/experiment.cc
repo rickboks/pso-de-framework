@@ -3,7 +3,6 @@
 #include <set>
 #include "hybridalgorithm.h"
 #include "differentialevolution.h"
-
 HybridAlgorithm* ha;
 ParticleSwarm* pso;
 DifferentialEvolution* de;
@@ -18,7 +17,7 @@ void algorithm
 
 
 void _run_experiment() {
-	pso = new ParticleSwarm(DECR_INERTIA_WEIGHT, LBEST, ASYNCHRONOUS);
+	pso = new ParticleSwarm(DECR_INERTIA_WEIGHT, GBEST, ASYNCHRONOUS);
 
       std::string configName = "./configuration.ini";
       IOHprofiler_experimenter<double> experimenter(configName,"PSO",algorithm, true); 
@@ -39,6 +38,8 @@ void visualize() {
 }
 
 int main(int argc, char** argv){
+    _run_experiment();
+    return 0; 
 	if (argc > 1 && strcmp(argv[1], "-v") == 0){
 		visualize();	
 		return 0;

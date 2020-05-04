@@ -35,8 +35,6 @@ class Particle : public Solution{
 		void updateGbest();
 		void updateVelocityAndPosition(double progress);
 		bool isNeighbor(Particle* particle) const;
-		double getResultingVelocity() const;
 		void replaceNeighbors(std::map<Particle*, Particle*> mapping);
-
 		int getAmountOfNeighbors();
 };

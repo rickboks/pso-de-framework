@@ -1,0 +1,16 @@
+#!/bin/bash
+mkdir -p lib
+printf "Cloning repository ...\n"
+git clone https://github.com/IOHprofiler/IOHexperimenter &> /dev/null || exit
+cd IOHexperimenter
+git reset --hard ba75c00150a30262ecded5fd7ca86ab9c001d203 &> /dev/null
+printf "Compiling IOHexperimenter ...\n"
+make &> /dev/null || exit
+cd build/Cpp/obj
+printf "Creating lib/libiohexperimenter.a ...\n"
+ar rcs ../../../../lib/libiohexperimenter.a *.o
+cd ../../../..
+rm -rf IOHexperimenter
+printf "Done! :)\n"
+
+

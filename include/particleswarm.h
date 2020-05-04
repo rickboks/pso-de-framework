@@ -25,7 +25,6 @@ class ParticleSwarm {
 		std::vector<Particle*> particles;
 		TopologyManager* topologyManager;
 		Synchronicity const synchronicity;
-		std::ofstream* outfile;
 		std::shared_ptr<IOHprofiler_problem<double> > problem;
     	std::shared_ptr<IOHprofiler_csv_logger> logger;
 		bool logging;

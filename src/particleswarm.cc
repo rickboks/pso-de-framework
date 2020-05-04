@@ -14,8 +14,7 @@ ParticleSwarm::ParticleSwarm(UpdateManagerType const updateManagerType,
 	Topology topologyManagerType, Synchronicity const synchronicity):
 
 	updateManagerType(updateManagerType),
-	topologyManagerType(topologyManagerType), topologyManager(NULL), synchronicity(synchronicity), 
-	outfile(new std::ofstream()){
+	topologyManagerType(topologyManagerType), topologyManager(NULL), synchronicity(synchronicity){
 
 	logging = false;
 }
@@ -31,11 +30,6 @@ void ParticleSwarm::reset(){
 }
 
 ParticleSwarm::~ParticleSwarm(){
-	if (outfile->is_open())
-		outfile->close();
-	delete outfile;
-	outfile = NULL;
-	
 	if (topologyManager != NULL)
 		delete topologyManager;
 

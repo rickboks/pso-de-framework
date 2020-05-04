@@ -142,8 +142,6 @@ void DecrInertiaWeightManager::update(double progress) {
 
 	w = wMax - progress * (wMax - wMin);
 
-	std::cout << "w: " << w << std::endl;
-	
 	updatePosition();
 }
 

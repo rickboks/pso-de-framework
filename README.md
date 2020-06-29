@@ -23,5 +23,20 @@ The framework uses a precompiled static library (`lib/libiohexperimenter.a`). If
 ```
 This will clone the IOHexperimenter repository, recompile the library, and place it in the `lib` folder.
 
+Please cite this work as follows:
+
+```
+@misc{boks2020modular,
+    title={A Modular Hybridization of Particle Swarm Optimization and Differential Evolution},
+    author={Rick Boks and Hao Wang and Thomas Bäck},
+    year={2020},
+    eprint={2006.11886},
+    archivePrefix={arXiv},
+    primaryClass={cs.NE}
+}
+```
+
+
+
 
 

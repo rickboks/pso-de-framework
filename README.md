@@ -26,13 +26,21 @@ This will clone the IOHexperimenter repository, recompile the library, and place
 Please cite this work as follows:
 
 ```
-@misc{boks2020modular,
-    title={A Modular Hybridization of Particle Swarm Optimization and Differential Evolution},
-    author={Rick Boks and Hao Wang and Thomas Bäck},
-    year={2020},
-    eprint={2006.11886},
-    archivePrefix={arXiv},
-    primaryClass={cs.NE}
+@inproceedings{10.1145/3377929.3398123,
+author = {Boks, Rick and Wang, Hao and B\"{a}ck, Thomas},
+title = {A Modular Hybridization of Particle Swarm Optimization and Differential Evolution},
+year = {2020},
+isbn = {9781450371278},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3377929.3398123},
+doi = {10.1145/3377929.3398123},
+booktitle = {Proceedings of the 2020 Genetic and Evolutionary Computation Conference Companion},
+pages = {1418–1425},
+numpages = {8},
+keywords = {metaheuristics, hybridization, differential evolution, swarm intelligence, particle swarm optimization},
+location = {Canc\'{u}n, Mexico},
+series = {GECCO ’20}
 }
 ```
 

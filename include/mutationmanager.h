@@ -21,7 +21,6 @@ enum MutationType {
 	TO2,
 	MUT_END,
 
-
 	//Unused
 	TOPOLOGY
 };

@@ -48,10 +48,8 @@ std::vector<Synchronicity> synchronicities({
 	ASYNCHRONOUS
 });
 
-
 HybridSuite suite;
-DESuite deSuite;
-ParticleSwarmSuite psSuite;
+
 void experiment
 	(std::shared_ptr<IOHprofiler_problem<double>> problem,
 		std::shared_ptr<IOHprofiler_csv_logger> logger) {
@@ -72,25 +70,19 @@ int main(int argc, char **argv) {
 	suite.setSynchronicities(synchronicities);
 	suite.setDEAdaptationManagers(adaptationTypes);
 
-	std::string configName = "./configuration.ini";
+	std::string configFile = "./configuration.ini";
 	int id;
 	MPI_Init(&argc, &argv);
 	MPI_Comm_rank(MPI_COMM_WORLD, &id);
 
 	if (id < suite.size()){
-		IOHprofiler_experimenter<double> experimenter(configName,suite.getHybrid(id).getIdString(), experiment
-				, true
-				);
+		IOHprofiler_experimenter<double> experimenter(configFile,suite.getHybrid(id).getIdString(), experiment , true);
 	  	experimenter._set_independent_runs(30);
 	  	experimenter._run();
 	} else {
-		std::cout << "Error: suite does not contain " << id << std::endl;
+		std::cerr << "Error: suite does not contain " << id << std::endl;
 	}
 	MPI_Finalize();
 
 	return 0;
-}
-
-void _run_experiment() {
-
 }

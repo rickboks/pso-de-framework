@@ -37,7 +37,6 @@ void HybridSuite::generateConfigurations(){
 }
 
 HybridAlgorithm HybridSuite::getHybrid(int const i) {
-	//uto [update, topology, sync, mutation, crossover, selection, adapt] = configurations[i];
 	UpdateManagerType update = std::get<0>(configurations[i]);
 	Topology topology = std::get<1>(configurations[i]);
 	Synchronicity sync = std::get<2>(configurations[i]);

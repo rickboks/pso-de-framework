@@ -24,7 +24,6 @@ void TopologyManager::update(double progress){
 	// default: do nothing. (static topologies)
 }
 
-
 /*		Factory 	*/
 TopologyManager* TopologyManagerFactory::createTopologyManager(int const type, std::vector<Particle*> const & particles){
 	switch(type){

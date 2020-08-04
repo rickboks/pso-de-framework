@@ -23,5 +23,28 @@ The framework uses a precompiled static library (`lib/libiohexperimenter.a`). If
 ```
 This will clone the IOHexperimenter repository, recompile the library, and place it in the `lib` folder.
 
+Please cite this work as follows:
+
+```
+@inproceedings{10.1145/3377929.3398123,
+author = {Boks, Rick and Wang, Hao and B\"{a}ck, Thomas},
+title = {A Modular Hybridization of Particle Swarm Optimization and Differential Evolution},
+year = {2020},
+isbn = {9781450371278},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3377929.3398123},
+doi = {10.1145/3377929.3398123},
+booktitle = {Proceedings of the 2020 Genetic and Evolutionary Computation Conference Companion},
+pages = {1418–1425},
+numpages = {8},
+keywords = {metaheuristics, hybridization, differential evolution, swarm intelligence, particle swarm optimization},
+location = {Canc\'{u}n, Mexico},
+series = {GECCO ’20}
+}
+```
+
+
+
 
 

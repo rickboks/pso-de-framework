@@ -150,7 +150,6 @@ void ParticleSwarm::runSynchronous(int const evalBudget, int popSize,
 
 		for (int i = 0; i < popSize; i++){		
 			std::vector<double> position = particles[i]->getPosition();			
-
 			double y = particles[i]->evaluate(problem,logger);
 
 			if (y < bestFitness){

@@ -90,7 +90,6 @@ void ParticleSwarm::runAsynchronous(int const evalBudget,
 
 		for (int i = 0; i < popSize; i++){
 			std::vector<double> position = particles[i]->getPosition();			
-
 			double y = particles[i]->evaluate(problem,logger);
 
 			if (y < bestFitness){

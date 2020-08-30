@@ -1,4 +1,4 @@
-#include "iohsrc/Template/Experiments/IOHprofiler_experimenter.hpp"
+#include <IOHprofiler_experimenter.h>
 #include <random>
 #include <set>
 #include <mpi.h>

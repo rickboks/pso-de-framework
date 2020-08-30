@@ -3,7 +3,7 @@
 #include <random>
 #include <vector>
 #include <algorithm>
-#include "iohsrc/Template/IOHprofiler_problem.hpp"
+#include <IOHprofiler_problem.h>
 
 DEInitializer::DEInitializer(DEInitializationType const initializationType, std::shared_ptr<IOHprofiler_problem<double> > problem,
 	std::shared_ptr<IOHprofiler_csv_logger> logger)

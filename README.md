@@ -15,13 +15,7 @@ $ mpirun -np [# of instances in suite] mpi_experiment
 See `experiment.cc` and `mpi_experiment.cc` for example experiments.
 
 This framework uses IOHexperimenter for benchmarking. Please consult:
-https://github.com/IOHprofiler/IOHexperimenter for more information.
-
-The framework uses a precompiled static library (`lib/libiohexperimenter.a`). If you get any linking errors when compiling, please try:
-```
-./get_ioh_lib
-```
-This will clone the IOHexperimenter repository, recompile the library, and place it in the `lib` folder.
+https://github.com/IOHprofiler/IOHexperimenter for installation instructions.
 
 Please cite this work as follows:
 

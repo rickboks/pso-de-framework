@@ -1,4 +1,4 @@
-#include "iohsrc/Template/Experiments/IOHprofiler_experimenter.hpp"
+#include <IOHprofiler_experimenter.h>
 #include <random>
 #include <set>
 #include "hybridalgorithm.h"
@@ -23,7 +23,7 @@ void _run_experiment(bool log) {
 	pso->enableLogging();
 
     std::string configName = "./configuration.ini";
-    IOHprofiler_experimenter<double> experimenter(configName,"PSO",algorithm, !log); 
+    IOHprofiler_experimenter<double> experimenter(configName,algorithm); 
     experimenter._set_independent_runs(5);
     experimenter._run();
     delete pso;
@@ -31,7 +31,7 @@ void _run_experiment(bool log) {
 
 int main(int argc, char** argv){
     bool log = false;
-    if (argc > 1 && strcmp(argv[1], "-v") == 0)
-	log = true;
+    //if (argc > 1 && argv[1] == "-v")
+	//log = true;
     _run_experiment(log);	
 }

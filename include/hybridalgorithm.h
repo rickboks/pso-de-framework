@@ -9,7 +9,6 @@
 
 //typedef std::tuple<UpdateManagerType, Topology, Synchronicity, MutationType, 
 	//CrossoverType, SelectionType, DEAdaptationType> hybrid_config;
-
 struct hybrid_config{
 	UpdateManagerType update;
 	Topology topology;
@@ -35,7 +34,6 @@ struct hybrid_config{
 
 class HybridAlgorithm {
 	protected:
-		std::vector<Particle*> particles;		
 		hybrid_config const config;
 		TopologyManager* topologyManager;
 		MutationManager<Particle>* mutationManager;

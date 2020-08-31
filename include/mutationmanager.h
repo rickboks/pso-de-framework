@@ -93,6 +93,7 @@ class MutationManager {
 		}
 
 		virtual std::vector<T*> mutate(std::vector<T*>const& genomes, std::vector<double>& Fs) = 0;
+		virtual std::vector<T*> mutate(std::vector<T*>const& genomes, std::vector<int> indices, std::vector<double>& Fs) = 0;
 
 		//template<class T>
 		static MutationManager<T>* createMutationManager(MutationType const mutationType, int const D){
@@ -129,20 +130,40 @@ class MutationManager {
 
 template<class T>
 class Rand1MutationManager : public MutationManager<T> {
-	private:
-
 	public:
 		Rand1MutationManager(int const D):MutationManager<T>(D){}
+
 		std::vector<T*> mutate(std::vector<T*> const& genomes, std::vector<double>& Fs){
 			std::vector<T*> mutants;
 			mutants.reserve(genomes.size());
 
 			for (unsigned int i = 0; i < genomes.size(); i++){
 				std::vector<T*> possibilities = genomes;
+				possibilities.erase(possibilities.begin() + i);
 
-				auto position = std::find(possibilities.begin(), possibilities.end(), genomes[i]);
-				if (position != possibilities.end())
-				    possibilities.erase(position);
+				std::vector<double> xr0 = this->pickRandom(possibilities)->getPosition();
+				std::vector<double> xr1 = this->pickRandom(possibilities)->getPosition();
+				std::vector<double> xr2 = this->pickRandom(possibilities)->getPosition();
+
+				std::vector<double> x = xr0;
+				std::vector<double> subtraction(this->D);
+				subtract(xr1, xr2, subtraction);
+				scale(subtraction, Fs[i]);
+				add(x,subtraction, x);
+
+				T* mutant = new T(x);
+				mutants.push_back(mutant);		
+			}
+			return mutants;
+		}
+
+		std::vector<T*> mutate(std::vector<T*> const& genomes, std::vector<int> indices, std::vector<double>& Fs){
+			std::vector<T*> mutants;
+			mutants.reserve(genomes.size());
+
+			for (int i : indices){
+				std::vector<T*> possibilities = genomes;
+				possibilities.erase(possibilities.begin() + i);
 
 				std::vector<double> xr0 = this->pickRandom(possibilities)->getPosition();
 				std::vector<double> xr1 = this->pickRandom(possibilities)->getPosition();
@@ -163,8 +184,6 @@ class Rand1MutationManager : public MutationManager<T> {
 
 template<class T>
 class TTB1MutationManager : public MutationManager<T> {
-	private:
-
 	public:
 		TTB1MutationManager(int const D):MutationManager<T>(D){}
 		std::vector<T*> mutate(std::vector<T*>const& genomes, std::vector<double>& Fs){
@@ -174,10 +193,36 @@ class TTB1MutationManager : public MutationManager<T> {
 
 			for (unsigned int i = 0; i < genomes.size(); i++){
 				std::vector<T*> possibilities = genomes;
+				possibilities.erase(possibilities.begin() + i);
 
-				auto position = std::find(possibilities.begin(), possibilities.end(), genomes[i]);
-				if (position != possibilities.end())
-				    possibilities.erase(position);
+				std::vector<double> mutant = genomes[i]->getPosition();
+				std::vector<double> subtraction(this->D);
+				subtract(best, genomes[i]->getPosition(), subtraction);
+				scale(subtraction, Fs[i]);
+				add(mutant, subtraction, mutant);
+
+				std::vector<double> xr0 = this->pickRandom(possibilities)->getPosition();
+				std::vector<double> xr1 = this->pickRandom(possibilities)->getPosition();
+
+				subtract(xr0, xr1, subtraction);
+				scale(subtraction,Fs[i]);
+				add(mutant, subtraction, mutant);
+
+				T* m = new T(mutant);
+				mutants.push_back(m);
+			}
+			
+			return mutants;
+		}
+
+		std::vector<T*> mutate(std::vector<T*>const& genomes, std::vector<int> indices, std::vector<double>& Fs){
+			std::vector<double> best = this->getBest(genomes)->getPosition(); 
+			std::vector<T*> mutants;
+			mutants.reserve(genomes.size());
+
+			for (int i : indices){
+				std::vector<T*> possibilities = genomes;
+				possibilities.erase(possibilities.begin() + i);
 
 				std::vector<double> mutant = genomes[i]->getPosition();
 				std::vector<double> subtraction(this->D);
@@ -222,10 +267,36 @@ class TTPB1MutationManager : public MutationManager<T> {
 
 			for (unsigned int i = 0; i < genomes.size(); i++){
 				std::vector<T*> possibilities = genomes;
+				possibilities.erase(possibilities.begin() + i);
 
-				auto position = std::find(possibilities.begin(), possibilities.end(), genomes[i]);
-				if (position != possibilities.end())
-				    possibilities.erase(position);
+				std::vector<double> mutant = genomes[i]->getPosition();
+				std::vector<double> subtraction(this->D);
+				subtract(best, genomes[i]->getPosition(), subtraction);
+				scale(subtraction, Fs[i]);
+				add(mutant, subtraction, mutant);
+
+				std::vector<double> xr0 = this->pickRandom(possibilities)->getPosition();
+				std::vector<double> xr1 = this->pickRandom(possibilities)->getPosition();
+
+				subtract(xr0, xr1, subtraction);
+				scale(subtraction,Fs[i]);
+				add(mutant, subtraction, mutant);
+
+				T* m = new T(mutant);
+				mutants.push_back(m);
+			}
+			
+			return mutants;
+		}
+
+		std::vector<T*> mutate(std::vector<T*>const& genomes, std::vector<int> indices, std::vector<double>& Fs){
+			std::vector<double> best = this->getPBest(genomes)->getPosition(); 
+			std::vector<T*> mutants;
+			mutants.reserve(genomes.size());
+
+			for (int i : indices){
+				std::vector<T*> possibilities = genomes;
+				possibilities.erase(possibilities.begin() + i);
 
 				std::vector<double> mutant = genomes[i]->getPosition();
 				std::vector<double> subtraction(this->D);
@@ -262,10 +333,7 @@ class Best1MutationManager: public MutationManager<T> {
 
 			for (unsigned int i = 0; i < genomes.size(); i++){
 				std::vector<T*> possibilities = genomes;
-
-				auto position = std::find(possibilities.begin(), possibilities.end(), genomes[i]);
-				if (position != possibilities.end())
-				    possibilities.erase(position);
+				possibilities.erase(possibilities.begin() + i);
 
 				std::vector<double> mutant = best;
 				std::vector<double> subtraction(this->D);
@@ -285,6 +353,32 @@ class Best1MutationManager: public MutationManager<T> {
 			return mutants;
 		}
 
+		std::vector<T*> mutate(std::vector<T*>const& genomes, std::vector<int> indices, std::vector<double>& Fs){
+			std::vector<T*> mutants;
+			mutants.reserve(genomes.size());
+			std::vector<double> best = this->getBest(genomes)->getPosition();
+
+			for (int i : indices){
+				std::vector<T*> possibilities = genomes;
+				possibilities.erase(possibilities.begin() + i);
+
+				std::vector<double> mutant = best;
+				std::vector<double> subtraction(this->D);
+
+				std::vector<double> xr0 = this->pickRandom(possibilities)->getPosition();
+				std::vector<double> xr1 = this->pickRandom(possibilities)->getPosition();
+
+				subtract(xr0, xr1, subtraction);
+				scale(subtraction,Fs[i]);
+				add(mutant, subtraction, mutant);
+
+				T* m = new T(mutant);
+				mutants.push_back(m);
+			}
+
+
+			return mutants;
+		}
 };
 
 template<class T>
@@ -300,10 +394,7 @@ class Best2MutationManager: public MutationManager<T> {
 
 			for (unsigned int i = 0; i < genomes.size(); i++){
 				std::vector<T*> possibilities = genomes;
-
-				auto position = std::find(possibilities.begin(), possibilities.end(), genomes[i]);
-				if (position != possibilities.end())
-				    possibilities.erase(position);
+				possibilities.erase(possibilities.begin() + i);
 
 				std::vector<double> mutant = best;
 				std::vector<double> subtraction(this->D);
@@ -327,6 +418,36 @@ class Best2MutationManager: public MutationManager<T> {
 			return mutants;
 		}
 
+		std::vector<T*> mutate(std::vector<T*>const& genomes, std::vector<int> indices, std::vector<double>& Fs){
+			std::vector<double> best = this->getBest(genomes)->getPosition(); 
+			std::vector<T*> mutants;
+			mutants.reserve(genomes.size());
+
+			for (int i : indices){
+				std::vector<T*> possibilities = genomes;
+				possibilities.erase(possibilities.begin() + i);
+
+				std::vector<double> mutant = best;
+				std::vector<double> subtraction(this->D);
+
+				std::vector<double> xr0 = this->pickRandom(possibilities)->getPosition();
+				std::vector<double> xr1 = this->pickRandom(possibilities)->getPosition();
+				std::vector<double> xr2 = this->pickRandom(possibilities)->getPosition();
+				std::vector<double> xr3 = this->pickRandom(possibilities)->getPosition();
+				subtract(xr0, xr1, subtraction);
+				scale(subtraction, Fs[i]);
+				add(mutant, subtraction, mutant);
+				subtract(xr2, xr3, subtraction);
+				scale(subtraction, Fs[i]);
+				add(mutant, subtraction, mutant);
+
+				T* m = new T(mutant);
+
+				mutants.push_back(m);
+			}
+
+			return mutants;
+		}
 };
 
 template<class T>
@@ -341,10 +462,37 @@ class Rand2MutationManager: public MutationManager<T> {
 
 			for (unsigned int i = 0; i < genomes.size(); i++){
 				std::vector<T*> possibilities = genomes;
+				possibilities.erase(possibilities.begin() + i);
 
-				auto position = std::find(possibilities.begin(), possibilities.end(), genomes[i]);
-				if (position != possibilities.end())
-				    possibilities.erase(position);		
+				std::vector<double> xr0 = this->pickRandom(possibilities)->getPosition();
+				std::vector<double> xr1 = this->pickRandom(possibilities)->getPosition();
+				std::vector<double> xr2 = this->pickRandom(possibilities)->getPosition();
+				std::vector<double> xr3 = this->pickRandom(possibilities)->getPosition();
+				std::vector<double> xr4 = this->pickRandom(possibilities)->getPosition();
+
+				std::vector<double> mutant = xr4;
+				std::vector<double> subtraction(this->D);
+				subtract(xr0, xr1, subtraction);
+				scale(subtraction, Fs[i]);
+				add(mutant, subtraction, mutant);
+				subtract(xr2, xr3, subtraction);
+				scale(subtraction, Fs[i]);
+				add(mutant, subtraction, mutant);
+				T* m = new T(mutant);
+
+				mutants.push_back(m);
+			}
+			
+			return mutants;
+		}
+
+		std::vector<T*> mutate(std::vector<T*>const& genomes, std::vector<int> indices, std::vector<double>& Fs){
+			std::vector<T*> mutants;
+			mutants.reserve(genomes.size());
+
+			for (int i : indices){
+				std::vector<T*> possibilities = genomes;
+				possibilities.erase(possibilities.begin() + i);
 
 				std::vector<double> xr0 = this->pickRandom(possibilities)->getPosition();
 				std::vector<double> xr1 = this->pickRandom(possibilities)->getPosition();
@@ -382,10 +530,7 @@ class Rand2DirMutationManager : public MutationManager<T> {
 
 			for (unsigned int i = 0; i < genomes.size(); i++){
 				std::vector<T*> possibilities = genomes;
-
-				auto position = std::find(possibilities.begin(), possibilities.end(), genomes[i]);
-				if (position != possibilities.end())
-				    possibilities.erase(position);		
+				possibilities.erase(possibilities.begin() + i);
 
 				T* r0 = this->pickRandom(possibilities);
 				T* r1 = this->pickRandom(possibilities);
@@ -426,6 +571,55 @@ class Rand2DirMutationManager : public MutationManager<T> {
 			return mutants;
 		}
 
+
+		std::vector<T*> mutate(std::vector<T*>const& genomes, std::vector<int> indices, std::vector<double>& Fs){
+			std::vector<T*> mutants;
+			mutants.reserve(genomes.size());
+
+			for (int i : indices){
+				std::vector<T*> possibilities = genomes;
+				possibilities.erase(possibilities.begin() + i);
+
+				T* r0 = this->pickRandom(possibilities);
+				T* r1 = this->pickRandom(possibilities);
+				T* r2 = this->pickRandom(possibilities);
+				T* r3 = this->pickRandom(possibilities);
+
+				std::vector<double> xr0, xr1, xr2, xr3;
+
+				if (r0->getFitness() < r1->getFitness()){
+					xr0 = r0->getPosition();
+					xr1 = r1->getPosition();
+				} else {
+					xr0 = r1->getPosition();
+					xr1 = r0->getPosition();
+				}
+
+				if (r2->getFitness() < r3->getFitness()){
+					xr2 = r2->getPosition();
+					xr3 = r3->getPosition();
+				} else {
+					xr2 = r3->getPosition();
+					xr3 = r2->getPosition();
+				}
+
+				std::vector<double> mutant = xr0;
+				std::vector<double> subtraction(this->D);
+				subtract(xr0, xr1, subtraction);
+				add(subtraction, xr2, subtraction);
+				subtract(subtraction, xr3, subtraction);
+				scale(subtraction, Fs[i]*0.5);
+				add(mutant, subtraction, mutant);
+
+				T* m = new T(mutant);
+
+				mutants.push_back(m);
+			}
+			
+			return mutants;
+		}
+
+
 };
 
 template<class T>
@@ -440,10 +634,7 @@ class NSDEMutationManager : public MutationManager<T> {
 
 			for (unsigned int i = 0; i < genomes.size(); i++){
 				std::vector<T*> possibilities = genomes;
-
-				auto position = std::find(possibilities.begin(), possibilities.end(), genomes[i]);
-				if (position != possibilities.end())
-				    possibilities.erase(position);
+				possibilities.erase(possibilities.begin() + i);
 
 				std::vector<double> mutant = this->pickRandom(possibilities)->getPosition();
 				std::vector<double> xr1 = this->pickRandom(possibilities)->getPosition();
@@ -456,19 +647,46 @@ class NSDEMutationManager : public MutationManager<T> {
 					double n = rng.normalDistribution(0.5,0.5);
 					scale(subtraction, n);
 				} else {
-					// std::cauchy_distribution<double> cauchy(0,1);
 					double c = rng.cauchyDistribution(0,1);
 					scale(subtraction, c);
 				}
 
 				add(mutant, subtraction, mutant);
 
-				// std::cout << "{";
-				// for (double d : mutant){
-				// 	std::cout << d << ", ";
-				// }
+				T* m = new T(mutant);
 
-				// std::cout << "}" << std::endl;
+				mutants.push_back(m);
+			}
+
+			return mutants;
+		}
+
+
+		std::vector<T*> mutate(std::vector<T*>const& genomes, std::vector<int> indices, std::vector<double>& Fs){
+			std::vector<T*> mutants;
+			mutants.reserve(genomes.size());
+
+			for (int i : indices){
+				std::vector<T*> possibilities = genomes;
+				possibilities.erase(possibilities.begin() + i);
+
+				std::vector<double> mutant = this->pickRandom(possibilities)->getPosition();
+				std::vector<double> xr1 = this->pickRandom(possibilities)->getPosition();
+				std::vector<double> xr2 = this->pickRandom(possibilities)->getPosition();
+
+				std::vector<double> subtraction(this->D);
+				subtract(xr1, xr2, subtraction);
+
+				if (rng.randDouble(0,1) < 0.5){
+					double n = rng.normalDistribution(0.5,0.5);
+					scale(subtraction, n);
+				} else {
+					double c = rng.cauchyDistribution(0,1);
+					scale(subtraction, c);
+				}
+
+				add(mutant, subtraction, mutant);
+
 				T* m = new T(mutant);
 
 				mutants.push_back(m);
@@ -499,10 +717,7 @@ class TrigonometricMutationManager : public MutationManager<T> {
 
 			for (unsigned int i = 0; i < genomes.size(); i++){
 				std::vector<T*> possibilities = genomes;
-
-				auto position = std::find(possibilities.begin(), possibilities.end(), genomes[i]);
-				if (position != possibilities.end())
-				    possibilities.erase(position);
+				possibilities.erase(possibilities.begin() + i);
 
 				T* r0 = this->pickRandom(possibilities);
 				T* r1 = this->pickRandom(possibilities);
@@ -542,16 +757,60 @@ class TrigonometricMutationManager : public MutationManager<T> {
 			return mutants;
 		}
 
+		std::vector<T*> trigonometricMutation(std::vector<T*>const& genomes, std::vector<int> indices, std::vector<double>& Fs){
+			std::vector<T*> mutants;
+			mutants.reserve(genomes.size());
+
+			for (int i : indices){
+				std::vector<T*> possibilities = genomes;
+				possibilities.erase(possibilities.begin() + i);
+
+				T* r0 = this->pickRandom(possibilities);
+				T* r1 = this->pickRandom(possibilities);
+				T* r2 = this->pickRandom(possibilities);
+
+				double pPrime = fabs(r0->getFitness()) + fabs(r1->getFitness()) 
+								+ fabs(r2->getFitness());
+
+				double p0 = r0->getFitness() / pPrime;
+				double p1 = r1->getFitness() / pPrime;
+				double p2 = r2->getFitness() / pPrime;
+
+				std::vector<double> mutant;
+				std::vector<double> temp(this->D);
+
+				add(r0->getPosition(), r1->getPosition(), temp);
+				add(temp, r2->getPosition(), temp);
+				scale(temp, 1.0/3.0);
+				mutant = temp;
+
+				subtract(r0->getPosition(), r1->getPosition(), temp);
+				scale(temp, p1-p0);
+				add(temp, mutant, mutant);
+
+				subtract(r1->getPosition(), r2->getPosition(), temp);
+				scale(temp, p2-p1);
+				add(temp, mutant, mutant);
+
+				subtract(r2->getPosition(), r0->getPosition(), temp);
+				scale(temp, p0-p2);
+				add(temp, mutant, mutant);
+
+				mutants.push_back(new T(mutant));
+			}
+
+
+			return mutants;
+		}
+
+
 		std::vector<T*> rand1Mutation(std::vector<T*>const& genomes, std::vector<double>& Fs){
 			std::vector<T*> mutants;
 			mutants.reserve(genomes.size());
 
 			for (unsigned int i = 0; i < genomes.size(); i++){
 				std::vector<T*> possibilities = genomes;
-
-				auto position = std::find(possibilities.begin(), possibilities.end(), genomes[i]);
-				if (position != possibilities.end())
-				    possibilities.erase(position);
+				possibilities.erase(possibilities.begin() + i);
 
 				std::vector<double> xr0 = this->pickRandom(possibilities)->getPosition();
 				std::vector<double> xr1 = this->pickRandom(possibilities)->getPosition();
@@ -569,10 +828,40 @@ class TrigonometricMutationManager : public MutationManager<T> {
 			return mutants;	
 		}
 
+		std::vector<T*> rand1Mutation(std::vector<T*>const& genomes, std::vector<int> indices, std::vector<double>& Fs){
+			std::vector<T*> mutants;
+			mutants.reserve(genomes.size());
+
+			for (int i : indices){
+				std::vector<T*> possibilities = genomes;
+				possibilities.erase(possibilities.begin() + i);
+
+				std::vector<double> xr0 = this->pickRandom(possibilities)->getPosition();
+				std::vector<double> xr1 = this->pickRandom(possibilities)->getPosition();
+				std::vector<double> xr2 = this->pickRandom(possibilities)->getPosition(); 				
+
+				std::vector<double> x = xr0;
+				std::vector<double> subtraction(this->D);
+				subtract(xr1, xr2, subtraction);
+				scale(subtraction, Fs[i]);
+				add(x,subtraction, x);
+
+				T* mutant = new T(x);
+				mutants.push_back(mutant);
+			}
+			return mutants;	
+		}
+
+
 	public:
 		TrigonometricMutationManager(int const D): MutationManager<T>(D), gamma(0.05){}
 		std::vector<T*> mutate(std::vector<T*>const& genomes, std::vector<double>& Fs){
 			return rng.randDouble(0,1) <= gamma ? trigonometricMutation(genomes,Fs) : rand1Mutation(genomes,Fs);
+		}
+
+
+		std::vector<T*> mutate(std::vector<T*>const& genomes, std::vector<int> indices, std::vector<double>& Fs){
+			return rng.randDouble(0,1) <= gamma ? trigonometricMutation(genomes,indices,Fs) : rand1Mutation(genomes,indices,Fs);
 		}
 };
 
@@ -587,11 +876,42 @@ class TwoOpt1MutationManager : public MutationManager<T> {
 
 			for (unsigned int i = 0; i < genomes.size(); i++){
 				std::vector<T*> possibilities = genomes;
+				possibilities.erase(possibilities.begin() + i);
 
-				auto position = std::find(possibilities.begin(), possibilities.end(), genomes[i]);
-				if (position != possibilities.end())
-				    possibilities.erase(position);
+				T* r0 = this->pickRandom(possibilities);
+				T* r1 = this->pickRandom(possibilities);
 
+				std::vector<double> xr0;
+				std::vector<double> xr1;
+				std::vector<double> xr2 = this->pickRandom(possibilities)->getPosition();
+
+				if (r0->getFitness() < r1->getFitness()){
+					xr0 = r0->getPosition();
+					xr1 = r1->getPosition();
+				} else {
+					xr1 = r0->getPosition();
+					xr0 = r1->getPosition();
+				}
+
+				std::vector<double> x = xr0;
+				std::vector<double> subtraction(this->D);
+				subtract(xr1, xr2, subtraction);
+				scale(subtraction, Fs[i]);
+				add(x,subtraction, x);
+
+				T* mutant = new T(x);
+				mutants.push_back(mutant);		
+			}
+			return mutants;
+		}
+
+		std::vector<T*> mutate(std::vector<T*>const& genomes, std::vector<int> indices, std::vector<double>& Fs){
+			std::vector<T*> mutants;
+			mutants.reserve(genomes.size());
+
+			for (int i : indices){
+				std::vector<T*> possibilities = genomes;
+				possibilities.erase(possibilities.begin() + i);
 
 				T* r0 = this->pickRandom(possibilities);
 				T* r1 = this->pickRandom(possibilities);
@@ -632,10 +952,48 @@ class TwoOpt2MutationManager : public MutationManager<T> {
 
 			for (unsigned int i = 0; i < genomes.size(); i++){
 				std::vector<T*> possibilities = genomes;
+				possibilities.erase(possibilities.begin() + i);
 
-				auto position = std::find(possibilities.begin(), possibilities.end(), genomes[i]);
-				if (position != possibilities.end())
-				    possibilities.erase(position);		
+				std::vector<double> xr0;
+				std::vector<double> xr1;
+				std::vector<double> xr2 = this->pickRandom(possibilities)->getPosition();
+				std::vector<double> xr3 = this->pickRandom(possibilities)->getPosition();
+				std::vector<double> xr4 = this->pickRandom(possibilities)->getPosition();
+
+				T* r0 = this->pickRandom(possibilities);
+				T* r1 = this->pickRandom(possibilities);
+
+				if (r0->getFitness() < r1->getFitness()){
+					xr0 = r0->getPosition();
+					xr1 = r1->getPosition();
+				} else {
+					xr1 = r0->getPosition();
+					xr0 = r1->getPosition();
+				}
+
+				std::vector<double> mutant = xr4;
+				std::vector<double> subtraction(this->D);
+				subtract(xr0, xr1, subtraction);
+				scale(subtraction, Fs[i]);
+				add(mutant, subtraction, mutant);
+				subtract(xr2, xr3, subtraction);
+				scale(subtraction, Fs[i]);
+				add(mutant, subtraction, mutant);
+				T* m = new T(mutant);
+
+				mutants.push_back(m);
+			}
+			
+			return mutants;
+		}
+
+		std::vector<T*> mutate(std::vector<T*>const& genomes, std::vector<int> indices, std::vector<double>& Fs){
+			std::vector<T*> mutants;
+			mutants.reserve(genomes.size());
+
+			for (int i : indices){
+				std::vector<T*> possibilities = genomes;
+				possibilities.erase(possibilities.begin() + i);
 
 				std::vector<double> xr0;
 				std::vector<double> xr1;
@@ -670,5 +1028,3 @@ class TwoOpt2MutationManager : public MutationManager<T> {
 			return mutants;
 		}
 };
-
-

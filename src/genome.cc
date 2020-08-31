@@ -17,11 +17,3 @@ Genome::Genome(Particle* particle) :
 Genome::Genome(std::vector<double>x): 
 	Solution(x){
 }
-
-void Genome::setWeightFactor(double weightFactor){
-	this->weightFactor = weightFactor;
-}
-
-double Genome::getWeightFactor() const{
-	return weightFactor;
-}

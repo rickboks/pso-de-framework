@@ -10,6 +10,8 @@
 
 class PSODE : public HybridAlgorithm {
 	private:
+		std::vector<Particle*> particles;		
+
 		void runSynchronous(int const evalBudget, int const popSize, 
 			std::map<int,double> particleUpdateParams);
 
@@ -23,6 +25,8 @@ class PSODE : public HybridAlgorithm {
 			Topology topologyManager, Synchronicity const synchronous, 
 			MutationType const mutationType, CrossoverType const crossoverType, 
 			SelectionType const selection, DEAdaptationType adaptionType);
+
+		PSODE(hybrid_config);
 
 		~PSODE();
 

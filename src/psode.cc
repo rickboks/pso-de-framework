@@ -20,6 +20,10 @@ PSODE::PSODE(UpdateManagerType const updateManagerType,
 			mutationType, crossoverType, selection, adaptionType){
 }
 
+PSODE::PSODE(hybrid_config config):
+		HybridAlgorithm(config){
+}
+
 std::vector<Particle*> PSODE::copyPopulation(std::vector<Particle*>const& particles){
 	std::vector<Particle*> copy;
 	copy.reserve(particles.size());

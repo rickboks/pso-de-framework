@@ -1,11 +1,9 @@
 #include "instancenamer.h"
 
 //For Hybrid
-std::string InstanceNamer::getName(UpdateManagerType const update, Topology const topology, 
-			Synchronicity const sync, MutationType const mutation, CrossoverType const crossover, 
-			SelectionType const selection, DEAdaptationType const adaptation){
-	return "H_" + updateID(update) + "_" + topologyID(topology) + /*synchronicityID(sync) +*/ "_" + mutationID(mutation)
-			+ "_" + crossoverID(crossover) +"_"+ selectionID(selection)/* + adaptationID(adaptation)*/; 
+std::string InstanceNamer::getName(hybrid_config config){
+	return "H_" + updateID(std::get<0>(config)) + "_" + topologyID(std::get<1>(config)) + /*synchronicityID(std::get<2>(config)) +*/ "_" + mutationID(std::get<3>(config))
+			+ "_" + crossoverID(std::get<4>(config)) +"_"+ selectionID(std::get<5>(config))/* + adaptationID(std::get<6>(config))*/; 
 }
 
 //For PSO

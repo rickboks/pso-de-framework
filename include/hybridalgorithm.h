@@ -7,16 +7,13 @@
 #include "selectionmanager.h"
 #include <memory>
 
+typedef std::tuple<UpdateManagerType, Topology, Synchronicity, MutationType, 
+	CrossoverType, SelectionType, DEAdaptationType> hybrid_config;
+
 class HybridAlgorithm {
 	protected:
-		UpdateManagerType const updateManagerType;
-		Topology topologyManagerType;
 		std::vector<Particle*> particles;		
-		Synchronicity const synchronicity;
-		MutationType const mutationType;
-		CrossoverType const crossoverType;
-		SelectionType const selectionType;
-		DEAdaptationType const adaptationType;
+		hybrid_config const config;
 		TopologyManager* topologyManager;
 		MutationManager<Particle>* mutationManager;
 		CrossoverManager<Particle>* crossoverManager;
@@ -24,6 +21,7 @@ class HybridAlgorithm {
 		SelectionManager* selectionManager;
 		std::shared_ptr<IOHprofiler_problem<double> > problem; 
 		std::shared_ptr<IOHprofiler_csv_logger> logger;
+
 		public:
 		HybridAlgorithm(UpdateManagerType const updateManagerType, 
 			Topology topologyManager, Synchronicity const synchronous, 

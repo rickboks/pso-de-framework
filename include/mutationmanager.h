@@ -25,7 +25,6 @@ enum MutationType {
 	TOPOLOGY
 };
 
-
 template<class T>
 class Rand1MutationManager;
 template<class T>
@@ -127,7 +126,6 @@ class MutationManager {
 			}	
 		}
 };
-
 
 template<class T>
 class Rand1MutationManager : public MutationManager<T> {

@@ -7,8 +7,6 @@
 #include "topologymanager.h"
 #include "particleswarm.h"
 #include "hybridalgorithm.h"
-typedef std::tuple<UpdateManagerType, Topology, Synchronicity, MutationType, 
-	CrossoverType, SelectionType, DEAdaptationType> hybrid_configuration;
 
 template <typename T>
 class HybridSuite {
@@ -20,7 +18,7 @@ class HybridSuite {
 		std::vector<CrossoverType> crossoverManagers;
 		std::vector<SelectionType> selectionManagers;
 		std::vector<DEAdaptationType> adaptationManagers;
-		std::vector<hybrid_configuration> configurations;
+		std::vector<hybrid_config> configurations;
 
 		public:
 		HybridSuite(){

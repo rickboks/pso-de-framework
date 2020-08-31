@@ -6,6 +6,7 @@
 #include "selectionmanager.h"
 #include "particleswarm.h"
 #include "deinitializer.h"
+#include "hybridalgorithm.h"
 
 class InstanceNamer {
 	private:
@@ -19,9 +20,7 @@ class InstanceNamer {
 		static std::string deInitializationID(DEInitializationType deinit);
 	public:
 		//For hyrbid
-		static std::string getName(UpdateManagerType const update, Topology const topology, 
-			Synchronicity const sync, MutationType const mutation, CrossoverType const crossover, 
-			SelectionType const selection, DEAdaptationType const adaptation);
+		static std::string getName(hybrid_config config);
 
 		//For PSO
 		static std::string getName(UpdateManagerType const update, Topology const topology, 

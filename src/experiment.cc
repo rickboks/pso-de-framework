@@ -31,7 +31,5 @@ void _run_experiment(bool log) {
 
 int main(int argc, char** argv){
     bool log = false;
-    //if (argc > 1 && argv[1] == "-v")
-	//log = true;
     _run_experiment(log);	
 }

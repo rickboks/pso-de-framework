@@ -41,13 +41,15 @@ struct ParticleUpdateSettings {
 	ParticleUpdateSettings(UpdateManagerType const managerType, std::map<int, double> const parameters, std::vector<double> xMin, std::vector<double> xMax)
 		:managerType(managerType), parameters(parameters), xMin(xMin), xMax(xMax){
 			initVMax();
-		};
+	};
 
 	ParticleUpdateSettings(const ParticleUpdateSettings & copy)
 	: managerType(copy.managerType), parameters(copy.parameters), xMin(copy.xMin), xMax(copy.xMax), vMax(copy.vMax) {
+
 	}
 
 	ParticleUpdateSettings(){	
+
 	}
 
 	void initVMax(){

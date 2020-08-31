@@ -60,15 +60,14 @@ void ParticleSwarm::runAsynchronous(int const evalBudget,
 	std::vector<double> smallest = problem->IOHprofiler_get_lowerbound(); //??
 	std::vector<double> largest = problem->IOHprofiler_get_upperbound(); //??
 
-
-	ParticleUpdateSettings settings(updateManagerType, particleUpdateParams, 
-				smallest, largest);
+	ParticleUpdateSettings settings(updateManagerType, particleUpdateParams, smallest, largest);
 
 	for (int i = 0; i < popSize; i++){
 		Particle* p = new Particle(D, settings);
 		p->randomize(settings.xMax, settings.xMin);
 		particles.push_back(p);
 	}
+
 	logStart();
 	logPositions();
 
@@ -78,7 +77,6 @@ void ParticleSwarm::runAsynchronous(int const evalBudget,
 	double bestFitness = std::numeric_limits<double>::max();
 	int notImproved = 0;
 	bool improved;
-
 
 	while (	
 			//notImproved < 100 && 

@@ -20,12 +20,9 @@ void ParticleSwarmSuite::generateConfigurations(){
 			for (auto synchronicity : synchronicities)
 					configurations.push_back(
 						std::make_tuple(update, topology, synchronicity));
-
 }
 
-
 ParticleSwarm ParticleSwarmSuite::getParticleSwarm(int const i) {
-	//auto [update, topology, sync] = configurations[i];
 	UpdateManagerType update = std::get<0>(configurations[i]);
 	Topology topology = std::get<1>(configurations[i]);
 	Synchronicity sync = std::get<2>(configurations[i]);

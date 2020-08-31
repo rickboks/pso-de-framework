@@ -8,7 +8,7 @@
 #include <memory>
 
 class HybridAlgorithm {
-	private:
+	protected:
 		UpdateManagerType const updateManagerType;
 		Topology topologyManagerType;
 		std::vector<Particle*> particles;		
@@ -23,27 +23,19 @@ class HybridAlgorithm {
 		DEAdaptationManager* adaptationManager;
 		SelectionManager* selectionManager;
 		std::shared_ptr<IOHprofiler_problem<double> > problem; 
-    	std::shared_ptr<IOHprofiler_csv_logger> logger;
-		void runSynchronous(int const evalBudget, int const popSize, 
-			std::map<int,double> particleUpdateParams);
-
-		void runAsynchronous(int const evalBudget, int const popSize, 
-			std::map<int,double> particleUpdateParams);
-
+		std::shared_ptr<IOHprofiler_csv_logger> logger;
 		public:
 		HybridAlgorithm(UpdateManagerType const updateManagerType, 
 			Topology topologyManager, Synchronicity const synchronous, 
 			MutationType const mutationType, CrossoverType const crossoverType, 
 			SelectionType const selection, DEAdaptationType adaptionType);
 
-		~HybridAlgorithm();
+		virtual ~HybridAlgorithm() = 0;
 
-		void run(std::shared_ptr<IOHprofiler_problem<double> > problem, 
+		virtual void run(std::shared_ptr<IOHprofiler_problem<double> > problem, 
     		std::shared_ptr<IOHprofiler_csv_logger> logger, int const evalBudget, 
-    		int const popSize, std::map<int,double> particleUpdateParams);
+    		int const popSize, std::map<int,double> particleUpdateParams) = 0;
 
-		void reset();
-		std::string getIdString() const;
-
-		std::vector<Particle*> copyPopulation(std::vector<Particle*>const& particles);
+		virtual void reset() = 0;
+		virtual std::string getIdString() const = 0;
 };

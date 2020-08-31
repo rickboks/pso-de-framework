@@ -25,10 +25,6 @@ class TopologyManager {
 		virtual void initialize() = 0;
 		virtual void update(double progress);
 		virtual int getClosestValidPopulationSize(int const popSize);
-};
-
-class TopologyManagerFactory{
-	public:
 		static TopologyManager* createTopologyManager(int const type, std::vector<Particle*> const & particles);
 };
 

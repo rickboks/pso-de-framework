@@ -9,23 +9,7 @@ TopologyManager::TopologyManager(std::vector<Particle*> const & particles)
 	:particles(particles){	
 }
 
-TopologyManager::~TopologyManager() = default;
-
-int TopologyManager::getClosestValidPopulationSize(int const popSize){
-	if (popSize > 0)
-		return popSize;
-	else {
-		std::cerr << "Warning: population size needs to be greater or equal to 1. Setting population size to 1." << std::endl;
-		return 1;
-	}
-}
-
-void TopologyManager::update(double progress){
-	// default: do nothing. (static topologies)
-}
-
-/*		Factory 	*/
-TopologyManager* TopologyManagerFactory::createTopologyManager(int const type, std::vector<Particle*> const & particles){
+TopologyManager* TopologyManager::createTopologyManager(int const type, std::vector<Particle*> const & particles){
 	switch(type){
 		case Topology::LBEST:
 			return new LbestTopologyManager(particles);
@@ -46,6 +30,21 @@ TopologyManager* TopologyManagerFactory::createTopologyManager(int const type, s
 		default:
 			throw std::invalid_argument("Error: Invalid topology manager type");
 	}
+}
+
+TopologyManager::~TopologyManager() = default;
+
+int TopologyManager::getClosestValidPopulationSize(int const popSize){
+	if (popSize > 0)
+		return popSize;
+	else {
+		std::cerr << "Warning: population size needs to be greater or equal to 1. Setting population size to 1." << std::endl;
+		return 1;
+	}
+}
+
+void TopologyManager::update(double progress){
+	// default: do nothing. (static topologies)
 }
 
 /*		Lbest 		*/

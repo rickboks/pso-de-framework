@@ -4,6 +4,15 @@
 #include <iostream>
 #include "rng.h"
 
+DEAdaptationManager* DEAdaptationManager::createDEAdaptationManager(DEAdaptationType type){
+	switch(type){
+		case JADE: return new JADEManager();
+		case NO: return new NoAdaptationManager();
+		default:
+			throw std::invalid_argument("Error: Invalid DE adaptation type");
+	}
+}
+
 //JADE
 JADEManager::JADEManager()
  : DEAdaptationManager(), MuCr(0.5), MuF(0.6), c(0.1){
@@ -95,4 +104,3 @@ void NoAdaptationManager::reset(){
 void NoAdaptationManager::successfulIndex(int i){
 	//ignore
 }
-

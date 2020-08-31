@@ -25,6 +25,30 @@ enum MutationType {
 	TOPOLOGY
 };
 
+
+template<class T>
+class Rand1MutationManager;
+template<class T>
+class TTB1MutationManager;
+template<class T>
+class TTPB1MutationManager;
+template<class T>
+class Best1MutationManager;
+template<class T>
+class Best2MutationManager;
+template<class T>
+class Rand2MutationManager;
+template<class T>
+class Rand2DirMutationManager;
+template<class T>
+class NSDEMutationManager;
+template<class T>
+class TrigonometricMutationManager;
+template<class T>
+class TwoOpt1MutationManager;
+template<class T>
+class TwoOpt2MutationManager;
+
 template<class T>
 class MutationManager {
 	protected:
@@ -70,7 +94,40 @@ class MutationManager {
 		}
 
 		virtual std::vector<T*> mutate(std::vector<T*>const& genomes, std::vector<double>& Fs) = 0;
+
+		//template<class T>
+		static MutationManager<T>* createMutationManager(MutationType const mutationType, int const D){
+			switch(mutationType){
+				case RAND_1:
+					return new Rand1MutationManager<T>(D);
+				case TTB_1:
+					return new TTB1MutationManager<T>(D);
+				case TTPB_1:
+					return new TTPB1MutationManager<T>(D);
+				case BEST_1:
+					return new Best1MutationManager<T>(D);
+				case BEST_2:
+					return new Best2MutationManager<T>(D);
+				case RAND_2:
+					return new Rand2MutationManager<T>(D);
+				case RAND_2_DIR:
+					return new Rand2DirMutationManager<T>(D);
+				case NSDE:
+					return new NSDEMutationManager<T>(D);
+				case TRIGONOMETRIC:
+					return new TrigonometricMutationManager<T>(D);
+				case TO1:
+					return new TwoOpt1MutationManager<T>(D);
+				case TO2:
+					return new TwoOpt2MutationManager<T>(D);
+				// case TOPOLOGY:
+				// 	return new TopologyMutationManager(genomes,F,D);
+				default:
+					throw std::invalid_argument("Error: Invalid DE mutation type");
+			}	
+		}
 };
+
 
 template<class T>
 class Rand1MutationManager : public MutationManager<T> {
@@ -617,38 +674,3 @@ class TwoOpt2MutationManager : public MutationManager<T> {
 };
 
 
-class MutationManagerFactory {
-	public:
-		template<class T>
-		static MutationManager<T>* createMutationManager(MutationType const mutationType, int const D){
-			switch(mutationType){
-				case RAND_1:
-					return new Rand1MutationManager<T>(D);
-				case TTB_1:
-					return new TTB1MutationManager<T>(D);
-				case TTPB_1:
-					return new TTPB1MutationManager<T>(D);
-				case BEST_1:
-					return new Best1MutationManager<T>(D);
-				case BEST_2:
-					return new Best2MutationManager<T>(D);
-				case RAND_2:
-					return new Rand2MutationManager<T>(D);
-				case RAND_2_DIR:
-					return new Rand2DirMutationManager<T>(D);
-				case NSDE:
-					return new NSDEMutationManager<T>(D);
-				case TRIGONOMETRIC:
-					return new TrigonometricMutationManager<T>(D);
-				case TO1:
-					return new TwoOpt1MutationManager<T>(D);
-				case TO2:
-					return new TwoOpt2MutationManager<T>(D);
-				// case TOPOLOGY:
-				// 	return new TopologyMutationManager(genomes,F,D);
-				
-				default:
-					throw std::invalid_argument("Error: Invalid DE mutation type");
-			}	
-		}
-};

@@ -14,6 +14,11 @@ enum CrossoverType {
 };
 
 template <class T>
+class BinomialCrossoverManager;
+template <class T>
+class ExponentialCrossoverManager;
+
+template <class T>
 class CrossoverManager {
 	protected:
 		int const D;
@@ -26,6 +31,17 @@ class CrossoverManager {
 
 		virtual std::vector<double> singleCrossover(std::vector<double>const& target, 
 			std::vector<double>const& donor, double const Cr) =0;
+
+		static CrossoverManager<T>* createCrossoverManager(CrossoverType const crossoverType, int const D){
+			switch(crossoverType){
+				case BINOMIAL:
+					return new BinomialCrossoverManager<T>(D);
+				case EXPONENTIAL:
+					return new ExponentialCrossoverManager<T>(D);
+				default:
+					throw std::invalid_argument("Error: Invalid DE crossover type");
+			}
+		}
 };
 
 template <class T>
@@ -101,20 +117,5 @@ class ExponentialCrossoverManager : public CrossoverManager<T> {
 			}
 
 			return x;
-		}
-};
-
-class CrossoverManagerFactory {
-	public:
-		template <class T>
-		static CrossoverManager<T>* createCrossoverManager(CrossoverType const crossoverType, int const D){
-			switch(crossoverType){
-				case BINOMIAL:
-					return new BinomialCrossoverManager<T>(D);
-				case EXPONENTIAL:
-					return new ExponentialCrossoverManager<T>(D);
-				default:
-					throw std::invalid_argument("Error: Invalid DE crossover type");
-			}
 		}
 };

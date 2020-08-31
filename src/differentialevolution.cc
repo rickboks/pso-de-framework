@@ -51,9 +51,9 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > pr
 	newPopulation.reserve(popSize);
 	oldPopulation.reserve(popSize);
 
-	crossoverManager = CrossoverManagerFactory::createCrossoverManager<Genome>(crossoverType, dimension);
-	mutationManager = MutationManagerFactory::createMutationManager<Genome>(mutationType, dimension);
-	adaptationManager = DEAdaptationManagerFactory::createDEAdaptationManager(adaptationType);
+	crossoverManager = CrossoverManager<Genome>::createCrossoverManager(crossoverType, dimension);
+	mutationManager = MutationManager<Genome>::createMutationManager(mutationType, dimension);
+	adaptationManager = DEAdaptationManager::createDEAdaptationManager(adaptationType);
 
 	std::vector<double> Fs(popSize);
 	std::vector<double> Crs(popSize);

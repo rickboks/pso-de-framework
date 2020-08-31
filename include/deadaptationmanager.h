@@ -22,6 +22,7 @@ public:
 	virtual void nextCr(std::vector<double>& Crs)=0;
 	virtual void reset()=0;
 	virtual void update()=0;
+	static DEAdaptationManager* createDEAdaptationManager(DEAdaptationType type);
 };
 
 class JADEManager : public DEAdaptationManager{
@@ -52,17 +53,4 @@ public:
 	void nextCr(std::vector<double>& Crs);
 	void reset();
 	void update();
-};
-
-class DEAdaptationManagerFactory {
-public:
-	static DEAdaptationManager* createDEAdaptationManager(DEAdaptationType type){
-		switch(type){
-			case JADE: return new JADEManager();
-			case NO: return new NoAdaptationManager();
-			default:
-				throw std::invalid_argument("Error: Invalid DE adaptation type");
-		}
-
-	}
 };

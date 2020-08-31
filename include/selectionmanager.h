@@ -17,6 +17,8 @@ public:
 	void checkSuccessfulIndices();
 	virtual void select(std::vector<Particle*>& particles, 
 		std::vector<Particle*>const& p0, std::vector<Particle*>const& p2) =0;
+
+	static SelectionManager* createSelectionManager(SelectionType type, int const D, DEAdaptationManager* dam);
 };
 
 
@@ -50,11 +52,4 @@ public:
 	Union3SelectionManager(int D, DEAdaptationManager* dam);
 	void select(std::vector<Particle*>& particles, 
 		std::vector<Particle*>const& p0, std::vector<Particle*>const& p2);
-};
-
-
-class SelectionManagerFactory {
-private:
-public:
-	static SelectionManager* createSelectionManager(SelectionType type, int const D, DEAdaptationManager* dam);
 };

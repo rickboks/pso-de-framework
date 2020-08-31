@@ -8,10 +8,24 @@ SelectionManager::SelectionManager(int const D, DEAdaptationManager* dam)
 
 }
 
+SelectionManager* SelectionManager::createSelectionManager(SelectionType type, int const D, DEAdaptationManager* dam){
+	switch(type){
+		case P2:
+			return new Pairwise2SelectionManager(D, dam);
+		case P3:
+			return new Pairwise3SelectionManager(D, dam);
+		case U2:
+			return new Union2SelectionManager(D, dam);
+		case U3:
+			return new Union3SelectionManager(D, dam);
+		default:
+			throw std::invalid_argument("Error: Invalid DE mutation type");
+	}
+}
+
 void SelectionManager::selection(std::vector<Particle*>& particles, 
 		std::vector<Particle*>const& p0, std::vector<Particle*>const& p2){
 	//check sucessful indices
-
 	for (unsigned int i = 0; i < particles.size(); i++){
 		if (p2[i]->getFitness() < particles[i]->getFitness()){
 			dam->successfulIndex(i);
@@ -21,8 +35,6 @@ void SelectionManager::selection(std::vector<Particle*>& particles,
 	//start selection
 	select(particles, p0, p2);
 }
-
-
 
 //Pairwise 2
 Pairwise2SelectionManager::Pairwise2SelectionManager(int const D, DEAdaptationManager* dam)
@@ -159,19 +171,4 @@ void Union3SelectionManager::select(std::vector<Particle*>& particles,
 		}
 	}
 
-}
-
-SelectionManager* SelectionManagerFactory::createSelectionManager(SelectionType type, int const D, DEAdaptationManager* dam){
-	switch(type){
-		case P2:
-			return new Pairwise2SelectionManager(D, dam);
-		case P3:
-			return new Pairwise3SelectionManager(D, dam);
-		case U2:
-			return new Union2SelectionManager(D, dam);
-		case U3:
-			return new Union3SelectionManager(D, dam);
-		default:
-			throw std::invalid_argument("Error: Invalid DE mutation type");
-	}
 }

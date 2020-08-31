@@ -90,7 +90,7 @@ void HybridAlgorithm::runSynchronous(int const evalBudget, int popSize,
 	std::vector<Particle*> p1;
 	std::vector<Particle*> p2;
 		
-	topologyManager = TopologyManagerFactory::createTopologyManager(topologyManagerType, particles);
+	topologyManager = TopologyManager::createTopologyManager(topologyManagerType, particles);
 	popSize = topologyManager->getClosestValidPopulationSize(popSize);	
 
 	int const D = problem->IOHprofiler_get_number_of_variables(); /// dimension
@@ -115,10 +115,10 @@ void HybridAlgorithm::runSynchronous(int const evalBudget, int popSize,
 		p->updateGbest();
 
 	topologyManager->initialize();
-	mutationManager = MutationManagerFactory::createMutationManager<Particle>(mutationType, D);
-	crossoverManager = CrossoverManagerFactory::createCrossoverManager<Particle>(crossoverType, D);
-	adaptationManager = DEAdaptationManagerFactory::createDEAdaptationManager(adaptationType);
-	selectionManager = SelectionManagerFactory::createSelectionManager(selectionType, D, adaptationManager);
+	mutationManager = MutationManager<Particle>::createMutationManager(mutationType, D);
+	crossoverManager = CrossoverManager<Particle>::createCrossoverManager(crossoverType, D);
+	adaptationManager = DEAdaptationManager::createDEAdaptationManager(adaptationType);
+	selectionManager = SelectionManager::createSelectionManager(selectionType, D, adaptationManager);
 
 	int iterations = 0;
 	double bestFitness = std::numeric_limits<double>::max();
@@ -200,7 +200,7 @@ void HybridAlgorithm::runAsynchronous(int const evalBudget,
 	std::vector<Particle*> p1;
 	std::vector<Particle*> p2;
 		
-	topologyManager = TopologyManagerFactory::createTopologyManager(topologyManagerType, particles);
+	topologyManager = TopologyManager::createTopologyManager(topologyManagerType, particles);
 	popSize = topologyManager->getClosestValidPopulationSize(popSize);	
 
 	int const D = problem->IOHprofiler_get_number_of_variables(); /// dimension
@@ -217,10 +217,10 @@ void HybridAlgorithm::runAsynchronous(int const evalBudget,
 		p->randomize(settings.xMax, settings.xMin);
 
 	topologyManager->initialize();
-	mutationManager = MutationManagerFactory::createMutationManager<Particle>(mutationType,D);
-	crossoverManager = CrossoverManagerFactory::createCrossoverManager<Particle>(crossoverType, D);
-	adaptationManager = DEAdaptationManagerFactory::createDEAdaptationManager(adaptationType);
-	selectionManager = SelectionManagerFactory::createSelectionManager(selectionType, D, adaptationManager);
+	mutationManager = MutationManager<Particle>::createMutationManager(mutationType, D);
+	crossoverManager = CrossoverManager<Particle>::createCrossoverManager(crossoverType, D);
+	adaptationManager = DEAdaptationManager::createDEAdaptationManager(adaptationType);
+	selectionManager = SelectionManager::createSelectionManager(selectionType, D, adaptationManager);
 
 	int iterations = 0;
 

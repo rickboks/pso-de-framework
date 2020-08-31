@@ -7,7 +7,6 @@
 #include "instancenamer.h"
 #include <limits>
 #include <iostream>
-
 #include <fstream>
 
 ParticleSwarm::ParticleSwarm(UpdateManagerType const updateManagerType,
@@ -54,7 +53,7 @@ void ParticleSwarm::run(std::shared_ptr<IOHprofiler_problem<double> > problem,
 
 void ParticleSwarm::runAsynchronous(int const evalBudget, 
 			int popSize, std::map<int,double> particleUpdateParams){
-	this->topologyManager = TopologyManagerFactory::createTopologyManager(topologyManagerType, particles);
+	this->topologyManager = TopologyManager::createTopologyManager(topologyManagerType, particles);
 	popSize = this->topologyManager->getClosestValidPopulationSize(popSize);
 
 	int const D = problem->IOHprofiler_get_number_of_variables(); /// dimension
@@ -116,7 +115,7 @@ void ParticleSwarm::runAsynchronous(int const evalBudget,
 void ParticleSwarm::runSynchronous(int const evalBudget, int popSize, 
 			std::map<int,double> particleUpdateParams){
 
-	this->topologyManager = TopologyManagerFactory::createTopologyManager(topologyManagerType, particles);
+	this->topologyManager = TopologyManager::createTopologyManager(topologyManagerType, particles);
 	popSize = this->topologyManager->getClosestValidPopulationSize(popSize);
 
 	int const D = problem->IOHprofiler_get_number_of_variables(); /// dimension

@@ -1,4 +1,4 @@
 class ContraintHandler {
-	public:
-		ContraintHandler();
+	//public:
+		//ContraintHandler();
 };

@@ -2,8 +2,8 @@
 
 //For Hybrid
 std::string InstanceNamer::getName(hybrid_config config){
-	return "H_" + updateID(std::get<0>(config)) + "_" + topologyID(std::get<1>(config)) + /*synchronicityID(std::get<2>(config)) +*/ "_" + mutationID(std::get<3>(config))
-			+ "_" + crossoverID(std::get<4>(config)) +"_"+ selectionID(std::get<5>(config))/* + adaptationID(std::get<6>(config))*/; 
+	return "H_" + updateID(config.update) + "_" + topologyID(config.topology) + /*synchronicityID(config.synchronicity) +*/ "_" + mutationID(config.mutation)
+			+ "_" + crossoverID(config.crossover) +"_"+ selectionID(config.selection)/* + adaptationID(config.adaptation)*/; 
 }
 
 //For PSO

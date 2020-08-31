@@ -3,7 +3,6 @@
 #include <cstdlib>
 #include <vector>
 #include "particleupdatemanager.h"
-#include <iostream>
 
 constexpr double INER_PHI1_DEFAULT = 1.49618;
 constexpr double INER_PHI2_DEFAULT = 1.49618;
@@ -38,7 +37,8 @@ enum Setting {
 };
 
 struct ParticleUpdateSettings {
-	ParticleUpdateSettings(UpdateManagerType const managerType, std::map<int, double> const parameters, std::vector<double> xMin, std::vector<double> xMax)
+	ParticleUpdateSettings(UpdateManagerType const managerType, std::map<int, double> const parameters, 
+		std::vector<double> xMin, std::vector<double> xMax)
 		:managerType(managerType), parameters(parameters), xMin(xMin), xMax(xMax){
 			initVMax();
 	};

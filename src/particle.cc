@@ -8,26 +8,23 @@
 #include <random>
 #include <cmath>
 
-
 Particle::Particle(int const D, ParticleUpdateSettings& particleUpdateSettings)
-	: Solution(D), v(D), p(D), pbest(std::numeric_limits<double>::max()), g(D), gbest(std::numeric_limits<double>::max()), 
+	: Solution(D), v(D), p(D), g(D), pbest(std::numeric_limits<double>::max()), gbest(std::numeric_limits<double>::max()), 
 		settings(particleUpdateSettings), vMax(particleUpdateSettings.vMax){
-
-	particleUpdateManager = ParticleUpdateManagerFactory::createParticleUpdateManager(x,v,p,g,particleUpdateSettings,neighborhood);
+	particleUpdateManager = ParticleUpdateManager::createParticleUpdateManager(x,v,p,g,particleUpdateSettings,neighborhood);
 }
 
 Particle::Particle(const Particle& other)
-: 	Solution(other.x, other.fitness), v(other.v), p(other.p),
-	pbest(other.pbest), g(other.g), gbest(other.gbest), neighborhood(other.neighborhood),
+: 	Solution(other.x, other.fitness), v(other.v), p(other.p), g(other.g),
+	pbest(other.pbest),  gbest(other.gbest), neighborhood(other.neighborhood),
 	settings(other.settings), vMax(other.vMax){
-	particleUpdateManager = ParticleUpdateManagerFactory::createParticleUpdateManager(x,v,p,g,settings,neighborhood);
+	particleUpdateManager = ParticleUpdateManager::createParticleUpdateManager(x,v,p,g,settings,neighborhood);
 }
 
 //When using this construtor, note that only the position is initialized
 Particle::Particle(std::vector<double> x)
 : 	Solution(x), particleUpdateManager(NULL) {
 }
-
 
 Particle::~Particle(){
 	if (particleUpdateManager != NULL)
@@ -37,6 +34,7 @@ Particle::~Particle(){
 std::vector<double> Particle::getVelocity() const {
 	return v;
 }
+
 void Particle::setVelocity(std::vector<double> v){
 	this->v = v;
 }
@@ -65,7 +63,6 @@ double Particle::getGbest() const {
 double Particle::getPbest() const {
 	return pbest;
 }
-
 
 std::vector<double> Particle::getG() const {
 	return g;

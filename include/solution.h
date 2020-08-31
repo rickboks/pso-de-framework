@@ -3,7 +3,6 @@
 #include <string>
 #include <memory>
 
-
 class Particle;
 template <typename T>
 class IOHprofiler_problem;
@@ -16,7 +15,6 @@ class Solution {
 		Solution(Particle* p);
 		Solution(std::vector<double>x); 
 		Solution(std::vector<double> x, double fitness);
-		//~Solution();
 		std::vector<double> getPosition() const;
 		double evaluate (std::shared_ptr<IOHprofiler_problem<double> > problem, std::shared_ptr<IOHprofiler_csv_logger> logger);
 		double getFitness() const;

@@ -5,6 +5,7 @@
 
 class ParticleUpdateSettings;
 class Particle;
+
 enum UpdateManagerType {
 	INERTIA_WEIGHT,
 	DECR_INERTIA_WEIGHT,
@@ -34,15 +35,12 @@ class ParticleUpdateManager {
 		//This constructor is used for ParticleUpdateManagers that do not use a 
 		//velocity vector.
 		ParticleUpdateManager(std::vector<double>& x, std::vector<double> & p, std::vector<double>& g, std::vector<double> const vMax);
-		virtual void update(double progress) = 0;
-};
 
-class ParticleUpdateManagerFactory {
-	public:
 		static ParticleUpdateManager* createParticleUpdateManager(std::vector<double>& x, 
 			std::vector<double>& v,	std::vector<double> & p, std::vector<double>& g, 
 			ParticleUpdateSettings const settings, std::vector<Particle*>& neighborhood);
 
+		virtual void update(double progress) = 0;
 };
 
 class InertiaWeightManager : public ParticleUpdateManager{

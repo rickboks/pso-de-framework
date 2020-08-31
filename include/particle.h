@@ -6,12 +6,12 @@
 
 class ParticleUpdateManager;
 
-class Particle : public Solution{
+class Particle : public Solution {
 	private:		
 		std::vector<double> v;
 		std::vector<double> p;		
-		double pbest;
 		std::vector<double> g;
+		double pbest;
 		double gbest;
 		std::vector<Particle*> neighborhood;
 		ParticleUpdateManager* particleUpdateManager;

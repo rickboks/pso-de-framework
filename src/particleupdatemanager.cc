@@ -31,15 +31,13 @@ void ParticleUpdateManager::applyVMax(){
 	}
 }
 
-
 void ParticleUpdateManager::updatePosition(){
 		std::transform (x.begin(), x.end(),
 				v.begin(), x.begin(),
 		std::plus<double>());
 }
 
-/*		Factory 		*/
-ParticleUpdateManager* ParticleUpdateManagerFactory::createParticleUpdateManager
+ParticleUpdateManager* ParticleUpdateManager::createParticleUpdateManager
 	(std::vector<double>& x, std::vector<double>& v,std::vector<double> & p, 
 	std::vector<double>& g,  ParticleUpdateSettings const settings, std::vector<Particle*>& neighborhood){
 
@@ -85,7 +83,6 @@ void VmaxManager::update(double progress){
 
 	updatePosition();
 }
-
 
 /*		Inertia weight 		*/
 InertiaWeightManager::InertiaWeightManager (std::vector<double>& x, std::vector<double>& v,

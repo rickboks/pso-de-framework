@@ -5,7 +5,6 @@
 //BASE
 SelectionManager::SelectionManager(int const D, DEAdaptationManager* dam)
 : D(D), dam(dam){
-
 }
 
 SelectionManager* SelectionManager::createSelectionManager(SelectionType type, int const D, DEAdaptationManager* dam){
@@ -31,7 +30,6 @@ void SelectionManager::selection(std::vector<Particle*>& particles,
 			dam->successfulIndex(i);
 		}
 	}
-
 	//start selection
 	select(particles, p0, p2);
 }

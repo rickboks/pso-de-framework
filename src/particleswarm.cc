@@ -128,6 +128,7 @@ void ParticleSwarm::runSynchronous(int const evalBudget, int popSize,
 		p->randomize(settings.xMax, settings.xMin);
 		particles.push_back(p);
 	}
+
 	logStart();
 	logPositions();
 

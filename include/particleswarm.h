@@ -18,6 +18,7 @@ struct ParticleUpdateSettings;
 template <typename T> 
 class IOHprofiler_problem;
 class IOHprofiler_csv_logger;
+
 class ParticleSwarm {
 	private:
 		UpdateManagerType const updateManagerType;

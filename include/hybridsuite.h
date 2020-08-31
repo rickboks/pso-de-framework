@@ -50,21 +50,13 @@ class HybridSuite {
 								for (auto selection : selectionManagers)
 									for (auto adaptation : adaptationManagers)
 										configurations.push_back(
-											std::make_tuple(update, topology, synchronicity, mutation, 
+											hybrid_config(update, topology, synchronicity, mutation, 
 												crossover, selection, adaptation));
 
 		}
 
 		T getHybrid(int const i) {
-			UpdateManagerType update = std::get<0>(configurations[i]);
-			Topology topology = std::get<1>(configurations[i]);
-			Synchronicity sync = std::get<2>(configurations[i]);
-			MutationType mutation = std::get<3>(configurations[i]);
-			CrossoverType crossover = std::get<4>(configurations[i]);
-			SelectionType selection = std::get<5> (configurations[i]);
-			DEAdaptationType adapt = std::get<6>(configurations[i]);
-
-			return T(update, topology, sync, mutation, crossover, selection, adapt);
+			return T(configurations[i]);
 		}
 
 		void setMutationManagers(std::vector<MutationType> mutationManagers){

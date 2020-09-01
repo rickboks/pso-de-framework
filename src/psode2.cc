@@ -104,7 +104,6 @@ void PSODE2::runAsynchronous(int const evalBudget, int popSize, std::map<int,dou
 	crossoverManager = CrossoverManager<Particle>::createCrossoverManager(config.crossover, D);
 	adaptationManager = DEAdaptationManager::createDEAdaptationManager(config.adaptation);
 
-	int iterations = 0;
 	double bestFitness = std::numeric_limits<double>::max();
 	int split = particles.size() / 2;
 	std::vector<int> deIndices(split);
@@ -125,6 +124,7 @@ void PSODE2::runAsynchronous(int const evalBudget, int popSize, std::map<int,dou
 	std::vector<double> Crs(dePop.size());
 
 	logStart();
+	int iterations = 0;
 	while (problem->IOHprofiler_get_evaluations() < evalBudget &&
 			!problem->IOHprofiler_hit_optimal()){
 
@@ -171,7 +171,7 @@ void PSODE2::runAsynchronous(int const evalBudget, int popSize, std::map<int,dou
 		for (Particle* p : trials)
 			delete p;
 
-		if (iterations % 10 == 0)
+		if (iterations % 100 == 0)
 			share();
 
 		adaptationManager->update();

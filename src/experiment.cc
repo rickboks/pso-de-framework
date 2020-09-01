@@ -15,11 +15,13 @@ void algorithm
  std::shared_ptr<IOHprofiler_csv_logger> logger) {
     int const D = problem->IOHprofiler_get_number_of_variables(); 
     psode2->run(problem, logger, D*10000, D*5, std::map<int,double>()); 
+    //de->run(problem, logger, D*10000, D*5); 
 }
 
-
 void _run_experiment(bool log) {
-    psode2 = new PSODE2(DECR_INERTIA_WEIGHT, GBEST, ASYNCHRONOUS, TTB_1, BINOMIAL, P3, JADE);
+    psode2 = new PSODE2(INERTIA_WEIGHT, VON_NEUMANN, ASYNCHRONOUS, TTB_1, BINOMIAL, P3, JADE);
+    pso = new ParticleSwarm(INERTIA_WEIGHT, VON_NEUMANN, ASYNCHRONOUS);
+	de = new DifferentialEvolution(RANDOM, TTB_1, BINOMIAL, JADE, false);
 
     if (log)
 	pso->enableLogging();

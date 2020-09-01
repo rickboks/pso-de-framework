@@ -46,10 +46,6 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > pr
 
 	std::vector<Genome*> donors;
 	std::vector<Genome*> trials;
-	std::vector<Genome*> newPopulation;
-	std::vector<Genome*> oldPopulation;
-	newPopulation.reserve(popSize);
-	oldPopulation.reserve(popSize);
 
 	crossoverManager = CrossoverManager<Genome>::createCrossoverManager(crossoverType, dimension);
 	mutationManager = MutationManager<Genome>::createMutationManager(mutationType, dimension);
@@ -87,23 +83,15 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > pr
 				bestFitness = trialF;
 			}
 
-			if (parentF < trialF){
-				newPopulation.push_back(genomes[i]);
-				oldPopulation.push_back(trials[i]);
-			} else {
+			if (trialF < parentF){
+				genomes[i]->setPosition(trials[i]->getPosition(), trials[i]->getFitness());
 				adaptationManager->successfulIndex(i);				
-				newPopulation.push_back(trials[i]);
-				oldPopulation.push_back(genomes[i]);
 			}
 		}
-
-		genomes = newPopulation;
-		newPopulation.clear();
-
-		for (Genome* g : oldPopulation)
-			delete g;
-
-		oldPopulation.clear();
+		
+		for (Genome* g : trials){
+				delete g;
+		}
 
 		if (jumpOpposition)
 			oppositionGenerationJump();
@@ -118,12 +106,6 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > pr
 	delete mutationManager;
 	delete crossoverManager;
 	delete adaptationManager;
-
-	for (Genome* d : oldPopulation)
-		delete d;
-
-	for (Genome* d : newPopulation)
-		delete d;	
 
 	genomes.clear();
 }

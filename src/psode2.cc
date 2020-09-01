@@ -137,7 +137,7 @@ void PSODE2::runAsynchronous(int const evalBudget, int popSize, std::map<int,dou
 		// Update pbest and gbest of PSO population
 		// Update velocity and position of PSO population
 		for (int i = 0; i < psoPop.size(); i++){
-			particles[i]->evaluate(problem,logger);
+			psoPop[i]->evaluate(problem,logger);
 			psoPop[i]->updatePbest();
 			psoPop[i]->updateGbest();
 			psoPop[i]->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));			
@@ -206,13 +206,13 @@ void PSODE2::share(){
 	Particle* best_pso = getBest(psoPop);
 
 	if (best_de->getFitness() < best_pso->getFitness()){
+		//Share a good solution with the PSO population
 		Particle* worst = getWorst(psoPop);
 		worst->setPosition(best_de->getPosition(), best_de->getFitness());
-		//Share a good solution with the PSO population
 	} else {
+		//Share a good solution with the DE population
 		Particle* worst = getWorst(dePop);
 		worst->setPosition(best_pso->getPosition(), best_pso->getFitness());
-		//Share a good solution with the DE population
 	}
 
 }

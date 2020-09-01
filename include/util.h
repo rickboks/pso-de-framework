@@ -2,6 +2,7 @@
 #include <vector>
 #include <functional>
 #include <algorithm>
+#include <iostream>
 #include "rng.h"
 
 void scale(std::vector<double>& vec, double x);
@@ -32,6 +33,7 @@ T* getWorst(std::vector<T*>const& genomes){
 
 	for (unsigned int i = 0; i < genomes.size(); i++){
 		double const score = genomes[i]->getFitness();
+		std::cout << score << std::endl;
 		if (score > worstF){
 			worstF = score;
 			worst = i;

@@ -7,7 +7,7 @@
 #include "particle.h"
 #include "particleupdatemanager.h"
 #include "particleupdatesettings.h"
-#include "vectoroperations.h"
+#include "util.h"
 #include "rng.h"
 
 /*		Base 		*/

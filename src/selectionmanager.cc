@@ -1,5 +1,5 @@
 #include "selectionmanager.h"
-#include "vectoroperations.h"
+#include "util.h"
 #include "deadaptationmanager.h"
 #include <tuple>
 //BASE

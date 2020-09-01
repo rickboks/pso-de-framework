@@ -23,7 +23,6 @@ Solution::Solution(std::vector<double> x, double fitness):
 	x(x), D(x.size()), evaluated(true), fitness(fitness){
 }
 
-
 double Solution::getFitness() const{
 	return fitness;
 }
@@ -32,7 +31,7 @@ double Solution::evaluate(std::shared_ptr<IOHprofiler_problem<double> > problem,
 	if (!evaluated){
 		evaluated = true;		
 		fitness = problem->evaluate(x);
-		logger->write_line(problem->loggerInfo());
+		logger->do_log(problem->loggerCOCOInfo());
 		return fitness;
 	} else {
 		return fitness;
@@ -64,6 +63,7 @@ void Solution::randomize(std::vector<double> lowerBounds, std::vector<double> up
 	for (int i = 0; i < D; i++){
 		x[i] = rng.randDouble(lowerBounds[i], upperBounds[i]);
 	}
+	evaluated=false;
 }
 
 int Solution::getDimension(){

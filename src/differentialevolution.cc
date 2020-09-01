@@ -6,13 +6,12 @@
 #include "utilities.h"
 #include "deadaptationmanager.h"
 #include "instancenamer.h"
+#include "util.h"
 #include <random>
 #include <algorithm>
 #include <iostream>
 #include <functional>
 #include <string>
-
-bool comparePtrs(Genome* a, Genome* b);
 
 DifferentialEvolution::DifferentialEvolution(DEInitializationType initializationType, 
 	MutationType const mutationType, CrossoverType const crossoverType, 
@@ -41,9 +40,6 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > pr
 		if (genome->getFitness() < bestFitness)
 			bestFitness = genome->getFitness();
 
-	int noImprovement = 0;
-	bool improved = false;
-
 	std::vector<Genome*> donors;
 	std::vector<Genome*> trials;
 
@@ -62,7 +58,6 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > pr
 		adaptationManager->nextF(Fs);
 		adaptationManager->nextCr(Crs);
 		adaptationManager->reset();
-		improved = false;
 		
 		donors = mutationManager->mutate(genomes,Fs);
 		trials = crossoverManager->crossover(genomes, donors, Crs);
@@ -72,16 +67,7 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > pr
 		
 		for (int i = 0; i < popSize; i++){
 			double parentF = genomes[i]->evaluate(problem,logger);
-			if (parentF < bestFitness){
-				improved = true;
-				bestFitness = parentF;
-			}
-
 			double trialF = trials[i]->evaluate(problem,logger);
-			if (trialF < bestFitness){
-				improved = true;
-				bestFitness = trialF;
-			}
 
 			if (trialF < parentF){
 				genomes[i]->setPosition(trials[i]->getPosition(), trials[i]->getFitness());
@@ -97,7 +83,6 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > pr
 			oppositionGenerationJump();
 
 		adaptationManager->update();
-		improved ? noImprovement=0 : noImprovement++;
 	}
 
 	for (Genome* d : genomes)
@@ -151,7 +136,7 @@ void DifferentialEvolution::oppositionGenerationJump(){
 
 	combined.insert(combined.end(), genomes.begin(), genomes.end());
 
-	std::sort(combined.begin(), combined.end(), comparePtrs);
+	std::sort(combined.begin(), combined.end(), comparePtrs<Genome>);
 
 	for (int i = 0; i < popSize; i++){
 		genomes[i] = combined[i];

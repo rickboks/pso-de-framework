@@ -5,7 +5,7 @@
 #include "topologymanager.h"
 #include "genome.h"
 #include "particleupdatesettings.h"
-#include "vectoroperations.h"
+#include "util.h"
 #include "mutationmanager.h"
 #include "instancenamer.h"
 #include "psode.h"

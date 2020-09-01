@@ -10,7 +10,10 @@
 
 class PSODE2 : public HybridAlgorithm {
 	private:
+		bool logging;
 		std::vector<Particle*> particles;		
+		std::vector<Particle*> psoPop;		
+		std::vector<Particle*> dePop;		
 		//void runSynchronous(int const evalBudget, int const popSize, 
 			//std::map<int,double> particleUpdateParams);
 
@@ -18,6 +21,11 @@ class PSODE2 : public HybridAlgorithm {
 			std::map<int,double> particleUpdateParams);
 
 		std::vector<Particle*> copyPopulation(std::vector<Particle*>const& particles);
+
+		void logPositions();
+		void logStart();
+		void logEnd();
+		void share();
 
 		public:
 		PSODE2(UpdateManagerType const updateManagerType, 
@@ -34,5 +42,6 @@ class PSODE2 : public HybridAlgorithm {
     		int const popSize, std::map<int,double> particleUpdateParams);
 
 		void reset();
+
 		std::string getIdString() const;
 };

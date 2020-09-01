@@ -9,7 +9,7 @@
 
 //typedef std::tuple<UpdateManagerType, Topology, Synchronicity, MutationType, 
 	//CrossoverType, SelectionType, DEAdaptationType> hybrid_config;
-struct hybrid_config{
+struct hybrid_config {
 	UpdateManagerType update;
 	Topology topology;
 	Synchronicity synchronicity;

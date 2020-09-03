@@ -24,24 +24,6 @@ PSODE2::PSODE2(hybrid_config config):
 		HybridAlgorithm(config){
 }
 
-std::vector<Particle*> PSODE2::copyPopulation(std::vector<Particle*>const& particles){
-	std::vector<Particle*> copy;
-	copy.reserve(particles.size());
-
-	std::map<Particle*, Particle*> newAddresses;	
-
-	for (int i = 0; i < (int)particles.size(); i++){
-		copy.push_back(new Particle(*(particles[i])));
-		newAddresses[particles[i]] = copy[i];
-	}
-
-	for (Particle* p: copy){
-		p->replaceNeighbors(newAddresses);
-	}
-
-	return copy;
-}
-
 void PSODE2::reset(){
 	delete topologyManager;
 	delete mutationManager;

@@ -216,10 +216,6 @@ void PSODE::runAsynchronous(int const evalBudget,
 
 	int iterations = 0;
 
-	double bestFitness = std::numeric_limits<double>::max();
-	int notImproved = 0;
-	bool improved;
-
 	std::vector<double> Fs(popSize);
 	std::vector<double> Crs(popSize);
 
@@ -229,18 +225,9 @@ void PSODE::runAsynchronous(int const evalBudget,
 		adaptationManager->nextCr(Crs);
 		adaptationManager->reset();
 		
-		improved = false;
-		
 		for (int i = 0; i < popSize; i++){
 			double y = particles[i]->evaluate(problem,logger);
-
-			if (y < bestFitness){
-				improved = true;
-				bestFitness = y;
-			}
 		}
-
-		improved ? notImproved = 0 : notImproved++;
 
 		p0 = copyPopulation(particles);
 		
@@ -253,23 +240,13 @@ void PSODE::runAsynchronous(int const evalBudget,
 		p1 = mutationManager->mutate(particles, Fs);
 		p2 = crossoverManager->crossover(particles,p1, Crs);
 			
-		improved = false;
 		for (unsigned int i = 0; i < p2.size(); i++){
 			p0[i]->evaluate(problem,logger);
 			p2[i]->evaluate(problem,logger);
-
-
-			double minF = std::min(p0[i]->getFitness(), p2[i]->getFitness());	
-			if (minF < bestFitness){
-				improved = true;
-				bestFitness = minF;
-			}
 		}
 
 		selectionManager->selection(particles, p0, p2);
 		adaptationManager->update();
-
-		improved ? notImproved = 0 : notImproved++;
 
 		for (int i = 0; i < popSize; i++) {
 			delete p0[i]; 

@@ -182,28 +182,29 @@ void PSODE2::logEnd(){
 
 // If PSO population has the best solution, replace the worst solution in DE with the best in PSO
 // If DE population has the best solution, replace the worst solution in PSO with the best in DE
-void PSODE2::share(){
-	Particle* best_de = getBest(dePop);
-	Particle* best_pso = getBest(psoPop);
-
-	if (best_de->getFitness() < best_pso->getFitness()){
-		Particle* worst_pso = getWorst(psoPop);
-		worst_pso->setPosition(best_de->getPosition(), best_de->getFitness(), true); //Updates the velocity aswell
-	} else {
-		Particle* worst_de = getWorst(dePop);
-		worst_de->setPosition(best_pso->getPosition(), best_pso->getFitness(), false); //Not here
-	}
-}
-
 //void PSODE2::share(){
 	//Particle* best_de = getBest(dePop);
 	//Particle* best_pso = getBest(psoPop);
 
-	//std::vector<double> x = best_pso->getPosition();
-	//double y = best_pso->getFitness();
-	//best_pso->setPosition(best_de->getPosition(), best_de->getFitness(), true); //Updates the velocity aswell
-	//best_de->setPosition(x, y, false); //Not here
+	//if (best_de->getFitness() < best_pso->getFitness()){
+		//Particle* worst_pso = getWorst(psoPop);
+		//worst_pso->setPosition(best_de->getPosition(), best_de->getFitness(), true); //Updates the velocity aswell
+	//} else {
+		//Particle* worst_de = getWorst(dePop);
+		//worst_de->setPosition(best_pso->getPosition(), best_pso->getFitness(), false); //Not here
+	//}
 //}
+
+void PSODE2::share(){
+	Particle* best_de = getPBest(dePop, 0.1);
+	Particle* best_pso = getPBest(psoPop, 0.1);
+
+	std::vector<double> x = best_pso->getPosition();
+	double y = best_pso->getFitness();
+
+	best_pso->setPosition(best_de->getPosition(), best_de->getFitness(), true); //Updates the velocity aswell
+	best_de->setPosition(x, y, false); //Not here
+}
 
 void PSODE2::logPositions(){
 	if (logging){

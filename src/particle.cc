@@ -1,6 +1,7 @@
 #include "particle.h"
 #include "particleupdatesettings.h"
 #include "particleupdatemanager.h"
+#include "util.h"
 #include "rng.h"
 #include <iostream>
 #include <algorithm>
@@ -74,9 +75,14 @@ std::vector<double> Particle::getP() const {
 
 void Particle::updateGbest(){
 	int bestNeighbor = -1;
-	double bestScore = gbest;
 	int const size = neighborhood.size();
 
+	if (fitness < gbest){
+		gbest = fitness;
+		g = x;
+	}
+
+	double bestScore = gbest;
 	for (int i = 0; i < size; i++){
 		double const currentScore = neighborhood[i]->getPbest();
 		if (currentScore < bestScore){
@@ -95,11 +101,6 @@ void Particle::updatePbest(){
 	if (fitness < pbest){
 		pbest = fitness;
 		p = x;
-
-		if (fitness < gbest){
-			gbest = fitness;
-			g = x;
-		}
 	}
 }
 
@@ -115,4 +116,11 @@ void Particle::replaceNeighbors(std::map<Particle*, Particle*> mapping){
 
 int Particle::getAmountOfNeighbors(){
 	return neighborhood.size();
+}
+
+void Particle::setPosition(std::vector<double> x, double fitness, bool updateVelocity){
+	if (updateVelocity)
+		subtract(x, this->x, v); // Reverse engineer velocity
+	this->x = x;
+	this->fitness = fitness;
 }

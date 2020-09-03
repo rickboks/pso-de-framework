@@ -24,6 +24,7 @@ class Particle : public Solution {
 		~Particle();
 		std::vector<double> getVelocity() const;
 		void setVelocity(std::vector<double> v);
+		void setPosition(std::vector<double>x, double fitness, bool updateVelocity);
 		void addNeighbor(Particle* const neighbor);
 		void removeNeighbor(Particle* const neighbor);
 		void removeAllNeighbors();

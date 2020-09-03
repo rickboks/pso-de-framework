@@ -5,6 +5,7 @@
 #include "mutationmanager.h"
 #include "crossovermanager.h"
 #include "selectionmanager.h"
+#include "constrainthandler.h"
 #include <memory>
 
 //typedef std::tuple<UpdateManagerType, Topology, Synchronicity, MutationType, 
@@ -40,6 +41,7 @@ class HybridAlgorithm {
 		CrossoverManager<Particle>* crossoverManager;
 		DEAdaptationManager* adaptationManager;
 		SelectionManager* selectionManager;
+		ConstraintHandler* constraintHandler;
 		std::shared_ptr<IOHprofiler_problem<double> > problem; 
 		std::shared_ptr<IOHprofiler_csv_logger> logger;
 

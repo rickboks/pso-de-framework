@@ -45,15 +45,15 @@ void Pairwise2SelectionManager::select(std::vector<Particle*>& particles,
 	for (unsigned int i = 0 ; i < particles.size(); i++){
 		//PSO wins
 		if (p0[i]->getFitness() < p2[i]->getFitness()){
-			particles[i]->setPosition(p0[i]->getPosition(), p0[i]->getFitness());
+			particles[i]->setPosition(p0[i]->getPosition(), p0[i]->getFitness(), false);
 			particles[i]->setVelocity(p0[i]->getVelocity());
 		} else {
 			//DE
-			std::vector<double> newVelocity(D);
+			//std::vector<double> newVelocity(D);
 			//reverse engineer velocity
-			subtract(p2[i]->getPosition(), particles[i]->getPosition(), newVelocity);
-			particles[i]->setVelocity(newVelocity);
-			particles[i]->setPosition(p2[i]->getPosition(), p2[i]->getFitness());							
+			//subtract(p2[i]->getPosition(), particles[i]->getPosition(), newVelocity);
+			//particles[i]->setVelocity(newVelocity);
+			particles[i]->setPosition(p2[i]->getPosition(), p2[i]->getFitness(), true);
 		}
 	}
 }
@@ -76,14 +76,14 @@ void Pairwise3SelectionManager::select(std::vector<Particle*>& particles,
 		if (Fparticle < Fp0 && Fparticle < Fp2){
 			//Do nothing
 		} else if (Fp0 < Fparticle && Fp0 < Fp2){
-			particles[i]->setPosition(p0[i]->getPosition(), p0[i]->getFitness());
+			particles[i]->setPosition(p0[i]->getPosition(), p0[i]->getFitness(), false);
 			particles[i]->setVelocity(p0[i]->getVelocity());
 		} else {
-			std::vector<double> newVelocity(D);
+			//std::vector<double> newVelocity(D);
 			//reverse engineer velocity
-			subtract(p2[i]->getPosition(), particles[i]->getPosition(), newVelocity);
-			particles[i]->setVelocity(newVelocity);
-			particles[i]->setPosition(p2[i]->getPosition(), p2[i]->getFitness());
+			//subtract(p2[i]->getPosition(), particles[i]->getPosition(), newVelocity);
+			//particles[i]->setVelocity(newVelocity);
+			particles[i]->setPosition(p2[i]->getPosition(), p2[i]->getFitness(), true);
 		}
 	}
 }
@@ -118,13 +118,13 @@ void Union2SelectionManager::select(std::vector<Particle*>& particles,
 		Particle* p = std::get<0>(allSolutions[i]);
 		int index = std::get<2>(allSolutions[i]);		
 		if (std::get<1>(allSolutions[i]) == 0){
-			particles[index]->setPosition(p->getPosition(), p->getFitness());
+			particles[index]->setPosition(p->getPosition(), p->getFitness(), false);
 			particles[index]->setVelocity(p->getVelocity());
 		} else {
-			std::vector<double> newVelocity(D);			//reverse engineer velocity
-			subtract(p->getPosition(), particles[index]->getPosition(), newVelocity);
-			particles[index]->setVelocity(newVelocity);
-			particles[index]->setPosition(p->getPosition(), p->getFitness());
+			//std::vector<double> newVelocity(D);			//reverse engineer velocity
+			//subtract(p->getPosition(), particles[index]->getPosition(), newVelocity);
+			//particles[index]->setVelocity(newVelocity);
+			particles[index]->setPosition(p->getPosition(), p->getFitness(), true);
 		}
 	}
 }
@@ -157,13 +157,13 @@ void Union3SelectionManager::select(std::vector<Particle*>& particles,
 		int index = std::get<2>(allSolutions[i]);		
 
 		if (type == 0){
-			particles[index]->setPosition(p->getPosition(), p->getFitness());
+			particles[index]->setPosition(p->getPosition(), p->getFitness(), false);
 			particles[index]->setVelocity(p->getVelocity());
 		} else if (type == 1){
-			std::vector<double> newVelocity(D);			//reverse engineer velocity
-			subtract(p->getPosition(), particles[index]->getPosition(), newVelocity);
-			particles[index]->setVelocity(newVelocity);
-			particles[index]->setPosition(p->getPosition(), p->getFitness());
+			//std::vector<double> newVelocity(D);			//reverse engineer velocity
+			//subtract(p->getPosition(), particles[index]->getPosition(), newVelocity);
+			//particles[index]->setVelocity(newVelocity);
+			particles[index]->setPosition(p->getPosition(), p->getFitness(), true);
 		} else {
 			// do nothing: original is best
 		}

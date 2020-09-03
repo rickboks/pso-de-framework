@@ -1,6 +1,7 @@
 #include <IOHprofiler_problem.h>
 #include <IOHprofiler_csv_logger.h>
 #include "hybridalgorithm.h"
+#include "repairhandler.h"
 #include "particle.h"
 #include "topologymanager.h"
 #include "genome.h"
@@ -29,10 +30,12 @@ void PSODE2::reset(){
 	delete mutationManager;
 	delete crossoverManager;
 	delete adaptationManager;
+	delete constraintHandler;
 	topologyManager = NULL;
 	mutationManager = NULL;
 	crossoverManager = NULL;
 	adaptationManager = NULL;
+
 	
 	for (Particle* const particle : particles)
 		delete particle;
@@ -85,22 +88,17 @@ void PSODE2::runAsynchronous(int const evalBudget, int popSize, std::map<int,dou
 	mutationManager = MutationManager<Particle>::createMutationManager(config.mutation, D);
 	crossoverManager = CrossoverManager<Particle>::createCrossoverManager(config.crossover, D);
 	adaptationManager = DEAdaptationManager::createDEAdaptationManager(config.adaptation);
+	constraintHandler = new ProjectionRepair(smallest, largest);
 
-	double bestFitness = std::numeric_limits<double>::max();
 	int split = particles.size() / 2;
-	std::vector<int> deIndices(split);
-	for (int i = 0; i < split; i++) 
-		deIndices.push_back(i);
-
 	psoPop = std::vector<Particle*>(particles.begin(), particles.begin() + split);
 	dePop = std::vector<Particle*>(particles.begin() + split, particles.end());
 
-	//Evaluate DE population to avoid uninitialized values in *best* mutation schemes
-	for (Particle* p : dePop)
-		p->evaluate(problem, logger);
-
 	topologyManager = TopologyManager::createTopologyManager(config.topology, psoPop);
 	topologyManager->initialize();
+
+	for (Particle* p : particles)
+		p->evaluate(problem, logger);
 
 	std::vector<double> Fs(dePop.size());
 	std::vector<double> Crs(dePop.size());
@@ -119,14 +117,20 @@ void PSODE2::runAsynchronous(int const evalBudget, int popSize, std::map<int,dou
 		// Update pbest and gbest of PSO population
 		// Update velocity and position of PSO population
 		for (int i = 0; i < psoPop.size(); i++){
-			psoPop[i]->evaluate(problem,logger);
 			psoPop[i]->updatePbest();
 			psoPop[i]->updateGbest();
 			psoPop[i]->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));			
+			psoPop[i]->repair(constraintHandler);
+			psoPop[i]->evaluate(problem,logger);
 		}
 
-		// Perform mutation and crossover
+		// Perform mutation 
 		std::vector<Particle*> donors = mutationManager->mutate(dePop, Fs);
+
+		for (Particle* p : donors) 
+			p->repair(constraintHandler); // Repair the mutants
+
+		// Perform crossover
 		std::vector<Particle*> trials = crossoverManager->crossover(dePop, donors, Crs);
 
 		// We don't need the donor vectors resulting from mutation anymore
@@ -142,18 +146,15 @@ void PSODE2::runAsynchronous(int const evalBudget, int popSize, std::map<int,dou
 
 			// Perform selection
 			if (trialF < parentF){
-				dePop[i]->setPosition(trials[i]->getPosition(), trials[i]->getFitness());
+				dePop[i]->setPosition(trials[i]->getPosition(), trials[i]->getFitness(), false);
 				adaptationManager->successfulIndex(i);
 			}
-
-			dePop[i]->updatePbest();
-			dePop[i]->updateGbest();
 		}
 
 		for (Particle* p : trials)
 			delete p;
 
-		if (iterations % 100 == 0)
+		if (iterations % 10 == 0)
 			share();
 
 		adaptationManager->update();
@@ -188,16 +189,23 @@ void PSODE2::share(){
 	Particle* best_pso = getBest(psoPop);
 
 	if (best_de->getFitness() < best_pso->getFitness()){
-		//Share a good solution with the PSO population
-		Particle* worst = getWorst(psoPop);
-		worst->setPosition(best_de->getPosition(), best_de->getFitness());
+		Particle* worst_pso = getWorst(psoPop);
+		worst_pso->setPosition(best_de->getPosition(), best_de->getFitness(), true); //Updates the velocity aswell
 	} else {
-		//Share a good solution with the DE population
-		Particle* worst = getWorst(dePop);
-		worst->setPosition(best_pso->getPosition(), best_pso->getFitness());
+		Particle* worst_de = getWorst(dePop);
+		worst_de->setPosition(best_pso->getPosition(), best_pso->getFitness(), false); //Not here
 	}
-
 }
+
+//void PSODE2::share(){
+	//Particle* best_de = getBest(dePop);
+	//Particle* best_pso = getBest(psoPop);
+
+	//std::vector<double> x = best_pso->getPosition();
+	//double y = best_pso->getFitness();
+	//best_pso->setPosition(best_de->getPosition(), best_de->getFitness(), true); //Updates the velocity aswell
+	//best_de->setPosition(x, y, false); //Not here
+//}
 
 void PSODE2::logPositions(){
 	if (logging){

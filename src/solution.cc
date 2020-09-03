@@ -10,6 +10,9 @@ Solution::Solution(int const D)
 
 }
 
+Solution::~Solution(){
+}
+
 Solution::Solution(Particle* particle)
 	:x(particle->getPosition()), D(particle->getPosition().size()),  evaluated(true), fitness(particle->getFitness()){
 
@@ -68,6 +71,10 @@ void Solution::randomize(std::vector<double> lowerBounds, std::vector<double> up
 
 int Solution::getDimension(){
 	return D;
+}
+
+void Solution::repair(ConstraintHandler* constraintHandler){
+	constraintHandler->repair(x);
 }
 
 bool Solution::operator < (const Solution& s) const {

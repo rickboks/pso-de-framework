@@ -133,19 +133,17 @@ void PSODE2::runAsynchronous(int const evalBudget, int popSize, std::map<int,dou
 		// Perform crossover
 		std::vector<Particle*> trials = crossoverManager->crossover(dePop, donors, Crs);
 
-		// We don't need the donor vectors resulting from mutation anymore
-		for (Particle* d : donors) 
-			delete d;
+		for (Particle* d : donors) delete d;
 
 		for (int i = 0; i < dePop.size(); i++){
 			//Evaluate the parent vector
-			double parentF = dePop[i]->evaluate(problem,logger);
+			dePop[i]->evaluate(problem,logger);
 
 			//Evaluate the trial vector
-			double trialF = trials[i]->evaluate(problem,logger);
+			trials[i]->evaluate(problem,logger);
 
 			// Perform selection
-			if (trialF < parentF){
+			if (trials[i]->getFitness() < dePop[i]->getFitness()){
 				dePop[i]->setPosition(trials[i]->getPosition(), trials[i]->getFitness(), false);
 				adaptationManager->successfulIndex(i);
 			}

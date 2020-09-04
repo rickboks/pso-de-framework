@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <map>
-#include <particleupdatesettings.h>
+#include "particleupdatesettings.h"
 #include "solution.h"
 
 class ParticleUpdateManager;

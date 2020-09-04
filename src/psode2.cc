@@ -30,7 +30,8 @@ void PSODE2::reset(){
 	delete mutationManager;
 	delete crossoverManager;
 	delete adaptationManager;
-	delete constraintHandler;
+	delete deCH;
+	delete psoCH;
 	topologyManager = NULL;
 	mutationManager = NULL;
 	crossoverManager = NULL;
@@ -88,7 +89,8 @@ void PSODE2::runAsynchronous(int const evalBudget, int popSize, std::map<int,dou
 	mutationManager = MutationManager<Particle>::createMutationManager(config.mutation, D);
 	crossoverManager = CrossoverManager<Particle>::createCrossoverManager(config.crossover, D);
 	adaptationManager = DEAdaptationManager::createDEAdaptationManager(config.adaptation);
-	constraintHandler = new ProjectionRepair(smallest, largest);
+	deCH = new ProjectionRepair(smallest, largest);
+	psoCH = new ProjectionRepair(smallest, largest);
 
 	int split = particles.size() / 2;
 	psoPop = std::vector<Particle*>(particles.begin(), particles.begin() + split);
@@ -120,7 +122,7 @@ void PSODE2::runAsynchronous(int const evalBudget, int popSize, std::map<int,dou
 			psoPop[i]->updatePbest();
 			psoPop[i]->updateGbest();
 			psoPop[i]->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));			
-			psoPop[i]->repair(constraintHandler);
+			psoPop[i]->repair(psoCH);
 			psoPop[i]->evaluate(problem,logger);
 		}
 
@@ -128,7 +130,7 @@ void PSODE2::runAsynchronous(int const evalBudget, int popSize, std::map<int,dou
 		std::vector<Particle*> donors = mutationManager->mutate(dePop, Fs);
 
 		for (Particle* p : donors) 
-			p->repair(constraintHandler); // Repair the mutants
+			p->repair(deCH); // Repair the mutants
 
 		// Perform crossover
 		std::vector<Particle*> trials = crossoverManager->crossover(dePop, donors, Crs);

@@ -73,8 +73,8 @@ int Solution::getDimension(){
 	return D;
 }
 
-void Solution::repair(ConstraintHandler* constraintHandler){
-	constraintHandler->repair(x);
+void Solution::repair(ConstraintHandler* rh){
+	rh->repair(x);
 }
 
 bool Solution::operator < (const Solution& s) const {

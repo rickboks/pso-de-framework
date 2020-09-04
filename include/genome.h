@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-
 #include "crossovermanager.h"
 #include "solution.h"
 

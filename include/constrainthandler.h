@@ -15,7 +15,7 @@ class DEConstraintHandler : public ConstraintHandler{
 		virtual void repair(std::vector<double>& x)=0;
 };
 
-class PSOConstraintHandler : public ConstraintHandler{
+class PSOConstraintHandler : public ConstraintHandler {
 	public:
 		virtual ~PSOConstraintHandler();
 		// Generic constraint handler

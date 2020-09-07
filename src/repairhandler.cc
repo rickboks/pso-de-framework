@@ -1,4 +1,5 @@
 #include "repairhandler.h"
+#include "particle.h"
 #include "util.h"
 #include <algorithm>
 #include <limits>
@@ -9,7 +10,7 @@ RepairHandler::RepairHandler(std::vector<double>const lb, std::vector<double>con
 
 RepairHandler::~RepairHandler(){}
 
-void RepairHandler::repair(std::vector<double>& x){
+void RepairHandler::repair(Particle* p){
 	// do nothing
 }
 
@@ -20,10 +21,11 @@ GenericRepairHandler::~GenericRepairHandler(){}
 ReinitializationRepair::ReinitializationRepair(std::vector<double>const lb, std::vector<double>const ub)
 	: GenericRepairHandler(lb, ub){
 }
-void ReinitializationRepair::repair(std::vector<double>& x){
+
+void ReinitializationRepair::repair(Particle* p){
 	for (int i = 0; i < D; i++){
-		if (x[i] < lb[i] || x[i] > ub[i])
-			x[i] = rng.randDouble(lb[i], ub[i]);
+		if (p->getDimension(i) < lb[i] || p->getDimension(i) > ub[i])
+			p->setDimension(i, rng.randDouble(lb[i], ub[i]));
 	}
 }
 
@@ -31,25 +33,25 @@ ProjectionRepair::ProjectionRepair(std::vector<double>const lb, std::vector<doub
 	: GenericRepairHandler(lb, ub){
 }
 
-void ProjectionRepair::repair(std::vector<double>& x){
+void ProjectionRepair::repair(Particle* p){
 	for (int i = 0; i < D; i++){
-		if (x[i] < lb[i]) 
-			x[i] = lb[i];
-		else if (x[i] > ub[i]) 
-			x[i] = ub[i];
+		if (p->getDimension(i) < lb[i]) 
+			p->setDimension(i, lb[i]);
+		else if (p->getDimension(i) > ub[i]) 
+			p->setDimension(i, ub[i]);
 	}
 }
 
 ReflectionRepair::ReflectionRepair(std::vector<double>const lb, std::vector<double>const ub)
 	: GenericRepairHandler(lb, ub){
 }
-void ReflectionRepair::repair(std::vector<double>& x){
+void ReflectionRepair::repair(Particle* p){
 	for (int i = 0; i < D; i++){
 		while (true){
-			if (x[i] < lb[i]) 
-				x[i] = 2 * lb[i] - x[i];
-			else if (x[i] > ub[i]) 
-				x[i] = 2 * ub[i] - x[i];
+			if (p->getDimension(i) < lb[i]) 
+				p->setDimension(i, 2 * lb[i] - p->getDimension(i));
+			else if (p->getDimension(i) > ub[i]) 
+				p->setDimension(i, 2 * ub[i] - p->getDimension(i));
 			else 
 				break;
 		}
@@ -59,13 +61,13 @@ void ReflectionRepair::repair(std::vector<double>& x){
 WrappingRepair::WrappingRepair(std::vector<double>const lb, std::vector<double>const ub)
 	: GenericRepairHandler(lb, ub){
 }
-void WrappingRepair::repair(std::vector<double>& x){
+void WrappingRepair::repair(Particle* p){
 	for (int i = 0; i < D; i++){
 		while (true){
-			if (x[i] < lb[i]) 
-				x[i] = ub[i] + x[i] - lb[i];
-			else if (x[i] > ub[i]) 
-				x[i] = lb[i] + x[i] - ub[i];
+			if (p->getDimension(i) < lb[i]) 
+				p->setDimension(i, ub[i] + p->getDimension(i) - lb[i]);
+			else if (p->getDimension(i) > ub[i]) 
+				p->setDimension(i, lb[i] + p->getDimension(i) - ub[i]);
 			else 
 				break;
 		}
@@ -77,19 +79,23 @@ ProjectionMidpointRepair::ProjectionMidpointRepair(std::vector<double>const lb, 
 	: GenericRepairHandler(lb, ub){
 }
 
-void ProjectionMidpointRepair::repair(std::vector<double>& x){
+void ProjectionMidpointRepair::repair(Particle* p){
+	std::vector<double> x = p->getX();
 	std::vector<double>alphas(D+1);
 	alphas[D] = 1;
 
 	for (int i = 0; i < D; i++){
-		if (x[i] > 0)
-			alphas[i] = ub[i]/x[i];
-		else if (x[i] < 0)
-			alphas[i] = lb[i]/x[i];
+		if (p->getDimension(i) > 0)
+			alphas[i] = ub[i]/p->getDimension(i);
+		else if (p->getDimension(i) < 0)
+			alphas[i] = lb[i]/p->getDimension(i);
 		else
 			alphas[i] = std::numeric_limits<double>::max(); //Can't divide by zero
 	}
 
 	double alpha=*std::min_element(alphas.begin(), alphas.end());
-	scale(x, alpha);
+	if (alpha != 1){
+		scale(x, alpha);	
+		p->setX(x);
+	}
 }

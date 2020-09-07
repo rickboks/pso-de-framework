@@ -5,7 +5,6 @@
 #include "deadaptationmanager.h"
 #include "selectionmanager.h"
 #include "particleswarm.h"
-#include "deinitializer.h"
 #include "hybridalgorithm.h"
 
 class InstanceNamer {
@@ -17,7 +16,6 @@ class InstanceNamer {
 		static std::string crossoverID(CrossoverType const crossover);
 		static std::string selectionID(SelectionType const selection);
 		static std::string adaptationID(DEAdaptationType const adaptation);
-		static std::string deInitializationID(DEInitializationType deinit);
 	public:
 		//For hyrbid
 		static std::string getName(hybrid_config config);
@@ -27,7 +25,6 @@ class InstanceNamer {
 			Synchronicity const sync);
 
 		//For DE
-		static std::string getName(DEInitializationType const init, MutationType const mutation, CrossoverType const crossover, 
-			DEAdaptationType const adaptation, bool jump);
-
+		static std::string getName(MutationType const mutation, CrossoverType const crossover, 
+			DEAdaptationType const adaptation);
 };

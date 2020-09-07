@@ -13,10 +13,10 @@ std::string InstanceNamer::getName(UpdateManagerType const update, Topology cons
 }
 
 //For DE
-std::string InstanceNamer::getName(DEInitializationType const init, MutationType const mutation, 
-	CrossoverType const crossover, DEAdaptationType const adaptation, bool jump){
+std::string InstanceNamer::getName(MutationType const mutation, 
+	CrossoverType const crossover, DEAdaptationType const adaptation){
 
-	return "D" + deInitializationID(init) + mutationID(mutation) + crossoverID(crossover) + adaptationID(adaptation) + (jump?"1":"0");
+	return "D" + mutationID(mutation) + crossoverID(crossover) + adaptationID(adaptation);
 }
 
 std::string InstanceNamer::updateID(UpdateManagerType const update){
@@ -58,7 +58,6 @@ std::string InstanceNamer::mutationID(MutationType const mutation){
 		case MutationType::RAND_2: return  "R2";
 		case MutationType::RAND_2_DIR: return  "RD";
 		case MutationType::NSDE: return  "NS";
-		case MutationType::TOPOLOGY: return  "TOP";
 		case MutationType::TRIGONOMETRIC: return  "TR";
 		case MutationType::TTPB_1: return  "PB";
 		case MutationType::TO1: return  "O1";
@@ -84,8 +83,4 @@ std::string InstanceNamer::selectionID(SelectionType const selection){
 
 std::string InstanceNamer::adaptationID(DEAdaptationType const adaptation){
 	return (adaptation == JADE ? "J" : "N");
-}
-
-std::string InstanceNamer::deInitializationID(DEInitializationType const deinit){
-	return (deinit == RANDOM ? "R" : "O");
 }

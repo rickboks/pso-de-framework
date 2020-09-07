@@ -86,7 +86,7 @@ void ParticleSwarm::runAsynchronous(int const evalBudget,
 		improved = false;
 
 		for (int i = 0; i < popSize; i++){
-			std::vector<double> position = particles[i]->getPosition();			
+			std::vector<double> position = particles[i]->getX();			
 			double y = particles[i]->evaluate(problem,logger);
 
 			if (y < bestFitness){
@@ -147,7 +147,7 @@ void ParticleSwarm::runSynchronous(int const evalBudget, int popSize,
 		improved = false;
 
 		for (int i = 0; i < popSize; i++){		
-			std::vector<double> position = particles[i]->getPosition();			
+			std::vector<double> position = particles[i]->getX();			
 			double y = particles[i]->evaluate(problem,logger);
 
 			if (y < bestFitness){
@@ -202,7 +202,7 @@ void ParticleSwarm::logPositions(){
 	if (logging){
 		std::cout << std::endl;
 		for (int i = 0; i < particles.size(); i++){
-			std::vector<double> position = particles[i]->getPosition();
+			std::vector<double> position = particles[i]->getX();
 			for (int j = 0; j < position.size()-1 ; j++){
 				std::cout << position[j] << " ";
 			}

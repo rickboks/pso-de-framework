@@ -26,7 +26,7 @@ void _run_experiment(bool log) {
     psode2 = new PSODE2(INERTIA_WEIGHT, VON_NEUMANN, ASYNCHRONOUS, TTB_1, BINOMIAL, P3, JADE);
     psode = new PSODE(INERTIA_WEIGHT, VON_NEUMANN, ASYNCHRONOUS, TTB_1, BINOMIAL, P3, JADE);
     pso = new ParticleSwarm(INERTIA_WEIGHT, VON_NEUMANN, ASYNCHRONOUS);
-	de = new DifferentialEvolution(RANDOM, TTB_1, BINOMIAL, JADE, false);
+	de = new DifferentialEvolution(TTB_1, BINOMIAL, JADE);
 
     if (log)
 		pso->enableLogging();

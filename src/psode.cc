@@ -3,7 +3,6 @@
 #include "hybridalgorithm.h"
 #include "particle.h"
 #include "topologymanager.h"
-#include "genome.h"
 #include "particleupdatesettings.h"
 #include "util.h"
 #include "mutationmanager.h"
@@ -111,8 +110,8 @@ void PSODE::runSynchronous(int const evalBudget, int popSize,
 		p->updateGbest();
 
 	topologyManager->initialize();
-	mutationManager = MutationManager<Particle>::createMutationManager(config.mutation, D);
-	crossoverManager = CrossoverManager<Particle>::createCrossoverManager(config.crossover, D);
+	mutationManager = MutationManager::createMutationManager(config.mutation, D);
+	crossoverManager = CrossoverManager::createCrossoverManager(config.crossover, D);
 	adaptationManager = DEAdaptationManager::createDEAdaptationManager(config.adaptation);
 	selectionManager = SelectionManager::createSelectionManager(config.selection, D, adaptationManager);
 
@@ -209,8 +208,8 @@ void PSODE::runAsynchronous(int const evalBudget,
 		p->randomize(settings.xMax, settings.xMin);
 
 	topologyManager->initialize();
-	mutationManager = MutationManager<Particle>::createMutationManager(config.mutation, D);
-	crossoverManager = CrossoverManager<Particle>::createCrossoverManager(config.crossover, D);
+	mutationManager = MutationManager::createMutationManager(config.mutation, D);
+	crossoverManager = CrossoverManager::createCrossoverManager(config.crossover, D);
 	adaptationManager = DEAdaptationManager::createDEAdaptationManager(config.adaptation);
 	selectionManager = SelectionManager::createSelectionManager(config.selection, D, adaptationManager);
 

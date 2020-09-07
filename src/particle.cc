@@ -6,25 +6,35 @@
 #include <iostream>
 #include <algorithm>
 #include <functional>
+#include <limits>
 #include <random>
 #include <cmath>
+#include <IOHprofiler_experimenter.h>
 
 Particle::Particle(int const D, ParticleUpdateSettings& particleUpdateSettings)
-	: Solution(D), v(D), p(D), g(D), pbest(std::numeric_limits<double>::max()), gbest(std::numeric_limits<double>::max()), 
-		settings(particleUpdateSettings), vMax(particleUpdateSettings.vMax){
+	: x(D), v(D), p(D), g(D), pbest(std::numeric_limits<double>::max()), gbest(std::numeric_limits<double>::max()), evaluated(false),
+		settings(particleUpdateSettings), vMax(particleUpdateSettings.vMax), D(D){
+
 	particleUpdateManager = ParticleUpdateManager::createParticleUpdateManager(x,v,p,g,particleUpdateSettings,neighborhood);
 }
 
 Particle::Particle(const Particle& other)
-: 	Solution(other.x, other.fitness), v(other.v), p(other.p), g(other.g),
-	pbest(other.pbest),  gbest(other.gbest), neighborhood(other.neighborhood),
-	settings(other.settings), vMax(other.vMax){
+: 	x(other.x), v(other.v), p(other.p), g(other.g),
+	pbest(other.pbest), gbest(other.gbest), evaluated(other.evaluated), 
+	fitness(other.fitness), neighborhood(other.neighborhood),
+	settings(other.settings), vMax(other.vMax), D(other.D){
+
 	particleUpdateManager = ParticleUpdateManager::createParticleUpdateManager(x,v,p,g,settings,neighborhood);
+}
+
+//for DE
+Particle::Particle(int const D)
+	: x(D), evaluated(false), fitness(std::numeric_limits<double>::max()), particleUpdateManager(NULL), D(D){
 }
 
 //When using this construtor, note that only the position is initialized
 Particle::Particle(std::vector<double> x)
-: 	Solution(x), particleUpdateManager(NULL) {
+: 	x(x), evaluated(false), particleUpdateManager(NULL), D(x.size()){
 }
 
 Particle::~Particle(){
@@ -118,9 +128,62 @@ int Particle::getAmountOfNeighbors(){
 	return neighborhood.size();
 }
 
-void Particle::setPosition(std::vector<double> x, double fitness, bool updateVelocity){
+void Particle::setX(std::vector<double> x, double fitness, bool updateVelocity){
 	if (updateVelocity)
 		subtract(x, this->x, v); // Reverse engineer velocity
 	this->x = x;
 	this->fitness = fitness;
+}
+
+void Particle::setX(std::vector<double> x){
+	this->x = x;
+}
+
+double Particle::getFitness() const{
+	return fitness;
+}
+
+double Particle::evaluate(std::shared_ptr<IOHprofiler_problem<double> > problem, std::shared_ptr<IOHprofiler_csv_logger> logger) {
+	if (!evaluated){
+		evaluated = true;		
+		fitness = problem->evaluate(x);
+		logger->do_log(problem->loggerCOCOInfo());
+		return fitness;
+	} else {
+		return fitness;
+	}
+}
+
+std::vector<double> Particle::getX() const {
+	return x;
+}
+
+std::string Particle::positionString() const {
+	std::string pos = "";
+	for (int i = 0; i < D -1; i++){
+		pos += std::to_string(x[i]);
+		pos += " ";
+	}
+	pos += std::to_string(x[D-1]);
+
+	return pos;
+}
+
+void Particle::randomize(std::vector<double> lowerBounds, std::vector<double> upperBounds){
+	for (int i = 0; i < D; i++){
+		x[i] = rng.randDouble(lowerBounds[i], upperBounds[i]);
+	}
+	evaluated=false;
+}
+
+bool Particle::operator < (const Particle& s) const {
+	return fitness < s.getFitness();
+}
+
+void Particle::setDimension(int dim, double val){
+	x[dim] = val;
+}
+
+double Particle::getDimension(int dim){
+	return x[dim];
 }

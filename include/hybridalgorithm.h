@@ -37,8 +37,8 @@ class HybridAlgorithm {
 	protected:
 		hybrid_config const config;
 		TopologyManager* topologyManager;
-		MutationManager<Particle>* mutationManager;
-		CrossoverManager<Particle>* crossoverManager;
+		MutationManager* mutationManager;
+		CrossoverManager* crossoverManager;
 		DEAdaptationManager* adaptationManager;
 		SelectionManager* selectionManager;
 		DEConstraintHandler* deCH;

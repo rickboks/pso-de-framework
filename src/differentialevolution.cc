@@ -1,7 +1,6 @@
 #include <IOHprofiler_problem.h>
 #include <IOHprofiler_csv_logger.h>
 #include "differentialevolution.h"
-#include "deinitializer.h"
 #include "rng.h"
 #include "utilities.h"
 #include "deadaptationmanager.h"
@@ -13,11 +12,9 @@
 #include <functional>
 #include <string>
 
-DifferentialEvolution::DifferentialEvolution(DEInitializationType initializationType, 
-	MutationType const mutationType, CrossoverType const crossoverType, 
-	DEAdaptationType const adaptationType, bool const jumpOpposition)
-	: mutationType(mutationType), crossoverType(crossoverType), 
-	initializationType(initializationType), adaptationType(adaptationType), jumpOpposition(jumpOpposition){
+DifferentialEvolution::DifferentialEvolution( MutationType const mutationType, CrossoverType const crossoverType, 
+	DEAdaptationType const adaptationType)
+	: mutationType(mutationType), crossoverType(crossoverType), adaptationType(adaptationType){
 }
 
 void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > problem, 
@@ -29,22 +26,24 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > pr
 
 	this->popSize = popSize;
 	dimension = problem->IOHprofiler_get_number_of_variables();
-	for (int i = 0; i < popSize; i++)
-		genomes.push_back(new Genome(dimension));
 
-	DEInitializer initializer(initializationType, problem, logger);
-	initializer.initialize(genomes);
+	for (int i = 0; i < popSize; i++)
+		genomes.push_back(new Particle(dimension));
+
+	for (Particle* const p : genomes)
+		p->randomize(problem->IOHprofiler_get_lowerbound(), problem->IOHprofiler_get_upperbound());
+
 	double bestFitness = std::numeric_limits<double>::max();
 
-	for (Genome* genome : genomes)
+	for (Particle* genome : genomes)
 		if (genome->getFitness() < bestFitness)
 			bestFitness = genome->getFitness();
 
-	std::vector<Genome*> donors;
-	std::vector<Genome*> trials;
+	std::vector<Particle*> donors;
+	std::vector<Particle*> trials;
 
-	crossoverManager = CrossoverManager<Genome>::createCrossoverManager(crossoverType, dimension);
-	mutationManager = MutationManager<Genome>::createMutationManager(mutationType, dimension);
+	crossoverManager = CrossoverManager::createCrossoverManager(crossoverType, dimension);
+	mutationManager = MutationManager::createMutationManager(mutationType, dimension);
 	adaptationManager = DEAdaptationManager::createDEAdaptationManager(adaptationType);
 
 	std::vector<double> Fs(popSize);
@@ -62,7 +61,7 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > pr
 		donors = mutationManager->mutate(genomes,Fs);
 		trials = crossoverManager->crossover(genomes, donors, Crs);
 
-		for (Genome* m : donors)
+		for (Particle* m : donors)
 			delete m;
 		
 		for (int i = 0; i < popSize; i++){
@@ -70,22 +69,19 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > pr
 			double trialF = trials[i]->evaluate(problem,logger);
 
 			if (trialF < parentF){
-				genomes[i]->setPosition(trials[i]->getPosition(), trials[i]->getFitness());
+				genomes[i]->setX(trials[i]->getX(), trials[i]->getFitness(), false);
 				adaptationManager->successfulIndex(i);				
 			}
 		}
 		
-		for (Genome* g : trials){
+		for (Particle* g : trials){
 				delete g;
 		}
-
-		if (jumpOpposition)
-			oppositionGenerationJump();
 
 		adaptationManager->update();
 	}
 
-	for (Genome* d : genomes)
+	for (Particle* d : genomes)
 		delete d;
 	
 	delete mutationManager;
@@ -96,53 +92,5 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > pr
 }
 
 std::string DifferentialEvolution::getIdString() const {
-	return InstanceNamer::getName(initializationType, mutationType, crossoverType, adaptationType, jumpOpposition);
-}
-
-void DifferentialEvolution::oppositionGenerationJump(){
-
-	if (rng.randDouble(0,1) > 0.3){
-		return;
-	}
-
-	std::vector<double> minValues(dimension, std::numeric_limits<double>::max());
-	std::vector<double> maxValues(dimension, -std::numeric_limits<double>::max());
-
-	for (Genome* genome: genomes){
-		std::vector<double> x = genome->getPosition();
-
-		for (int i = 0; i < dimension; i++){
-			if (x[i] < minValues[i])
-				minValues[i] = x[i];
-			if (x[i] > maxValues[i])
-				maxValues[i] = x[i];
-		}
-	}
-
-	std::vector<Genome*> combined;
-	combined.reserve(popSize * 2);
-
-	for (Genome* g : genomes) {
-		std::vector<double> x = g->getPosition();
-		for (int i = 0; i < dimension; i++){
-			x[i] = minValues[i] + maxValues[i] - x[i];
-		}
-
-		Genome* genome = new Genome(x);
-		genome->evaluate(problem,logger);
-
-		combined.push_back(genome);
-	}
-
-	combined.insert(combined.end(), genomes.begin(), genomes.end());
-
-	std::sort(combined.begin(), combined.end(), comparePtrs<Genome>);
-
-	for (int i = 0; i < popSize; i++){
-		genomes[i] = combined[i];
-	}
-
-	for (int i = popSize; i < (int)combined.size(); i++){
-		delete combined[i];
-	}
+	return InstanceNamer::getName(mutationType, crossoverType, adaptationType);
 }

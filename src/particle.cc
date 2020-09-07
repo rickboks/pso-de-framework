@@ -169,7 +169,7 @@ std::string Particle::positionString() const {
 	return pos;
 }
 
-void Particle::randomize(std::vector<double> lowerBounds, std::vector<double> upperBounds){
+void Particle::randomize(std::vector<double> const lowerBounds, std::vector<double> const upperBounds){
 	for (int i = 0; i < D; i++){
 		x[i] = rng.randDouble(lowerBounds[i], upperBounds[i]);
 	}
@@ -180,10 +180,10 @@ bool Particle::operator < (const Particle& s) const {
 	return fitness < s.getFitness();
 }
 
-void Particle::setDimension(int dim, double val){
+void Particle::setDimension(int const dim, double const val){
 	x[dim] = val;
 }
 
-double Particle::getDimension(int dim){
+double Particle::getDimension(int const dim) const {
 	return x[dim];
 }

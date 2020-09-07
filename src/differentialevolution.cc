@@ -23,8 +23,8 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > pr
 
 	this->logger = logger;
 	this->problem = problem;
-
 	this->popSize = popSize;
+
 	dimension = problem->IOHprofiler_get_number_of_variables();
 
 	for (int i = 0; i < popSize; i++)
@@ -32,12 +32,6 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > pr
 
 	for (Particle* const p : genomes)
 		p->randomize(problem->IOHprofiler_get_lowerbound(), problem->IOHprofiler_get_upperbound());
-
-	double bestFitness = std::numeric_limits<double>::max();
-
-	for (Particle* genome : genomes)
-		if (genome->getFitness() < bestFitness)
-			bestFitness = genome->getFitness();
 
 	std::vector<Particle*> donors;
 	std::vector<Particle*> trials;
@@ -74,9 +68,8 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > pr
 			}
 		}
 		
-		for (Particle* g : trials){
+		for (Particle* g : trials)
 				delete g;
-		}
 
 		adaptationManager->update();
 	}

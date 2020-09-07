@@ -16,8 +16,8 @@ void algorithm
 (std::shared_ptr<IOHprofiler_problem<double>> problem,
  std::shared_ptr<IOHprofiler_csv_logger> logger) {
     int const D = problem->IOHprofiler_get_number_of_variables(); 
-    psode2->run(problem, logger, D*10000, D*5, std::map<int,double>()); 
-    //psode->run(problem, logger, D*10000, D*5, std::map<int,double>()); 
+    //psode2->run(problem, logger, D*10000, D*5, std::map<int,double>()); 
+    psode->run(problem, logger, D*10000, D*5, std::map<int,double>()); 
     //de->run(problem, logger, D*10000, D*5); 
     //pso->run(problem, logger, D*10000, D*5, std::map<int,double>()); 
 }

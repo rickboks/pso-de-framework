@@ -46,10 +46,6 @@ void PSODE::reset(){
 	delete mutationManager;
 	delete crossoverManager;
 	delete adaptationManager;
-	topologyManager = NULL;
-	mutationManager = NULL;
-	crossoverManager = NULL;
-	adaptationManager = NULL;
 	
 	for (Particle* const particle : particles)
 		delete particle;
@@ -57,20 +53,7 @@ void PSODE::reset(){
 	particles.clear();
 }
 
-PSODE::~PSODE(){
-	if (topologyManager != NULL)
-		delete topologyManager;
-	if (mutationManager != NULL)
-		delete mutationManager;
-	if (crossoverManager != NULL)
-		delete crossoverManager;
-	if (adaptationManager != NULL)
-		delete adaptationManager;
-
-	if (!particles.empty())
-		for (Particle* const particle : particles)
-			delete particle;
-}
+PSODE::~PSODE(){}
 
 void PSODE::run(std::shared_ptr<IOHprofiler_problem<double> > problem, 
     		std::shared_ptr<IOHprofiler_csv_logger> logger,

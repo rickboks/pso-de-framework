@@ -31,32 +31,16 @@ void PSODE2::reset(){
 	delete adaptationManager;
 	delete deCH;
 	delete psoCH;
-	topologyManager = NULL;
-	mutationManager = NULL;
-	crossoverManager = NULL;
-	adaptationManager = NULL;
 
-	
 	for (Particle* const particle : particles)
 		delete particle;
 
 	particles.clear();
+	dePop.clear();
+	psoPop.clear();
 }
 
-PSODE2::~PSODE2(){
-	if (topologyManager != NULL)
-		delete topologyManager;
-	if (mutationManager != NULL)
-		delete mutationManager;
-	if (crossoverManager != NULL)
-		delete crossoverManager;
-	if (adaptationManager != NULL)
-		delete adaptationManager;
-
-	if (!particles.empty())
-		for (Particle* const particle : particles)
-			delete particle;
-}
+PSODE2::~PSODE2(){}
 
 void PSODE2::run(std::shared_ptr<IOHprofiler_problem<double> > problem, 
     		std::shared_ptr<IOHprofiler_csv_logger> logger,
@@ -85,23 +69,22 @@ void PSODE2::runAsynchronous(int const evalBudget, int popSize, std::map<int,dou
 	deCH = new ReinitializationRepair(smallest, largest);
 	psoCH = new ReinitializationRepair(smallest, largest);
 
-	int split = particles.size() / 2;
-	for (int i = 0; i < split; i++)
-		psoPop.push_back(new Particle(D, settings));
-	for (int i = split; i < popSize; i++)
-		dePop.push_back(new Particle(D));
-
-	particles.insert(particles.end(), psoPop.begin(), psoPop.end());
+	int split = popSize / 2;
+	for (int i = 0; i < split; i++) psoPop.push_back(new Particle(D, settings));
+	for (int i = split; i < popSize; i++) dePop.push_back(new Particle(D));
+	
+	// append the two populations
+	particles = psoPop; 
 	particles.insert(particles.end(), dePop.begin(), dePop.end());
 
 	for (Particle* const p : particles)
 		p->randomize(settings.xMax, settings.xMin);
 
+	for (Particle* const p : particles)
+		p->evaluate(problem, logger);
+
 	topologyManager = TopologyManager::createTopologyManager(config.topology, psoPop);
 	topologyManager->initialize();
-
-	for (Particle* p : particles)
-		p->evaluate(problem, logger);
 
 	std::vector<double> Fs(dePop.size());
 	std::vector<double> Crs(dePop.size());
@@ -119,7 +102,7 @@ void PSODE2::runAsynchronous(int const evalBudget, int popSize, std::map<int,dou
 		// Measure fitness of the PSO population
 		// Update pbest and gbest of PSO population
 		// Update velocity and position of PSO population
-		for (Particle* p : psoPop){
+		for (Particle* const p : psoPop){
 			p->updatePbest();
 			p->updateGbest();
 			p->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));			
@@ -130,13 +113,13 @@ void PSODE2::runAsynchronous(int const evalBudget, int popSize, std::map<int,dou
 		// Perform mutation 
 		std::vector<Particle*> donors = mutationManager->mutate(dePop, Fs);
 
-		for (Particle* p : donors) 
+		for (Particle* const p : donors) 
 			psoCH->repair(p);
 
 		// Perform crossover
 		std::vector<Particle*> trials = crossoverManager->crossover(dePop, donors, Crs);
 
-		for (Particle* d : donors) delete d;
+		for (Particle* const d : donors) delete d;
 
 		for (int i = 0; i < dePop.size(); i++){
 			//Evaluate the parent vector
@@ -152,7 +135,7 @@ void PSODE2::runAsynchronous(int const evalBudget, int popSize, std::map<int,dou
 			}
 		}
 
-		for (Particle* p : trials)
+		for (Particle* const p : trials)
 			delete p;
 
 		if (iterations % 10 == 0)

@@ -70,6 +70,7 @@ void PSODE2::runAsynchronous(int const evalBudget, int popSize, std::map<int,dou
 	psoCH = new ReinitializationRepair(smallest, largest);
 
 	int split = popSize / 2;
+
 	for (int i = 0; i < split; i++) psoPop.push_back(new Particle(D, settings));
 	for (int i = split; i < popSize; i++) dePop.push_back(new Particle(D));
 	

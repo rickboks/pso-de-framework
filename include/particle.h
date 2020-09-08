@@ -22,10 +22,9 @@ class Particle {
 		ParticleUpdateManager* particleUpdateManager;
 		ParticleUpdateSettings settings;
 		std::vector<double> vMax;		
-
-
 	public:
 		int const D;
+		bool const isPSO;
 		Particle(int const D, ParticleUpdateSettings& particleUpdateSettings);
 		Particle(int const D);
 		Particle(const Particle& other);
@@ -55,6 +54,7 @@ class Particle {
 		std::string positionString() const;
 		void randomize(std::vector<double> const lowerBounds, std::vector<double> const upperBounds);
 		bool operator < (const Particle& s) const;
-		void setDimension(int const dim, double const val);
-		double getDimension(int const dim) const;
+		void setX(int const dim, double const val);
+		double getX(int const dim) const;
+
 };

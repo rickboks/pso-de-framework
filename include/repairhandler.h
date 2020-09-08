@@ -14,6 +14,7 @@ class RepairHandler {
 		virtual void repair(Particle* p);
 		virtual void repair(Particle* p, Particle* base, Particle* target);
 		virtual ~RepairHandler()=0;
+		void repairVelocity(Particle* p, int i);
 };
 
 // Generic

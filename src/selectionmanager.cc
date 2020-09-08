@@ -49,10 +49,6 @@ void Pairwise2SelectionManager::select(std::vector<Particle*>& particles,
 			particles[i]->setVelocity(p0[i]->getVelocity());
 		} else {
 			//DE
-			//std::vector<double> newVelocity(D);
-			//reverse engineer velocity
-			//subtract(p2[i]->getX(), particles[i]->getX(), newVelocity);
-			//particles[i]->setVelocity(newVelocity);
 			particles[i]->setX(p2[i]->getX(), p2[i]->getFitness(), true);
 		}
 	}
@@ -79,10 +75,6 @@ void Pairwise3SelectionManager::select(std::vector<Particle*>& particles,
 			particles[i]->setX(p0[i]->getX(), p0[i]->getFitness(), false);
 			particles[i]->setVelocity(p0[i]->getVelocity());
 		} else {
-			//std::vector<double> newVelocity(D);
-			//reverse engineer velocity
-			//subtract(p2[i]->getX(), particles[i]->getX(), newVelocity);
-			//particles[i]->setVelocity(newVelocity);
 			particles[i]->setX(p2[i]->getX(), p2[i]->getFitness(), true);
 		}
 	}
@@ -121,9 +113,6 @@ void Union2SelectionManager::select(std::vector<Particle*>& particles,
 			particles[index]->setX(p->getX(), p->getFitness(), false);
 			particles[index]->setVelocity(p->getVelocity());
 		} else {
-			//std::vector<double> newVelocity(D);			//reverse engineer velocity
-			//subtract(p->getX(), particles[index]->getX(), newVelocity);
-			//particles[index]->setVelocity(newVelocity);
 			particles[index]->setX(p->getX(), p->getFitness(), true);
 		}
 	}
@@ -160,9 +149,6 @@ void Union3SelectionManager::select(std::vector<Particle*>& particles,
 			particles[index]->setX(p->getX(), p->getFitness(), false);
 			particles[index]->setVelocity(p->getVelocity());
 		} else if (type == 1){
-			//std::vector<double> newVelocity(D);			//reverse engineer velocity
-			//subtract(p->getX(), particles[index]->getX(), newVelocity);
-			//particles[index]->setVelocity(newVelocity);
 			particles[index]->setX(p->getX(), p->getFitness(), true);
 		} else {
 			// do nothing: original is best

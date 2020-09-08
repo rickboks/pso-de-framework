@@ -13,7 +13,7 @@
 
 Particle::Particle(int const D, ParticleUpdateSettings& particleUpdateSettings)
 	: x(D), v(D), p(D), g(D), pbest(std::numeric_limits<double>::max()), gbest(std::numeric_limits<double>::max()), evaluated(false),
-		settings(particleUpdateSettings), vMax(particleUpdateSettings.vMax), D(D){
+		settings(particleUpdateSettings), vMax(particleUpdateSettings.vMax), D(D), isPSO(true){
 
 	particleUpdateManager = ParticleUpdateManager::createParticleUpdateManager(x,v,p,g,particleUpdateSettings,neighborhood);
 }
@@ -22,19 +22,19 @@ Particle::Particle(const Particle& other)
 : 	x(other.x), v(other.v), p(other.p), g(other.g),
 	pbest(other.pbest), gbest(other.gbest), evaluated(other.evaluated), 
 	fitness(other.fitness), neighborhood(other.neighborhood),
-	settings(other.settings), vMax(other.vMax), D(other.D){
+	settings(other.settings), vMax(other.vMax), D(other.D), isPSO(other.isPSO){
 
 	particleUpdateManager = ParticleUpdateManager::createParticleUpdateManager(x,v,p,g,settings,neighborhood);
 }
 
 //for DE
 Particle::Particle(int const D)
-	: x(D), evaluated(false), fitness(std::numeric_limits<double>::max()), particleUpdateManager(NULL), D(D){
+	: x(D), evaluated(false), fitness(std::numeric_limits<double>::max()), particleUpdateManager(NULL), D(D), isPSO(false){
 }
 
 //When using this construtor, note that only the position is initialized
 Particle::Particle(std::vector<double> x)
-: 	x(x), evaluated(false), particleUpdateManager(NULL), D(x.size()){
+: 	x(x), evaluated(false), particleUpdateManager(NULL), D(x.size()), isPSO(false){
 }
 
 Particle::~Particle(){
@@ -180,10 +180,10 @@ bool Particle::operator < (const Particle& s) const {
 	return fitness < s.getFitness();
 }
 
-void Particle::setDimension(int const dim, double const val){
+void Particle::setX(int const dim, double const val){
 	x[dim] = val;
 }
 
-double Particle::getDimension(int const dim) const {
+double Particle::getX(int const dim) const {
 	return x[dim];
 }

@@ -66,7 +66,7 @@ void PSODE2::runAsynchronous(int const evalBudget, int popSize, std::map<int,dou
 	mutationManager = MutationManager::createMutationManager(config.mutation, D);
 	crossoverManager = CrossoverManager::createCrossoverManager(config.crossover, D);
 	adaptationManager = DEAdaptationManager::createDEAdaptationManager(config.adaptation);
-	deCH = new ReinitializationRepair(smallest, largest);
+	deCH = new MidpointBaseRepair(smallest, largest);
 	psoCH = new ReinitializationRepair(smallest, largest);
 
 	int split = popSize / 2;

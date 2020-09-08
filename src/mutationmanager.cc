@@ -1,35 +1,34 @@
 #include "mutationmanager.h"
 
-MutationManager::MutationManager(int const D)
-			:D(D){
-}
+MutationManager::MutationManager(int const D, DEConstraintHandler* deCH)
+			:D(D), deCH(deCH){}
 
 MutationManager::~MutationManager(){}
 
-MutationManager* MutationManager::createMutationManager(MutationType const mutationType, int const D){
+MutationManager* MutationManager::createMutationManager(MutationType const mutationType, int const D, DEConstraintHandler* deCH){
 	switch(mutationType){
 		case RAND_1:
-			return new Rand1MutationManager(D);
+			return new Rand1MutationManager(D, deCH);
 		case TTB_1:
-			return new TTB1MutationManager(D);
+			return new TTB1MutationManager(D, deCH);
 		case TTPB_1:
-			return new TTPB1MutationManager(D);
+			return new TTPB1MutationManager(D, deCH);
 		case BEST_1:
-			return new Best1MutationManager(D);
+			return new Best1MutationManager(D, deCH);
 		case BEST_2:
-			return new Best2MutationManager(D);
+			return new Best2MutationManager(D, deCH);
 		case RAND_2:
-			return new Rand2MutationManager(D);
+			return new Rand2MutationManager(D, deCH);
 		case RAND_2_DIR:
-			return new Rand2DirMutationManager(D);
+			return new Rand2DirMutationManager(D, deCH);
 		case NSDE:
-			return new NSDEMutationManager(D);
+			return new NSDEMutationManager(D, deCH);
 		case TRIGONOMETRIC:
-			return new TrigonometricMutationManager(D);
+			return new TrigonometricMutationManager(D, deCH);
 		case TO1:
-			return new TwoOpt1MutationManager(D);
+			return new TwoOpt1MutationManager(D, deCH);
 		case TO2:
-			return new TwoOpt2MutationManager(D);
+			return new TwoOpt2MutationManager(D, deCH);
 		// case TOPOLOGY:
 		// 	return new TopologyMutationManager(genomes,F,D);
 		default:
@@ -38,9 +37,8 @@ MutationManager* MutationManager::createMutationManager(MutationType const mutat
 }
 
 
-Rand1MutationManager::Rand1MutationManager(int const D)
-	: MutationManager(D){}
-
+Rand1MutationManager::Rand1MutationManager(int const D, DEConstraintHandler* deCH)
+	: MutationManager(D, deCH){}
 
 std::vector<Particle*> Rand1MutationManager::mutate(std::vector<Particle*> const& genomes, std::vector<double>& Fs){
 	std::vector<Particle*> mutants;
@@ -50,24 +48,22 @@ std::vector<Particle*> Rand1MutationManager::mutate(std::vector<Particle*> const
 		std::vector<Particle*> possibilities = genomes;
 		possibilities.erase(possibilities.begin() + i);
 
-		std::vector<double> xr0 = pickRandom(possibilities)->getX();
-		std::vector<double> xr1 = pickRandom(possibilities)->getX();
-		std::vector<double> xr2 = pickRandom(possibilities)->getX();
-
-		std::vector<double> x = xr0;
+		std::vector<Particle*> xr = pickRandom(possibilities, 3);
+		std::vector<double> x = xr[0]->getX();
 		std::vector<double> subtraction(this->D);
-		subtract(xr1, xr2, subtraction);
+		subtract(xr[1]->getX(), xr[2]->getX(), subtraction);
 		scale(subtraction, Fs[i]);
 		add(x,subtraction, x);
 
 		Particle* mutant = new Particle(x);
+		deCH->repair(mutant, xr[0], genomes[i]);
 		mutants.push_back(mutant);		
 	}
 	return mutants;
 }
 
-TTB1MutationManager::TTB1MutationManager(int const D):
-	MutationManager(D){}
+TTB1MutationManager::TTB1MutationManager(int const D, DEConstraintHandler* deCH)
+	: MutationManager(D, deCH){}
 
 std::vector<Particle*> TTB1MutationManager::mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs){
 	std::vector<double> best = getBest(genomes)->getX(); 
@@ -84,22 +80,21 @@ std::vector<Particle*> TTB1MutationManager::mutate(std::vector<Particle*>const& 
 		scale(subtraction, Fs[i]);
 		add(mutant, subtraction, mutant);
 
-		std::vector<double> xr0 = pickRandom(possibilities)->getX();
-		std::vector<double> xr1 = pickRandom(possibilities)->getX();
-
-		subtract(xr0, xr1, subtraction);
+		std::vector<Particle*> xr = pickRandom(possibilities, 2);
+		subtract(xr[0]->getX(), xr[1]->getX(), subtraction);
 		scale(subtraction,Fs[i]);
 		add(mutant, subtraction, mutant);
-
 		Particle* m = new Particle(mutant);
+
+		deCH->repair(m, genomes[i], genomes[i]);
 		mutants.push_back(m);
 	}
 	
 	return mutants;
 }
 
-TTPB1MutationManager::TTPB1MutationManager(int const D)
-	:MutationManager(D), p(0.1){}
+TTPB1MutationManager::TTPB1MutationManager(int const D, DEConstraintHandler* deCH)
+	:MutationManager(D, deCH), p(0.1){}
 
 
 std::vector<Particle*> TTPB1MutationManager::mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs){
@@ -117,52 +112,50 @@ std::vector<Particle*> TTPB1MutationManager::mutate(std::vector<Particle*>const&
 		scale(subtraction, Fs[i]);
 		add(mutant, subtraction, mutant);
 
-		std::vector<double> xr0 = pickRandom(possibilities)->getX();
-		std::vector<double> xr1 = pickRandom(possibilities)->getX();
-
-		subtract(xr0, xr1, subtraction);
+		std::vector<Particle*> xr = pickRandom(possibilities, 2);
+		subtract(xr[0]->getX(), xr[1]->getX(), subtraction);
 		scale(subtraction,Fs[i]);
 		add(mutant, subtraction, mutant);
 
 		Particle* m = new Particle(mutant);
+		deCH->repair(m, genomes[i], genomes[i]);
 		mutants.push_back(m);
 	}
 	
 	return mutants;
 }
 
-Best1MutationManager::Best1MutationManager(int const D):MutationManager(D){}
+Best1MutationManager::Best1MutationManager(int const D, DEConstraintHandler* deCH):MutationManager(D, deCH){}
 std::vector<Particle*> Best1MutationManager::mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs){
 	std::vector<Particle*> mutants;
 	mutants.reserve(genomes.size());
-	std::vector<double> best = getBest(genomes)->getX();
+	Particle* best = getBest(genomes);
 
 	for (unsigned int i = 0; i < genomes.size(); i++){
 		std::vector<Particle*> possibilities = genomes;
 		possibilities.erase(possibilities.begin() + i);
 
-		std::vector<double> mutant = best;
+		std::vector<double> mutant = best->getX();
 		std::vector<double> subtraction(this->D);
+		
+		std::vector<Particle*> xr = pickRandom(possibilities, 2);
 
-		std::vector<double> xr0 = pickRandom(possibilities)->getX();
-		std::vector<double> xr1 = pickRandom(possibilities)->getX();
-
-		subtract(xr0, xr1, subtraction);
+		subtract(xr[0]->getX(), xr[1]->getX(), subtraction);
 		scale(subtraction,Fs[i]);
 		add(mutant, subtraction, mutant);
 
 		Particle* m = new Particle(mutant);
+		deCH->repair(m, best, genomes[i]);
 		mutants.push_back(m);
 	}
-
 
 	return mutants;
 }
 
-Best2MutationManager::Best2MutationManager(int const D):MutationManager(D){}
+Best2MutationManager::Best2MutationManager(int const D, DEConstraintHandler* deCH):MutationManager(D, deCH){}
 
 std::vector<Particle*> Best2MutationManager::mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs){
-	std::vector<double> best = getBest(genomes)->getX(); 
+	Particle* best = getBest(genomes);
 	std::vector<Particle*> mutants;
 	mutants.reserve(genomes.size());
 
@@ -170,29 +163,26 @@ std::vector<Particle*> Best2MutationManager::mutate(std::vector<Particle*>const&
 		std::vector<Particle*> possibilities = genomes;
 		possibilities.erase(possibilities.begin() + i);
 
-		std::vector<double> mutant = best;
+		std::vector<double> mutant = best->getX();
 		std::vector<double> subtraction(this->D);
 
-		std::vector<double> xr0 = pickRandom(possibilities)->getX();
-		std::vector<double> xr1 = pickRandom(possibilities)->getX();
-		std::vector<double> xr2 = pickRandom(possibilities)->getX();
-		std::vector<double> xr3 = pickRandom(possibilities)->getX();
-		subtract(xr0, xr1, subtraction);
+		std::vector<Particle*> xr = pickRandom(possibilities, 4);
+		subtract(xr[0]->getX(), xr[1]->getX(), subtraction);
 		scale(subtraction, Fs[i]);
 		add(mutant, subtraction, mutant);
-		subtract(xr2, xr3, subtraction);
+		subtract(xr[2]->getX(), xr[3]->getX(), subtraction);
 		scale(subtraction, Fs[i]);
 		add(mutant, subtraction, mutant);
 
 		Particle* m = new Particle(mutant);
-
+		deCH->repair(m, best, genomes[i]);
 		mutants.push_back(m);
 	}
 
 	return mutants;
 }
 
-Rand2MutationManager::Rand2MutationManager(int const D):MutationManager(D){}
+Rand2MutationManager::Rand2MutationManager(int const D, DEConstraintHandler* deCH):MutationManager(D, deCH){}
 
 std::vector<Particle*> Rand2MutationManager::mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs){
 	std::vector<Particle*> mutants;
@@ -202,29 +192,25 @@ std::vector<Particle*> Rand2MutationManager::mutate(std::vector<Particle*>const&
 		std::vector<Particle*> possibilities = genomes;
 		possibilities.erase(possibilities.begin() + i);
 
-		std::vector<double> xr0 = pickRandom(possibilities)->getX();
-		std::vector<double> xr1 = pickRandom(possibilities)->getX();
-		std::vector<double> xr2 = pickRandom(possibilities)->getX();
-		std::vector<double> xr3 = pickRandom(possibilities)->getX();
-		std::vector<double> xr4 = pickRandom(possibilities)->getX();
-
-		std::vector<double> mutant = xr4;
+		std::vector<Particle*> xr = pickRandom(possibilities, 5);
+		std::vector<double> mutant = xr[4]->getX();
 		std::vector<double> subtraction(this->D);
-		subtract(xr0, xr1, subtraction);
+		subtract(xr[0]->getX(), xr[1]->getX(), subtraction);
 		scale(subtraction, Fs[i]);
 		add(mutant, subtraction, mutant);
-		subtract(xr2, xr3, subtraction);
+		subtract(xr[2]->getX(), xr[3]->getX(), subtraction);
 		scale(subtraction, Fs[i]);
 		add(mutant, subtraction, mutant);
 		Particle* m = new Particle(mutant);
 
+		deCH->repair(m, xr[4], genomes[i]);
 		mutants.push_back(m);
 	}
 	
 	return mutants;
 }
 
-Rand2DirMutationManager::Rand2DirMutationManager(int const D):MutationManager(D){}
+Rand2DirMutationManager::Rand2DirMutationManager(int const D, DEConstraintHandler* deCH):MutationManager(D, deCH){}
 
 std::vector<Particle*> Rand2DirMutationManager::mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs){
 	std::vector<Particle*> mutants;
@@ -234,46 +220,33 @@ std::vector<Particle*> Rand2DirMutationManager::mutate(std::vector<Particle*>con
 		std::vector<Particle*> possibilities = genomes;
 		possibilities.erase(possibilities.begin() + i);
 
-		Particle* r0 = pickRandom(possibilities);
-		Particle* r1 = pickRandom(possibilities);
-		Particle* r2 = pickRandom(possibilities);
-		Particle* r3 = pickRandom(possibilities);
+		std::vector<Particle*> xr = pickRandom(possibilities, 4);
 
-		std::vector<double> xr0, xr1, xr2, xr3;
-
-		if (r0->getFitness() < r1->getFitness()){
-			xr0 = r0->getX();
-			xr1 = r1->getX();
-		} else {
-			xr0 = r1->getX();
-			xr1 = r0->getX();
+		if (xr[1]->getFitness() < xr[0]->getFitness()){
+			std::swap(xr[0], xr[1]);
 		}
 
-		if (r2->getFitness() < r3->getFitness()){
-			xr2 = r2->getX();
-			xr3 = r3->getX();
-		} else {
-			xr2 = r3->getX();
-			xr3 = r2->getX();
+		if (xr[3]->getFitness() < xr[2]->getFitness()){
+			std::swap(xr[3], xr[2]);
 		}
 
-		std::vector<double> mutant = xr0;
+		std::vector<double> mutant = xr[0]->getX();
 		std::vector<double> subtraction(this->D);
-		subtract(xr0, xr1, subtraction);
-		add(subtraction, xr2, subtraction);
-		subtract(subtraction, xr3, subtraction);
+		subtract(xr[0]->getX(), xr[1]->getX(), subtraction);
+		add(subtraction, xr[2]->getX(), subtraction);
+		subtract(subtraction, xr[3]->getX(), subtraction);
 		scale(subtraction, Fs[i]*0.5);
 		add(mutant, subtraction, mutant);
 
 		Particle* m = new Particle(mutant);
-
+		deCH->repair(m, xr[0], genomes[i]);
 		mutants.push_back(m);
 	}
 	
 	return mutants;
 }
 
-NSDEMutationManager::NSDEMutationManager(int const D):MutationManager(D){}
+NSDEMutationManager::NSDEMutationManager(int const D, DEConstraintHandler* deCH):MutationManager(D, deCH){}
 
 std::vector<Particle*> NSDEMutationManager::mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs){
 	std::vector<Particle*> mutants;
@@ -283,12 +256,12 @@ std::vector<Particle*> NSDEMutationManager::mutate(std::vector<Particle*>const& 
 		std::vector<Particle*> possibilities = genomes;
 		possibilities.erase(possibilities.begin() + i);
 
-		std::vector<double> mutant = pickRandom(possibilities)->getX();
-		std::vector<double> xr1 = pickRandom(possibilities)->getX();
-		std::vector<double> xr2 = pickRandom(possibilities)->getX();
+
+		std::vector<Particle*> xr = pickRandom(possibilities, 3);
+		std::vector<double> mutant = xr[0]->getX(); 
 
 		std::vector<double> subtraction(this->D);
-		subtract(xr1, xr2, subtraction);
+		subtract(xr[1]->getX(), xr[2]->getX(), subtraction);
 
 		if (rng.randDouble(0,1) < 0.5){
 			double n = rng.normalDistribution(0.5,0.5);
@@ -301,19 +274,17 @@ std::vector<Particle*> NSDEMutationManager::mutate(std::vector<Particle*>const& 
 		add(mutant, subtraction, mutant);
 
 		Particle* m = new Particle(mutant);
-
+		deCH->repair(m, xr[0], genomes[i]);
 		mutants.push_back(m);
 	}
 
 	return mutants;
 }
 
-TrigonometricMutationManager::TrigonometricMutationManager(int const D): MutationManager(D), gamma(0.05){}
-
+TrigonometricMutationManager::TrigonometricMutationManager(int const D, DEConstraintHandler* deCH): MutationManager(D, deCH), gamma(0.05){}
 std::vector<Particle*> TrigonometricMutationManager::mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs){
 	return rng.randDouble(0,1) <= gamma ? trigonometricMutation(genomes,Fs) : rand1Mutation(genomes,Fs);
 }
-
 std::vector<Particle*> TrigonometricMutationManager::trigonometricMutation(std::vector<Particle*>const& genomes, std::vector<double>& Fs){
 	std::vector<Particle*> mutants;
 	mutants.reserve(genomes.size());
@@ -321,41 +292,42 @@ std::vector<Particle*> TrigonometricMutationManager::trigonometricMutation(std::
 	for (unsigned int i = 0; i < genomes.size(); i++){
 		std::vector<Particle*> possibilities = genomes;
 		possibilities.erase(possibilities.begin() + i);
+		
+		std::vector<Particle*> xr = pickRandom(possibilities, 3);
 
-		Particle* r0 = pickRandom(possibilities);
-		Particle* r1 = pickRandom(possibilities);
-		Particle* r2 = pickRandom(possibilities);
+		double pPrime = fabs(xr[0]->getFitness()) + fabs(xr[1]->getFitness()) 
+						+ fabs(xr[2]->getFitness());
 
-		double pPrime = fabs(r0->getFitness()) + fabs(r1->getFitness()) 
-						+ fabs(r2->getFitness());
-
-		double p0 = r0->getFitness() / pPrime;
-		double p1 = r1->getFitness() / pPrime;
-		double p2 = r2->getFitness() / pPrime;
+		double p0 = xr[0]->getFitness() / pPrime;
+		double p1 = xr[1]->getFitness() / pPrime;
+		double p2 = xr[2]->getFitness() / pPrime;
 
 		std::vector<double> mutant;
 		std::vector<double> temp(this->D);
 
-		add(r0->getX(), r1->getX(), temp);
-		add(temp, r2->getX(), temp);
+		add(xr[0]->getX(), xr[1]->getX(), temp);
+		add(temp, xr[2]->getX(), temp);
 		scale(temp, 1.0/3.0);
 		mutant = temp;
 
-		subtract(r0->getX(), r1->getX(), temp);
+		Particle base = Particle(mutant);
+
+		subtract(xr[0]->getX(), xr[1]->getX(), temp);
 		scale(temp, p1-p0);
 		add(temp, mutant, mutant);
 
-		subtract(r1->getX(), r2->getX(), temp);
+		subtract(xr[1]->getX(), xr[2]->getX(), temp);
 		scale(temp, p2-p1);
 		add(temp, mutant, mutant);
 
-		subtract(r2->getX(), r0->getX(), temp);
+		subtract(xr[2]->getX(), xr[0]->getX(), temp);
 		scale(temp, p0-p2);
 		add(temp, mutant, mutant);
-
-		mutants.push_back(new Particle(mutant));
+		
+		Particle* m = new Particle(mutant);
+		deCH->repair(m, &base, genomes[i]);
+		mutants.push_back(m);
 	}
-
 
 	return mutants;
 }
@@ -367,25 +339,23 @@ std::vector<Particle*> TrigonometricMutationManager::rand1Mutation(std::vector<P
 	for (unsigned int i = 0; i < genomes.size(); i++){
 		std::vector<Particle*> possibilities = genomes;
 		possibilities.erase(possibilities.begin() + i);
+		
+		std::vector<Particle*> xr = pickRandom(possibilities, 3);
 
-		std::vector<double> xr0 = pickRandom(possibilities)->getX();
-		std::vector<double> xr1 = pickRandom(possibilities)->getX();
-		std::vector<double> xr2 = pickRandom(possibilities)->getX(); 				
-
-		std::vector<double> x = xr0;
+		std::vector<double> x = xr[0]->getX();
 		std::vector<double> subtraction(this->D);
-		subtract(xr1, xr2, subtraction);
+		subtract(xr[1]->getX(), xr[2]->getX(), subtraction);
 		scale(subtraction, Fs[i]);
 		add(x,subtraction, x);
 
-		Particle* mutant = new Particle(x);
-		mutants.push_back(mutant);
+		Particle* m = new Particle(x);
+		deCH->repair(m, xr[0], genomes[i]);
+		mutants.push_back(m);
 	}
 	return mutants;	
 }
 
-TwoOpt1MutationManager::TwoOpt1MutationManager(int const D): MutationManager(D){}
-
+TwoOpt1MutationManager::TwoOpt1MutationManager(int const D, DEConstraintHandler* deCH): MutationManager(D, deCH){}
 std::vector<Particle*> TwoOpt1MutationManager::mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs){
 	std::vector<Particle*> mutants;
 	mutants.reserve(genomes.size());
@@ -394,35 +364,26 @@ std::vector<Particle*> TwoOpt1MutationManager::mutate(std::vector<Particle*>cons
 		std::vector<Particle*> possibilities = genomes;
 		possibilities.erase(possibilities.begin() + i);
 
-		Particle* r0 = pickRandom(possibilities);
-		Particle* r1 = pickRandom(possibilities);
+		std::vector<Particle*> xr = pickRandom(possibilities, 3);
 
-		std::vector<double> xr0;
-		std::vector<double> xr1;
-		std::vector<double> xr2 = pickRandom(possibilities)->getX();
-
-		if (r0->getFitness() < r1->getFitness()){
-			xr0 = r0->getX();
-			xr1 = r1->getX();
-		} else {
-			xr1 = r0->getX();
-			xr0 = r1->getX();
+		if (xr[1]->getFitness() < xr[0]->getFitness()){
+			std::swap(xr[0], xr[1]);
 		}
 
-		std::vector<double> x = xr0;
+		std::vector<double> x = xr[0]->getX();
 		std::vector<double> subtraction(this->D);
-		subtract(xr1, xr2, subtraction);
+		subtract(xr[1]->getX(), xr[2]->getX(), subtraction);
 		scale(subtraction, Fs[i]);
 		add(x,subtraction, x);
 
 		Particle* mutant = new Particle(x);
+		deCH->repair(mutant, xr[0], genomes[i]);
 		mutants.push_back(mutant);		
 	}
 	return mutants;
 }
 
-TwoOpt2MutationManager::TwoOpt2MutationManager(int const D): MutationManager(D){}
-
+TwoOpt2MutationManager::TwoOpt2MutationManager(int const D, DEConstraintHandler* deCH): MutationManager(D, deCH){}
 std::vector<Particle*> TwoOpt2MutationManager::mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs){
 	std::vector<Particle*> mutants;
 	mutants.reserve(genomes.size());
@@ -431,33 +392,23 @@ std::vector<Particle*> TwoOpt2MutationManager::mutate(std::vector<Particle*>cons
 		std::vector<Particle*> possibilities = genomes;
 		possibilities.erase(possibilities.begin() + i);
 
-		std::vector<double> xr0;
-		std::vector<double> xr1;
-		std::vector<double> xr2 = pickRandom(possibilities)->getX();
-		std::vector<double> xr3 = pickRandom(possibilities)->getX();
-		std::vector<double> xr4 = pickRandom(possibilities)->getX();
+		std::vector<Particle*> xr = pickRandom(possibilities, 5);
 
-		Particle* r0 = pickRandom(possibilities);
-		Particle* r1 = pickRandom(possibilities);
-
-		if (r0->getFitness() < r1->getFitness()){
-			xr0 = r0->getX();
-			xr1 = r1->getX();
-		} else {
-			xr1 = r0->getX();
-			xr0 = r1->getX();
+		if (xr[1]->getFitness() < xr[0]->getFitness()){
+			std::swap(xr[0], xr[1]);
 		}
 
-		std::vector<double> mutant = xr4;
+		std::vector<double> mutant = xr[0]->getX();
 		std::vector<double> subtraction(this->D);
-		subtract(xr0, xr1, subtraction);
+		subtract(xr[1]->getX(), xr[2]->getX(), subtraction);
 		scale(subtraction, Fs[i]);
 		add(mutant, subtraction, mutant);
-		subtract(xr2, xr3, subtraction);
+		subtract(xr[3]->getX(), xr[4]->getX(), subtraction);
 		scale(subtraction, Fs[i]);
 		add(mutant, subtraction, mutant);
-		Particle* m = new Particle(mutant);
 
+		Particle* m = new Particle(mutant);
+		deCH->repair(m, xr[0], genomes[i]);
 		mutants.push_back(m);
 	}
 	

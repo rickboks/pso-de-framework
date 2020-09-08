@@ -24,3 +24,62 @@ void randomMult(std::vector<double> & vec, double min, double max){
 	}
 }
 
+Particle* getBest(std::vector<Particle*>const& genomes){
+	int best = 0;
+	double bestF = std::numeric_limits<double>::max();
+
+	for (unsigned int i = 0; i < genomes.size(); i++){
+		double const score = genomes[i]->getFitness();
+		if (score < bestF){
+			bestF = score;
+			best = i;
+		}
+	}
+
+	return genomes[best];
+}
+
+Particle* getWorst(std::vector<Particle*>const& genomes){
+	int worst = 0;
+	double worstF = -std::numeric_limits<double>::max();
+
+	for (unsigned int i = 0; i < genomes.size(); i++){
+		double const score = genomes[i]->getFitness();
+		if (score > worstF){
+			worstF = score;
+			worst = i;
+		}
+	}
+
+	return genomes[worst];
+}
+
+Particle* pickRandom(std::vector<Particle*>& possibilities){
+	int const r = rng.randInt(0,possibilities.size()-1);
+	Particle* g = possibilities[r];
+	possibilities.erase(possibilities.begin() + r);
+	return g;
+}
+
+std::vector<Particle*> pickRandom(std::vector<Particle*>& possibilities, int n){
+	std::vector<Particle*> particles;
+	for (int i = 0; i < n; i++){
+		particles.push_back(pickRandom(possibilities));
+	}
+	return particles;
+}
+
+
+bool comparePtrs(Particle*a, Particle*b){
+	return *a < *b;
+}
+
+void sortOnFitness(std::vector<Particle*>& genomes){
+	std::sort(genomes.begin(), genomes.end(), comparePtrs);
+}
+
+Particle* getPBest(std::vector<Particle*> genomes, double const p){
+	sortOnFitness(genomes);
+	std::vector<Particle*> bestP = std::vector<Particle*>(genomes.begin(), genomes.begin() + (genomes.size() * p));
+	return bestP[rng.randInt(0, bestP.size()-1)];
+}

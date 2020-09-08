@@ -42,12 +42,20 @@ Particle::~Particle(){
 		delete particleUpdateManager;
 }
 
-std::vector<double> Particle::getVelocity() const {
+std::vector<double> Particle::getV() const {
 	return v;
 }
 
-void Particle::setVelocity(std::vector<double> v){
+double Particle::getV(int const dim) const {
+	return v[dim];
+}
+
+void Particle::setV(std::vector<double> v){
 	this->v = v;
+}
+
+void Particle::setV(int const dim, double val){
+	this->v[dim] = val;
 }
 
 void Particle::addNeighbor(Particle* const neighbor){

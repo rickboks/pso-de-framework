@@ -7,6 +7,7 @@
 #include "util.h"
 #include "mutationmanager.h"
 #include "instancenamer.h"
+#include "repairhandler.h"
 #include "psode.h"
 #include <limits>
 #include <iostream>
@@ -46,6 +47,8 @@ void PSODE::reset(){
 	delete mutationManager;
 	delete crossoverManager;
 	delete adaptationManager;
+	delete deCH;
+	delete psoCH;
 	
 	for (Particle* const particle : particles)
 		delete particle;
@@ -93,7 +96,12 @@ void PSODE::runSynchronous(int const evalBudget, int popSize,
 		p->updateGbest();
 
 	topologyManager->initialize();
-	mutationManager = MutationManager::createMutationManager(config.mutation, D);
+
+
+	deCH = new MidpointBaseRepair(smallest, largest);
+	psoCH = new ReinitializationRepair(smallest, largest);
+
+	mutationManager = MutationManager::createMutationManager(config.mutation, D, deCH);
 	crossoverManager = CrossoverManager::createCrossoverManager(config.crossover, D);
 	adaptationManager = DEAdaptationManager::createDEAdaptationManager(config.adaptation);
 	selectionManager = SelectionManager::createSelectionManager(config.selection, D, adaptationManager);
@@ -191,7 +199,7 @@ void PSODE::runAsynchronous(int const evalBudget,
 		p->randomize(settings.xMax, settings.xMin);
 
 	topologyManager->initialize();
-	mutationManager = MutationManager::createMutationManager(config.mutation, D);
+	mutationManager = MutationManager::createMutationManager(config.mutation, D, deCH);
 	crossoverManager = CrossoverManager::createCrossoverManager(config.crossover, D);
 	adaptationManager = DEAdaptationManager::createDEAdaptationManager(config.adaptation);
 	selectionManager = SelectionManager::createSelectionManager(config.selection, D, adaptationManager);

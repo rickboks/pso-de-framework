@@ -13,7 +13,9 @@ void RepairHandler::repair(Particle* p){ /* do nothing */ }
 void RepairHandler::repair(Particle* p, Particle* base, Particle* target){ /* do nothing */ }
 
 void RepairHandler::repairVelocity(Particle* p, int i){
-	
+	if (p->isPSO){ // Only repair is we're dealing with a 'PSO particle'
+		p->setV(i, -0.5 * p->getV(i)); // Deterministic back velocity repair from paper pso2.pdf
+	}
 }
 
 // Generic
@@ -25,42 +27,53 @@ void GenericRepairHandler::repair(Particle* p, Particle* base, Particle* target)
 ReinitializationRepair::ReinitializationRepair(std::vector<double>const lb, std::vector<double>const ub) : GenericRepairHandler(lb, ub){}
 void ReinitializationRepair::repair(Particle* p){
 	for (int i = 0; i < D; i++){
-		if (p->getX(i) < lb[i] || p->getX(i) > ub[i])
+		if (p->getX(i) < lb[i] || p->getX(i) > ub[i]){
 			p->setX(i, rng.randDouble(lb[i], ub[i]));
+			repairVelocity(p, i);
+		}
 	}
 }
 
 ProjectionRepair::ProjectionRepair(std::vector<double>const lb, std::vector<double>const ub) : GenericRepairHandler(lb, ub){}
 void ProjectionRepair::repair(Particle* p){
 	for (int i = 0; i < D; i++){
-		if (p->getX(i) < lb[i]) 
+		if (p->getX(i) < lb[i]){
 			p->setX(i, lb[i]);
-		else if (p->getX(i) > ub[i]) 
+			repairVelocity(p, i);
+		} else if (p->getX(i) > ub[i]){
 			p->setX(i, ub[i]);
+			repairVelocity(p, i);
+		}
 	}
 }
 
 ReflectionRepair::ReflectionRepair(std::vector<double>const lb, std::vector<double>const ub) : GenericRepairHandler(lb, ub){}
 void ReflectionRepair::repair(Particle* p){
 	for (int i = 0; i < D; i++){
-		while (true){
-			if (p->getX(i) < lb[i]) 
-				p->setX(i, 2 * lb[i] - p->getX(i));
-			else if (p->getX(i) > ub[i]) 
-				p->setX(i, 2 * ub[i] - p->getX(i));
-			else 
-				break;
+		bool is_repaired = false;
+		while (p->getX(i) < lb[i]){
+			p->setX(i, 2 * lb[i] - p->getX(i));
+			is_repaired = true;
 		}
+		while (p->getX(i) > ub[i]){
+			p->setX(i, 2 * ub[i] - p->getX(i));
+			is_repaired = true;
+		}
+		if (is_repaired)
+			repairVelocity(p, i);
 	}
 }
 
 WrappingRepair::WrappingRepair(std::vector<double>const lb, std::vector<double>const ub) : GenericRepairHandler(lb, ub){}
 void WrappingRepair::repair(Particle* p){
 	for (int i = 0; i < D; i++){
-		if (p->getX(i) < lb[i]) 
+		if (p->getX(i) < lb[i]){
 			p->setX(i, ub[i] - std::fmod(lb[i] - p->getX(i), std::fabs(ub[i]-lb[i])));
-		else if (p->getX(i) > ub[i]) 
+			repairVelocity(p,i);
+		} else if (p->getX(i) > ub[i]) {
 			p->setX(i, lb[i] - std::fmod(p->getX(i) - ub[i], std::fabs(ub[i]-lb[i])));
+			repairVelocity(p,i);
+		}
 	}
 }
 
@@ -71,11 +84,13 @@ void ProjectionMidpointRepair::repair(Particle* p){
 	alphas[D] = 1;
 
 	for (int i = 0; i < D; i++){
-		if (x[i] > 0)
+		if (x[i] > 0){
 			alphas[i] = ub[i]/x[i];
-		else if (x[i] < 0)
+			repairVelocity(p,i);
+		} else if (x[i] < 0){
 			alphas[i] = lb[i]/x[i];
-		else
+			repairVelocity(p,i);
+		} else
 			alphas[i] = std::numeric_limits<double>::max(); //Can't divide by zero
 	}
 
@@ -132,5 +147,5 @@ void ConservatismRepair::repair(Particle* p, Particle* base, Particle* target){
 		}
 	}
 }
-
+ 
 //TODO resampling

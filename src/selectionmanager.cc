@@ -46,7 +46,7 @@ void Pairwise2SelectionManager::select(std::vector<Particle*>& particles,
 		//PSO wins
 		if (p0[i]->getFitness() < p2[i]->getFitness()){
 			particles[i]->setX(p0[i]->getX(), p0[i]->getFitness(), false);
-			particles[i]->setVelocity(p0[i]->getVelocity());
+			particles[i]->setV(p0[i]->getV());
 		} else {
 			//DE
 			particles[i]->setX(p2[i]->getX(), p2[i]->getFitness(), true);
@@ -73,7 +73,7 @@ void Pairwise3SelectionManager::select(std::vector<Particle*>& particles,
 			//Do nothing
 		} else if (Fp0 < Fparticle && Fp0 < Fp2){
 			particles[i]->setX(p0[i]->getX(), p0[i]->getFitness(), false);
-			particles[i]->setVelocity(p0[i]->getVelocity());
+			particles[i]->setV(p0[i]->getV());
 		} else {
 			particles[i]->setX(p2[i]->getX(), p2[i]->getFitness(), true);
 		}
@@ -111,7 +111,7 @@ void Union2SelectionManager::select(std::vector<Particle*>& particles,
 		int index = std::get<2>(allSolutions[i]);		
 		if (std::get<1>(allSolutions[i]) == 0){
 			particles[index]->setX(p->getX(), p->getFitness(), false);
-			particles[index]->setVelocity(p->getVelocity());
+			particles[index]->setV(p->getV());
 		} else {
 			particles[index]->setX(p->getX(), p->getFitness(), true);
 		}
@@ -147,7 +147,7 @@ void Union3SelectionManager::select(std::vector<Particle*>& particles,
 
 		if (type == 0){
 			particles[index]->setX(p->getX(), p->getFitness(), false);
-			particles[index]->setVelocity(p->getVelocity());
+			particles[index]->setV(p->getV());
 		} else if (type == 1){
 			particles[index]->setX(p->getX(), p->getFitness(), true);
 		} else {

@@ -30,8 +30,10 @@ class Particle {
 		Particle(const Particle& other);
 		Particle(std::vector<double> x); 
 		~Particle();
-		std::vector<double> getVelocity() const;
-		void setVelocity(std::vector<double> const v);
+		std::vector<double> getV() const;
+		double getV(int const dim) const;
+		void setV(std::vector<double> const v);
+		void setV(int const dim, double val);
 		void setX(std::vector<double> const x, double const fitness, bool const updateVelocity);
 		void setX(std::vector<double> x);
 		void addNeighbor(Particle* const neighbor);

@@ -129,7 +129,7 @@ void ConservatismRepair::repair(Particle* p, Particle* base, Particle* target){
 //
 
 ProjectionMidpointRepair::ProjectionMidpointRepair(std::vector<double>const lb, std::vector<double>const ub) : DERepairHandler(lb, ub){}
-void ProjectionMidpointRepair::repair(Particle* p){
+void ProjectionMidpointRepair::repair(Particle* p, Particle* base, Particle* target){
 	std::vector<double> x = p->getX();
 	std::vector<double>alphas(D+1);
 	alphas[D] = 1;
@@ -145,9 +145,14 @@ void ProjectionMidpointRepair::repair(Particle* p){
 
 	double alpha=*std::min_element(alphas.begin(), alphas.end());
 	if (alpha != 1){
+		std::vector<double> midpoint(D);
+		add(lb, ub, midpoint);
+		scale(midpoint, 0.5*(1-alpha));
 		scale(x, alpha);
+		add(x, midpoint, x);
 		p->setX(x);
 	}
+
 }
 
 ProjectionBaseRepair::ProjectionBaseRepair(std::vector<double>const lb, std::vector<double>const ub) : DERepairHandler(lb, ub){}
@@ -167,7 +172,10 @@ void ProjectionBaseRepair::repair(Particle* p, Particle* base, Particle* target)
 
 	double alpha=*std::min_element(alphas.begin(), alphas.end());
 	if (alpha != 1){
+		std::vector<double> b = base->getX();
+		scale(b, (1-alpha));
 		scale(x, alpha);
+		add(x, b, x);
 		p->setX(x);
 	}
 }

@@ -86,7 +86,7 @@ class ConservatismRepair: public DERepairHandler {
 class ProjectionMidpointRepair : public DERepairHandler {
 	public:
 		ProjectionMidpointRepair(std::vector<double> const lb, std::vector<double> const ub);
-		void repair(Particle* p);
+		void repair(Particle* p, Particle* base, Particle* target);
 };
 
 class ProjectionBaseRepair: public DERepairHandler {

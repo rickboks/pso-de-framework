@@ -63,7 +63,7 @@ void PSODE2::runAsynchronous(int const evalBudget, int popSize, std::map<int,dou
 
 	ParticleUpdateSettings settings(config.update, particleUpdateParams, smallest, largest);
 
-	deCH = new MidpointBaseRepair(smallest, largest);
+	deCH = new ProjectionMidpointRepair(smallest, largest);
 	psoCH = new ReinitializationRepair(smallest, largest);
 
 	mutationManager = MutationManager::createMutationManager(config.mutation, D, deCH);
@@ -84,6 +84,8 @@ void PSODE2::runAsynchronous(int const evalBudget, int popSize, std::map<int,dou
 
 	for (Particle* const p : particles)
 		p->evaluate(problem, logger);
+
+	topologyManager = TopologyManager::createTopologyManager(config.topology, psoPop);
 	topologyManager->initialize();
 
 	std::vector<double> Fs(dePop.size());
@@ -166,21 +168,6 @@ void PSODE2::logEnd(){
 		std::cout << "LOGGER: END" << std::endl;
 }
 
-// If PSO population has the best solution, replace the worst solution in DE with the best in PSO
-// If DE population has the best solution, replace the worst solution in PSO with the best in DE
-//void PSODE2::share(){
-	//Particle* best_de = getBest(dePop);
-	//Particle* best_pso = getBest(psoPop);
-
-	//if (best_de->getFitness() < best_pso->getFitness()){
-		//Particle* worst_pso = getWorst(psoPop);
-		//worst_pso->setX(best_de->getX(), best_de->getFitness(), true); //Updates the velocity aswell
-	//} else {
-		//Particle* worst_de = getWorst(dePop);
-		//worst_de->setX(best_pso->getX(), best_pso->getFitness(), false); //Not here
-	//}
-//}
-
 void PSODE2::share(){
 	Particle* best_de = getPBest(dePop, 0.1);
 	Particle* best_pso = getPBest(psoPop, 0.1);
@@ -188,7 +175,7 @@ void PSODE2::share(){
 	std::vector<double> x = best_pso->getX();
 	double y = best_pso->getFitness();
 
-	best_pso->setX(best_de->getX(), best_de->getFitness(), true); //Updates the velocity aswell
+	best_pso->setX(best_de->getX(), best_de->getFitness(), true); //Updates the velocity as well
 	best_de->setX(x, y, false); //Not here
 }
 

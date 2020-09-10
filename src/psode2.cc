@@ -84,8 +84,6 @@ void PSODE2::runAsynchronous(int const evalBudget, int popSize, std::map<int,dou
 
 	for (Particle* const p : particles)
 		p->evaluate(problem, logger);
-
-	topologyManager = TopologyManager::createTopologyManager(config.topology, psoPop);
 	topologyManager->initialize();
 
 	std::vector<double> Fs(dePop.size());
@@ -108,7 +106,7 @@ void PSODE2::runAsynchronous(int const evalBudget, int popSize, std::map<int,dou
 			p->updatePbest();
 			p->updateGbest();
 			p->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));			
-			psoCH->repair(p);
+			psoCH->repair(p); // generic repair
 			p->evaluate(problem,logger);
 		}
 
@@ -116,7 +114,7 @@ void PSODE2::runAsynchronous(int const evalBudget, int popSize, std::map<int,dou
 		std::vector<Particle*> donors = mutationManager->mutate(dePop, Fs);
 
 		for (Particle* const p : donors) 
-			psoCH->repair(p);
+			psoCH->repair(p); // generic repair
 
 		// Perform crossover
 		std::vector<Particle*> trials = crossoverManager->crossover(dePop, donors, Crs);

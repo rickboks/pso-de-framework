@@ -50,12 +50,6 @@ class WrappingRepair : public GenericRepairHandler {
 		void repair(Particle* p);
 };
 
-class ProjectionMidpointRepair : public GenericRepairHandler {
-	public:
-		ProjectionMidpointRepair(std::vector<double> const lb, std::vector<double> const ub);
-		void repair(Particle* p);
-};
-
 // Differential Evolution
 class DERepairHandler : public RepairHandler, public DEConstraintHandler {
 	public:
@@ -86,5 +80,17 @@ class MidpointTargetRepair : public DERepairHandler {
 class ConservatismRepair: public DERepairHandler {
 	public:
 		ConservatismRepair(std::vector<double> const lb, std::vector<double> const ub);
+		void repair(Particle* p, Particle* base, Particle* target);
+};
+
+class ProjectionMidpointRepair : public DERepairHandler {
+	public:
+		ProjectionMidpointRepair(std::vector<double> const lb, std::vector<double> const ub);
+		void repair(Particle* p);
+};
+
+class ProjectionBaseRepair: public DERepairHandler {
+	public:
+		ProjectionBaseRepair(std::vector<double> const lb, std::vector<double> const ub);
 		void repair(Particle* p, Particle* base, Particle* target);
 };

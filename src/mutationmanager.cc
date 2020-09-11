@@ -1,11 +1,11 @@
 #include "mutationmanager.h"
 
-MutationManager::MutationManager(int const D, DEConstraintHandler* deCH)
+MutationManager::MutationManager(int const D, ConstraintHandler* deCH)
 			:D(D), deCH(deCH){}
 
 MutationManager::~MutationManager(){}
 
-MutationManager* MutationManager::createMutationManager(MutationType const mutationType, int const D, DEConstraintHandler* deCH){
+MutationManager* MutationManager::createMutationManager(MutationType const mutationType, int const D, ConstraintHandler* deCH){
 	switch(mutationType){
 		case RAND_1:
 			return new Rand1MutationManager(D, deCH);
@@ -37,7 +37,7 @@ MutationManager* MutationManager::createMutationManager(MutationType const mutat
 }
 
 
-Rand1MutationManager::Rand1MutationManager(int const D, DEConstraintHandler* deCH)
+Rand1MutationManager::Rand1MutationManager(int const D, ConstraintHandler* deCH)
 	: MutationManager(D, deCH){}
 
 std::vector<Particle*> Rand1MutationManager::mutate(std::vector<Particle*> const& genomes, std::vector<double>& Fs){
@@ -62,7 +62,7 @@ std::vector<Particle*> Rand1MutationManager::mutate(std::vector<Particle*> const
 	return mutants;
 }
 
-TTB1MutationManager::TTB1MutationManager(int const D, DEConstraintHandler* deCH)
+TTB1MutationManager::TTB1MutationManager(int const D, ConstraintHandler* deCH)
 	: MutationManager(D, deCH){}
 
 std::vector<Particle*> TTB1MutationManager::mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs){
@@ -93,7 +93,7 @@ std::vector<Particle*> TTB1MutationManager::mutate(std::vector<Particle*>const& 
 	return mutants;
 }
 
-TTPB1MutationManager::TTPB1MutationManager(int const D, DEConstraintHandler* deCH)
+TTPB1MutationManager::TTPB1MutationManager(int const D, ConstraintHandler* deCH)
 	:MutationManager(D, deCH), p(0.1){}
 
 
@@ -125,7 +125,7 @@ std::vector<Particle*> TTPB1MutationManager::mutate(std::vector<Particle*>const&
 	return mutants;
 }
 
-Best1MutationManager::Best1MutationManager(int const D, DEConstraintHandler* deCH):MutationManager(D, deCH){}
+Best1MutationManager::Best1MutationManager(int const D, ConstraintHandler* deCH):MutationManager(D, deCH){}
 std::vector<Particle*> Best1MutationManager::mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs){
 	std::vector<Particle*> mutants;
 	mutants.reserve(genomes.size());
@@ -152,7 +152,7 @@ std::vector<Particle*> Best1MutationManager::mutate(std::vector<Particle*>const&
 	return mutants;
 }
 
-Best2MutationManager::Best2MutationManager(int const D, DEConstraintHandler* deCH):MutationManager(D, deCH){}
+Best2MutationManager::Best2MutationManager(int const D, ConstraintHandler* deCH):MutationManager(D, deCH){}
 
 std::vector<Particle*> Best2MutationManager::mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs){
 	Particle* best = getBest(genomes);
@@ -182,7 +182,7 @@ std::vector<Particle*> Best2MutationManager::mutate(std::vector<Particle*>const&
 	return mutants;
 }
 
-Rand2MutationManager::Rand2MutationManager(int const D, DEConstraintHandler* deCH):MutationManager(D, deCH){}
+Rand2MutationManager::Rand2MutationManager(int const D, ConstraintHandler* deCH):MutationManager(D, deCH){}
 
 std::vector<Particle*> Rand2MutationManager::mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs){
 	std::vector<Particle*> mutants;
@@ -210,7 +210,7 @@ std::vector<Particle*> Rand2MutationManager::mutate(std::vector<Particle*>const&
 	return mutants;
 }
 
-Rand2DirMutationManager::Rand2DirMutationManager(int const D, DEConstraintHandler* deCH):MutationManager(D, deCH){}
+Rand2DirMutationManager::Rand2DirMutationManager(int const D, ConstraintHandler* deCH):MutationManager(D, deCH){}
 
 std::vector<Particle*> Rand2DirMutationManager::mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs){
 	std::vector<Particle*> mutants;
@@ -246,7 +246,7 @@ std::vector<Particle*> Rand2DirMutationManager::mutate(std::vector<Particle*>con
 	return mutants;
 }
 
-NSDEMutationManager::NSDEMutationManager(int const D, DEConstraintHandler* deCH):MutationManager(D, deCH){}
+NSDEMutationManager::NSDEMutationManager(int const D, ConstraintHandler* deCH):MutationManager(D, deCH){}
 
 std::vector<Particle*> NSDEMutationManager::mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs){
 	std::vector<Particle*> mutants;
@@ -281,7 +281,7 @@ std::vector<Particle*> NSDEMutationManager::mutate(std::vector<Particle*>const& 
 	return mutants;
 }
 
-TrigonometricMutationManager::TrigonometricMutationManager(int const D, DEConstraintHandler* deCH): MutationManager(D, deCH), gamma(0.05){}
+TrigonometricMutationManager::TrigonometricMutationManager(int const D, ConstraintHandler* deCH): MutationManager(D, deCH), gamma(0.05){}
 std::vector<Particle*> TrigonometricMutationManager::mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs){
 	return rng.randDouble(0,1) <= gamma ? trigonometricMutation(genomes,Fs) : rand1Mutation(genomes,Fs);
 }
@@ -355,7 +355,7 @@ std::vector<Particle*> TrigonometricMutationManager::rand1Mutation(std::vector<P
 	return mutants;	
 }
 
-TwoOpt1MutationManager::TwoOpt1MutationManager(int const D, DEConstraintHandler* deCH): MutationManager(D, deCH){}
+TwoOpt1MutationManager::TwoOpt1MutationManager(int const D, ConstraintHandler* deCH): MutationManager(D, deCH){}
 std::vector<Particle*> TwoOpt1MutationManager::mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs){
 	std::vector<Particle*> mutants;
 	mutants.reserve(genomes.size());
@@ -383,7 +383,7 @@ std::vector<Particle*> TwoOpt1MutationManager::mutate(std::vector<Particle*>cons
 	return mutants;
 }
 
-TwoOpt2MutationManager::TwoOpt2MutationManager(int const D, DEConstraintHandler* deCH): MutationManager(D, deCH){}
+TwoOpt2MutationManager::TwoOpt2MutationManager(int const D, ConstraintHandler* deCH): MutationManager(D, deCH){}
 std::vector<Particle*> TwoOpt2MutationManager::mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs){
 	std::vector<Particle*> mutants;
 	mutants.reserve(genomes.size());

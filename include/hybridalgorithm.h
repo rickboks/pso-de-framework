@@ -41,8 +41,8 @@ class HybridAlgorithm {
 		CrossoverManager* crossoverManager;
 		DEAdaptationManager* adaptationManager;
 		SelectionManager* selectionManager;
-		DEConstraintHandler* deCH;
-		PSOConstraintHandler* psoCH;
+		ConstraintHandler* deCH;
+		ConstraintHandler* psoCH;
 		std::shared_ptr<IOHprofiler_problem<double> > problem; 
 		std::shared_ptr<IOHprofiler_csv_logger> logger;
 

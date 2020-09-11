@@ -26,23 +26,23 @@ enum MutationType {
 class MutationManager {
 	protected:
 		int const D;
-		DEConstraintHandler* deCH;
+		ConstraintHandler* deCH;
 	public:
-		MutationManager(int const D, DEConstraintHandler* deCH);
+		MutationManager(int const D, ConstraintHandler* deCH);
 		virtual ~MutationManager();
 		virtual std::vector<Particle*> mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs) = 0;
-		static MutationManager* createMutationManager(MutationType const mutationType, int const D, DEConstraintHandler* deCH);
+		static MutationManager* createMutationManager(MutationType const mutationType, int const D, ConstraintHandler* deCH);
 };
 
 class Rand1MutationManager : public MutationManager {
 	public:
-		Rand1MutationManager(int const D, DEConstraintHandler* deCH);
+		Rand1MutationManager(int const D, ConstraintHandler* deCH);
 		std::vector<Particle*> mutate(std::vector<Particle*> const& genomes, std::vector<double>& Fs);
 };
 
 class TTB1MutationManager : public MutationManager {
 	public:
-		TTB1MutationManager(int const D, DEConstraintHandler* deCH);
+		TTB1MutationManager(int const D, ConstraintHandler* deCH);
 		std::vector<Particle*> mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs);
 };
 
@@ -50,38 +50,38 @@ class TTPB1MutationManager : public MutationManager {
 	private:
 		double const p;
 	public:
-		TTPB1MutationManager(int const D, DEConstraintHandler* deCH);
+		TTPB1MutationManager(int const D, ConstraintHandler* deCH);
 		std::vector<Particle*> mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs);
 };
 
 
 class Best1MutationManager: public MutationManager {
 	public:
-		Best1MutationManager(int const D, DEConstraintHandler* deCH);
+		Best1MutationManager(int const D, ConstraintHandler* deCH);
 		std::vector<Particle*> mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs);
 };
 
 class Best2MutationManager: public MutationManager {
 	public:
-		Best2MutationManager(int const D, DEConstraintHandler* deCH);
+		Best2MutationManager(int const D, ConstraintHandler* deCH);
 		std::vector<Particle*> mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs);
 };
 
 class Rand2MutationManager: public MutationManager {
 	public:
-		Rand2MutationManager(int const D, DEConstraintHandler* deCH);
+		Rand2MutationManager(int const D, ConstraintHandler* deCH);
 		std::vector<Particle*> mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs);
 };
 
 class Rand2DirMutationManager : public MutationManager {
 	public:
-		Rand2DirMutationManager(int const D, DEConstraintHandler* deCH);
+		Rand2DirMutationManager(int const D, ConstraintHandler* deCH);
 		std::vector<Particle*> mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs);
 };
 
 class NSDEMutationManager : public MutationManager {
 	public:
-		NSDEMutationManager(int const D, DEConstraintHandler* deCH);
+		NSDEMutationManager(int const D, ConstraintHandler* deCH);
 		std::vector<Particle*> mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs);
 };
 
@@ -92,18 +92,18 @@ class TrigonometricMutationManager : public MutationManager {
 		std::vector<Particle*> rand1Mutation(std::vector<Particle*>const& genomes, std::vector<double>& Fs);
 
 	public:
-		TrigonometricMutationManager(int const D, DEConstraintHandler* deCH);
+		TrigonometricMutationManager(int const D, ConstraintHandler* deCH);
 		std::vector<Particle*> mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs);
 };
 
 class TwoOpt1MutationManager : public MutationManager {
 	public:
-		TwoOpt1MutationManager(int const D, DEConstraintHandler* deCH);
+		TwoOpt1MutationManager(int const D, ConstraintHandler* deCH);
 		std::vector<Particle*> mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs);
 };
 
 class TwoOpt2MutationManager : public MutationManager {
 	public:
-		TwoOpt2MutationManager(int const D, DEConstraintHandler* deCH);
+		TwoOpt2MutationManager(int const D, ConstraintHandler* deCH);
 		std::vector<Particle*> mutate(std::vector<Particle*>const& genomes, std::vector<double>& Fs);
 };

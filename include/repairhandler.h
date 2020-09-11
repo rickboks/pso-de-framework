@@ -4,92 +4,70 @@
 
 class Particle;
 
-class RepairHandler {
-	protected:
-		std::vector<double>const lb;
-		std::vector<double>const ub;
-		int const D;
+class RepairHandler : public ConstraintHandler {
 	public:
-		RepairHandler(std::vector<double>const lb, std::vector<double>const ub);
+		virtual ~RepairHandler();
+		RepairHandler(std::vector<double> const lb, std::vector<double> const ub); 
 		virtual void repair(Particle* p);
 		virtual void repair(Particle* p, Particle* base, Particle* target);
-		virtual ~RepairHandler()=0;
-		void repairVelocity(Particle* p, int i);
-};
+};   
 
-// Generic
-class GenericRepairHandler : public RepairHandler, public DEConstraintHandler, public PSOConstraintHandler {
-	public:
-		GenericRepairHandler(std::vector<double> const lb, std::vector<double>const ub);
-		virtual ~GenericRepairHandler()=0;
-		virtual void repair(Particle* p)=0; // Generic
-		void repair(Particle* p, Particle* base, Particle* target); //DE
-};
-
-class ReinitializationRepair : public GenericRepairHandler {
+class ReinitializationRepair : public RepairHandler {
 	public:
 		ReinitializationRepair(std::vector<double> const lb, std::vector<double> const ub); 
 		void repair(Particle* p);
 };
 
-class ProjectionRepair : public GenericRepairHandler {
+class ProjectionRepair : public RepairHandler {
 	public:
 		ProjectionRepair(std::vector<double> const lb, std::vector<double> const ub); 
 		void repair(Particle* p);
 };
 
-class ReflectionRepair : public GenericRepairHandler {
+class ReflectionRepair : public RepairHandler {
 	public:
 		ReflectionRepair(std::vector<double> const lb, std::vector<double> const ub); 
 		void repair(Particle* p);
 };
 
-class WrappingRepair : public GenericRepairHandler {
+class WrappingRepair : public RepairHandler {
 	public:
 		WrappingRepair(std::vector<double> const lb, std::vector<double> const ub); 
 		void repair(Particle* p);
 };
 
 // Differential Evolution
-class DERepairHandler : public RepairHandler, public DEConstraintHandler {
-	public:
-		DERepairHandler(std::vector<double> const lb, std::vector<double>const ub);
-		virtual ~DERepairHandler()=0;
-		virtual void repair(Particle* p, Particle* base, Particle* target)=0;
-		void repair(Particle* p);
-};
-
-class RandBaseRepair : public DERepairHandler {
+class RandBaseRepair : public RepairHandler {
 	public:
 		RandBaseRepair(std::vector<double> const lb, std::vector<double> const ub);
 		void repair(Particle* p, Particle* base, Particle* target);
 };
 
-class MidpointBaseRepair : public DERepairHandler {
+class MidpointBaseRepair : public RepairHandler {
 	public:
 		MidpointBaseRepair(std::vector<double> const lb, std::vector<double> const ub);
 		void repair(Particle* p, Particle* base, Particle* target);
 };
 
-class MidpointTargetRepair : public DERepairHandler {
+class MidpointTargetRepair : public RepairHandler {
 	public:
 		MidpointTargetRepair(std::vector<double> const lb, std::vector<double> const ub);
 		void repair(Particle* p, Particle* base, Particle* target);
 };
 
-class ConservatismRepair: public DERepairHandler {
+class ConservatismRepair: public RepairHandler {
 	public:
 		ConservatismRepair(std::vector<double> const lb, std::vector<double> const ub);
 		void repair(Particle* p, Particle* base, Particle* target);
 };
 
-class ProjectionMidpointRepair : public DERepairHandler {
+class ProjectionMidpointRepair : public RepairHandler {
 	public:
 		ProjectionMidpointRepair(std::vector<double> const lb, std::vector<double> const ub);
 		void repair(Particle* p, Particle* base, Particle* target);
 };
 
-class ProjectionBaseRepair: public DERepairHandler {
+class ProjectionBaseRepair: public RepairHandler {
 	public:
 		ProjectionBaseRepair(std::vector<double> const lb, std::vector<double> const ub);
 		void repair(Particle* p, Particle* base, Particle* target);

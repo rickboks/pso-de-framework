@@ -19,7 +19,7 @@ class DifferentialEvolution {
 		MutationManager* mutationManager;
 		CrossoverManager* crossoverManager;
 		DEAdaptationManager* adaptationManager;
-		DEConstraintHandler* deCH;
+		ConstraintHandler* deCH;
 		int dimension;
 		int popSize;
 		std::shared_ptr<IOHprofiler_csv_logger> logger;

@@ -34,7 +34,7 @@ Particle::Particle(int const D)
 
 //When using this construtor, note that only the position is initialized
 Particle::Particle(std::vector<double> x)
-: 	x(x), evaluated(false), particleUpdateManager(NULL), D(x.size()), isPSO(false){
+: 	x(x), evaluated(false), fitness(std::numeric_limits<double>::max()), particleUpdateManager(NULL), D(x.size()), isPSO(false){
 }
 
 Particle::~Particle(){

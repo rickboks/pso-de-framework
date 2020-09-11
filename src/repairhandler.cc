@@ -8,7 +8,7 @@ RepairHandler::~RepairHandler(){}
 RepairHandler::RepairHandler(std::vector<double>const lb, std::vector<double>const ub) : ConstraintHandler(lb, ub){}
 void RepairHandler::repair(Particle*p){}
 void RepairHandler::repair(Particle* p, Particle* base, Particle* target){}
-bool RepairHandler::resample(Particle* p){
+bool RepairHandler::resample(Particle* p, int resamples){
 	return false;
 }
 
@@ -136,8 +136,8 @@ void ProjectionMidpointRepair::repair(Particle* p, Particle* base, Particle* tar
 }
 
 ResamplingRepair::ResamplingRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
-bool ResamplingRepair::resample(Particle* p){
-	if (isFeasible(p))
+bool ResamplingRepair::resample(Particle* p, int resamples){
+	if (resamples >= 100 || isFeasible(p))
 		return false;
 	return true;
 }

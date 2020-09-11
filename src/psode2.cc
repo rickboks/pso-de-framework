@@ -63,7 +63,7 @@ void PSODE2::runAsynchronous(int const evalBudget, int popSize, std::map<int,dou
 
 	ParticleUpdateSettings settings(config.update, particleUpdateParams, smallest, largest);
 
-	deCH = new ProjectionMidpointRepair(smallest, largest);
+	deCH = new ResamplingRepair(smallest, largest);
 	psoCH = new ReinitializationRepair(smallest, largest);
 
 	mutationManager = MutationManager::createMutationManager(config.mutation, D, deCH);

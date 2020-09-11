@@ -93,6 +93,7 @@ void PSODE2::runAsynchronous(int const evalBudget, int popSize, std::map<int,dou
 
 	logStart();
 	int iterations = 0;
+
 	while (problem->IOHprofiler_get_evaluations() < evalBudget &&
 			!problem->IOHprofiler_hit_optimal()){
 
@@ -113,6 +114,7 @@ void PSODE2::runAsynchronous(int const evalBudget, int popSize, std::map<int,dou
 		}
 
 		// Perform mutation 
+		//
 		std::vector<Particle*> donors = mutationManager->mutate(dePop, Fs);
 
 		for (Particle* const p : donors) 

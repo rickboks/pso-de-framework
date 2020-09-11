@@ -81,5 +81,8 @@ void sortOnFitness(std::vector<Particle*>& genomes){
 Particle* getPBest(std::vector<Particle*> genomes, double const p){
 	sortOnFitness(genomes);
 	std::vector<Particle*> bestP = std::vector<Particle*>(genomes.begin(), genomes.begin() + (genomes.size() * p));
-	return bestP[rng.randInt(0, bestP.size()-1)];
+	if (bestP.empty())
+		return genomes[0];
+	else
+		return bestP[rng.randInt(0, bestP.size()-1)];
 }

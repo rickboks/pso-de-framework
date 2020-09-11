@@ -11,9 +11,9 @@ class ConstraintHandler {
 	public:
 		ConstraintHandler(std::vector<double> lb,std::vector<double> ub);
 		virtual ~ConstraintHandler();
-		virtual void repair(Particle* p)=0;// Generic constraint handler
-		virtual void repair(Particle* p, Particle* base, Particle* target)=0;
-		virtual bool resample(Particle* p, int resamples)=0;
+		virtual void repair(Particle* p);// Generic constraint handler
+		virtual void repair(Particle* p, Particle* base, Particle* target);
+		virtual bool resample(Particle* p, int resamples);
 		void repairVelocity(Particle* p, int i);
 		bool isFeasible(Particle* p);
 };

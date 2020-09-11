@@ -151,6 +151,10 @@ double Particle::getFitness() const{
 	return fitness;
 }
 
+void Particle::setFitness(double const f){
+	this->fitness = f;
+}
+
 double Particle::evaluate(std::shared_ptr<IOHprofiler_problem<double> > problem, std::shared_ptr<IOHprofiler_csv_logger> logger) {
 	if (!evaluated){
 		evaluated = true;		

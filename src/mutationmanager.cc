@@ -57,7 +57,7 @@ MutationManager* MutationManager::createMutationManager(MutationType const mutat
 			throw std::invalid_argument("Error: Invalid DE mutation type");
 	}	
 }
-
+// Rand/1
 Rand1MutationManager::Rand1MutationManager(int const D, ConstraintHandler* deCH)
 	: MutationManager(D, deCH){}
 
@@ -77,6 +77,7 @@ Particle* Rand1MutationManager::mutate(int const i){
 	return mutant;
 }
 
+// Target-to-best/1
 TTB1MutationManager::TTB1MutationManager(int const D, ConstraintHandler* deCH)
 	: MutationManager(D, deCH){}
 
@@ -99,6 +100,7 @@ Particle* TTB1MutationManager::mutate(int const i){
 	return m;
 }
 
+// Target-to-pbest/1
 TTPB1MutationManager::TTPB1MutationManager(int const D, ConstraintHandler* deCH)
 	:MutationManager(D, deCH){}
 Particle* TTPB1MutationManager::mutate(int const i){
@@ -121,6 +123,7 @@ Particle* TTPB1MutationManager::mutate(int const i){
 	return m;
 }
 
+// Best/1
 Best1MutationManager::Best1MutationManager(int const D, ConstraintHandler* deCH):MutationManager(D, deCH){}
 Particle* Best1MutationManager::mutate(int const i){
 	std::vector<Particle*> possibilities = genomes;
@@ -140,8 +143,8 @@ Particle* Best1MutationManager::mutate(int const i){
 	return m;
 }
 
+// Best/2
 Best2MutationManager::Best2MutationManager(int const D, ConstraintHandler* deCH):MutationManager(D, deCH){}
-
 Particle* Best2MutationManager::mutate(int const i){
 	std::vector<Particle*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);
@@ -162,6 +165,7 @@ Particle* Best2MutationManager::mutate(int const i){
 	return m;
 }
 
+// Rand/2
 Rand2MutationManager::Rand2MutationManager(int const D, ConstraintHandler* deCH):MutationManager(D, deCH){}
 Particle* Rand2MutationManager::mutate(int const i){
 	std::vector<Particle*> possibilities = genomes;
@@ -182,6 +186,7 @@ Particle* Rand2MutationManager::mutate(int const i){
 	return m;
 }
 
+// Rand/2/dir
 Rand2DirMutationManager::Rand2DirMutationManager(int const D, ConstraintHandler* deCH):MutationManager(D, deCH){}
 Particle* Rand2DirMutationManager::mutate(int const i){
 	std::vector<Particle*> possibilities = genomes;
@@ -210,8 +215,8 @@ Particle* Rand2DirMutationManager::mutate(int const i){
 	return m;
 }
 
+// NSDE
 NSDEMutationManager::NSDEMutationManager(int const D, ConstraintHandler* deCH):MutationManager(D, deCH){}
-
 Particle* NSDEMutationManager::mutate(int const i){
 	std::vector<Particle*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);
@@ -237,6 +242,7 @@ Particle* NSDEMutationManager::mutate(int const i){
 	return m;
 }
 
+// Trigonometric
 TrigonometricMutationManager::TrigonometricMutationManager(int const D, ConstraintHandler* deCH): MutationManager(D, deCH), gamma(0.05){}
 Particle* TrigonometricMutationManager::mutate(int const i){
 	return rng.randDouble(0,1) <= gamma ? trigonometricMutation(i) : rand1Mutation(i);
@@ -299,6 +305,7 @@ Particle* TrigonometricMutationManager::rand1Mutation(int const i){
 	return m;
 }
 
+// Two-opt/1
 TwoOpt1MutationManager::TwoOpt1MutationManager(int const D, ConstraintHandler* deCH): MutationManager(D, deCH){}
 Particle* TwoOpt1MutationManager::mutate(int const i){
 	std::vector<Particle*> possibilities = genomes;
@@ -306,9 +313,8 @@ Particle* TwoOpt1MutationManager::mutate(int const i){
 
 	std::vector<Particle*> xr = pickRandom(possibilities, 3);
 
-	if (xr[1]->getFitness() < xr[0]->getFitness()){
+	if (xr[1]->getFitness() < xr[0]->getFitness())
 		std::swap(xr[0], xr[1]);
-	}
 
 	std::vector<double> x = xr[0]->getX();
 	std::vector<double> subtraction(this->D);
@@ -321,6 +327,7 @@ Particle* TwoOpt1MutationManager::mutate(int const i){
 	return m;
 }
 
+// Two-opt/2
 TwoOpt2MutationManager::TwoOpt2MutationManager(int const D, ConstraintHandler* deCH): MutationManager(D, deCH){}
 Particle* TwoOpt2MutationManager::mutate(int const i){
 	std::vector<Particle*> possibilities = genomes;
@@ -328,9 +335,8 @@ Particle* TwoOpt2MutationManager::mutate(int const i){
 
 	std::vector<Particle*> xr = pickRandom(possibilities, 5);
 
-	if (xr[1]->getFitness() < xr[0]->getFitness()){
+	if (xr[1]->getFitness() < xr[0]->getFitness())
 		std::swap(xr[0], xr[1]);
-	}
 
 	std::vector<double> mutant = xr[0]->getX();
 	std::vector<double> subtraction(this->D);

@@ -8,6 +8,10 @@ ConstraintHandler::~ConstraintHandler(){}
 
 void ConstraintHandler::repair(Particle* p, Particle* base, Particle* target){}
 void ConstraintHandler::repair(Particle* p){}
+bool ConstraintHandler::resample(Particle*p, int resamples){
+	return false;
+}
+
 void ConstraintHandler::repairVelocity(Particle* p, int i){
 	if (p->isPSO) p->setV(i, -0.5 * p->getV(i));
 }

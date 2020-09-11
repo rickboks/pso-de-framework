@@ -6,12 +6,12 @@ class Particle;
 
 class PenaltyHandler : public ConstraintHandler {
 	public:
-		PenaltyHandler(std::vector<double> lb,std::vector<double> ub);
-		virtual void penalize(Particle* p)=0;
+		PenaltyHandler(std::vector<double>const lb,std::vector<double>const ub);
+		virtual void penalize(Particle* const p) const=0;
 };
 
 class DeathPenalty : public PenaltyHandler {
 	public:
-		DeathPenalty(std::vector<double> lb,std::vector<double> ub);
-		void penalize(Particle* p);
+		DeathPenalty(std::vector<double>const lb,std::vector<double>const ub);
+		void penalize(Particle* const p) const;
 };

@@ -16,12 +16,11 @@
 
 PSODE2::PSODE2(UpdateManagerType const updateManagerType, 
 	Topology topologyManagerType, Synchronicity const synchronicity, MutationType const mutationType, 
-	CrossoverType const crossoverType, SelectionType selection,DEAdaptationType adaptionType):
+	CrossoverType const crossoverType, SelectionType const selection,DEAdaptationType const adaptionType):
 		HybridAlgorithm(updateManagerType, topologyManagerType, synchronicity, 
-			mutationType, crossoverType, selection, adaptionType){
-}
+			mutationType, crossoverType, selection, adaptionType){}
 
-PSODE2::PSODE2(hybrid_config config):
+PSODE2::PSODE2(hybrid_config const config):
 		HybridAlgorithm(config){
 }
 
@@ -45,7 +44,7 @@ PSODE2::~PSODE2(){}
 
 void PSODE2::run(std::shared_ptr<IOHprofiler_problem<double> > problem, 
     		std::shared_ptr<IOHprofiler_csv_logger> logger,
-    		int const evalBudget, int popSize, std::map<int,double> particleUpdateParams){
+    		int const evalBudget, int const popSize, std::map<int,double> particleUpdateParams){
 
 	this->problem=problem;
 	this->logger=logger;
@@ -55,7 +54,7 @@ void PSODE2::run(std::shared_ptr<IOHprofiler_problem<double> > problem,
 		runAsynchronous(evalBudget, popSize, particleUpdateParams);
 }
 
-void PSODE2::runAsynchronous(int const evalBudget, int popSize, std::map<int,double> particleUpdateParams){
+void PSODE2::runAsynchronous(int const evalBudget, int const popSize, std::map<int,double> particleUpdateParams){
 	int const D = problem->IOHprofiler_get_number_of_variables(); /// dimension
 	logging=false;
 

@@ -6,17 +6,17 @@ ConstraintHandler::ConstraintHandler(std::vector<double> lb,std::vector<double> 
 
 ConstraintHandler::~ConstraintHandler(){}
 
-void ConstraintHandler::repair(Particle* p, Particle* base, Particle* target){}
-void ConstraintHandler::repair(Particle* p){}
-bool ConstraintHandler::resample(Particle*p, int resamples){
+void ConstraintHandler::repair(Particle* const p, Particle const* const base, Particle const* const target) const{}
+void ConstraintHandler::repair(Particle* const p) const{}
+bool ConstraintHandler::resample(Particle const * const p, int const resamples) const{
 	return false;
 }
 
-void ConstraintHandler::repairVelocity(Particle* p, int i){
+void ConstraintHandler::repairVelocity(Particle* const p, int const i) const{
 	if (p->isPSO) p->setV(i, -0.5 * p->getV(i));
 }
 
-bool ConstraintHandler::isFeasible(Particle* p){
+bool ConstraintHandler::isFeasible(Particle const * const p) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i] || p->getX(i) > ub[i]){
 			return false;

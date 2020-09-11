@@ -6,11 +6,11 @@
 
 RepairHandler::~RepairHandler(){}
 RepairHandler::RepairHandler(std::vector<double>const lb, std::vector<double>const ub) : ConstraintHandler(lb, ub){}
-void RepairHandler::repair(Particle* const p){}
-void RepairHandler::repair(Particle* const p, Particle* const base, Particle* const target){}
+void RepairHandler::repair(Particle* const p) const{}
+void RepairHandler::repair(Particle* const p, Particle const* const base, Particle const* const target) const{}
 
 ReinitializationRepair::ReinitializationRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
-void ReinitializationRepair::repair(Particle* const p){
+void ReinitializationRepair::repair(Particle* const p) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i] || p->getX(i) > ub[i]){
 			p->setX(i, rng.randDouble(lb[i], ub[i]));
@@ -20,7 +20,7 @@ void ReinitializationRepair::repair(Particle* const p){
 }
 
 ProjectionRepair::ProjectionRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
-void ProjectionRepair::repair(Particle* const p){
+void ProjectionRepair::repair(Particle* const p) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i]){
 			p->setX(i, lb[i]);
@@ -33,7 +33,7 @@ void ProjectionRepair::repair(Particle* const p){
 }
 
 ReflectionRepair::ReflectionRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
-void ReflectionRepair::repair(Particle* const p){
+void ReflectionRepair::repair(Particle* const p) const{
 	for (int i = 0; i < D; i++){
 		bool is_repaired = false;
 		while (p->getX(i) < lb[i]){
@@ -50,7 +50,7 @@ void ReflectionRepair::repair(Particle* const p){
 }
 
 WrappingRepair::WrappingRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
-void WrappingRepair::repair(Particle* const p){
+void WrappingRepair::repair(Particle* const p) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i]){
 			p->setX(i, ub[i] - std::fmod(lb[i] - p->getX(i), std::fabs(ub[i]-lb[i])));
@@ -64,7 +64,7 @@ void WrappingRepair::repair(Particle* const p){
 
 // Differential Evolution
 RandBaseRepair::RandBaseRepair(std::vector<double>const lb, std::vector<double>const ub): RepairHandler(lb, ub){}
-void RandBaseRepair::repair(Particle* const p, Particle* const base, Particle* const target){
+void RandBaseRepair::repair(Particle* const p, Particle const* const base, Particle const* const target) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) > ub[i]){
 			p->setX(i, base->getX(i) + rng.randDouble(0,1) * (ub[i] - base->getX(i)));
@@ -75,7 +75,7 @@ void RandBaseRepair::repair(Particle* const p, Particle* const base, Particle* c
 }
 
 MidpointBaseRepair::MidpointBaseRepair(std::vector<double>const lb, std::vector<double>const ub): RepairHandler(lb, ub){}
-void MidpointBaseRepair::repair(Particle* const p, Particle* const base, Particle* const target){
+void MidpointBaseRepair::repair(Particle* const p, Particle const* const base, Particle const* const target) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) > ub[i]){
 			p->setX(i, 0.5 * (base->getX(i) + ub[i]));
@@ -86,7 +86,7 @@ void MidpointBaseRepair::repair(Particle* const p, Particle* const base, Particl
 }
 
 MidpointTargetRepair::MidpointTargetRepair(std::vector<double>const lb, std::vector<double>const ub): RepairHandler(lb, ub){}
-void MidpointTargetRepair::repair(Particle* const p, Particle* const base, Particle* const target){
+void MidpointTargetRepair::repair(Particle* const p, Particle const* const base, Particle const* const target) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) > ub[i]){
 			p->setX(i, 0.5 * (target->getX(i) + ub[i]));
@@ -97,7 +97,7 @@ void MidpointTargetRepair::repair(Particle* const p, Particle* const base, Parti
 }
 
 ConservatismRepair::ConservatismRepair(std::vector<double>const lb, std::vector<double>const ub): RepairHandler(lb, ub){}
-void ConservatismRepair::repair(Particle* const p, Particle* const base, Particle* const target){
+void ConservatismRepair::repair(Particle* const p, Particle const* const base, Particle const* const target) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) > ub[i] || p->getX(i) < lb[i]){
 			p->setX(i, base->getX(i));
@@ -106,7 +106,7 @@ void ConservatismRepair::repair(Particle* const p, Particle* const base, Particl
 }
 
 ProjectionMidpointRepair::ProjectionMidpointRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
-void ProjectionMidpointRepair::repair(Particle* const p, Particle* const base, Particle* const target){
+void ProjectionMidpointRepair::repair(Particle* const p, Particle const* const base, Particle const* const target) const{
 	std::vector<double> x = p->getX();
 	std::vector<double>alphas(D+1);
 	alphas[D] = 1;
@@ -133,14 +133,14 @@ void ProjectionMidpointRepair::repair(Particle* const p, Particle* const base, P
 }
 
 ResamplingRepair::ResamplingRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
-bool ResamplingRepair::resample(Particle* const p, int resamples){
+bool ResamplingRepair::resample(Particle const* const p, int const resamples) const{
 	if (resamples >= 100 || isFeasible(p))
 		return false;
 	return true;
 }
 
 ProjectionBaseRepair::ProjectionBaseRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
-void ProjectionBaseRepair::repair(Particle* const p, Particle* const base, Particle* const target){
+void ProjectionBaseRepair::repair(Particle* const p, Particle const* const base, Particle const* const target) const{
 	std::vector<double> x = p->getX();
 	std::vector<double>alphas(D+1);
 	alphas[D] = 1;

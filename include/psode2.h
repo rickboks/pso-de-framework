@@ -31,9 +31,9 @@ class PSODE2 : public HybridAlgorithm {
 		PSODE2(UpdateManagerType const updateManagerType, 
 			Topology topologyManager, Synchronicity const synchronous, 
 			MutationType const mutationType, CrossoverType const crossoverType, 
-			SelectionType const selection, DEAdaptationType adaptionType);
+			SelectionType const selection, DEAdaptationType const adaptionType);
 
-		PSODE2(hybrid_config config);
+		PSODE2(hybrid_config const config);
 
 		~PSODE2();
 

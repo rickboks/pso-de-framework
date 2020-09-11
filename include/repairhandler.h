@@ -8,8 +8,9 @@ class RepairHandler : public ConstraintHandler {
 	public:
 		virtual ~RepairHandler();
 		RepairHandler(std::vector<double> const lb, std::vector<double> const ub); 
-		virtual void repair(Particle* p);
-		virtual void repair(Particle* p, Particle* base, Particle* target);
+		virtual void repair(Particle* p); //Generic repair
+		virtual void repair(Particle* p, Particle* base, Particle* target); //DE mutation repair
+		virtual bool resample(Particle* p); //Resampling repair
 };   
 
 class ReinitializationRepair : public RepairHandler {
@@ -71,4 +72,10 @@ class ProjectionBaseRepair: public RepairHandler {
 	public:
 		ProjectionBaseRepair(std::vector<double> const lb, std::vector<double> const ub);
 		void repair(Particle* p, Particle* base, Particle* target);
+};
+
+class ResamplingRepair : public RepairHandler {
+	public:
+		ResamplingRepair(std::vector<double> const lb, std::vector<double> const ub);
+		bool resample(Particle* p);
 };

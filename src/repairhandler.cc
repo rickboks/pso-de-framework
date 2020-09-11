@@ -8,6 +8,9 @@ RepairHandler::~RepairHandler(){}
 RepairHandler::RepairHandler(std::vector<double>const lb, std::vector<double>const ub) : ConstraintHandler(lb, ub){}
 void RepairHandler::repair(Particle*p){}
 void RepairHandler::repair(Particle* p, Particle* base, Particle* target){}
+bool RepairHandler::resample(Particle* p){
+	return false;
+}
 
 ReinitializationRepair::ReinitializationRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
 void ReinitializationRepair::repair(Particle* p){
@@ -105,10 +108,6 @@ void ConservatismRepair::repair(Particle* p, Particle* base, Particle* target){
 	}
 }
 
- 
-//TODO resampling
-//
-
 ProjectionMidpointRepair::ProjectionMidpointRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
 void ProjectionMidpointRepair::repair(Particle* p, Particle* base, Particle* target){
 	std::vector<double> x = p->getX();
@@ -134,6 +133,13 @@ void ProjectionMidpointRepair::repair(Particle* p, Particle* base, Particle* tar
 		p->setX(x);
 	}
 
+}
+
+ResamplingRepair::ResamplingRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
+bool ResamplingRepair::resample(Particle* p){
+	if (isFeasible(p))
+		return false;
+	return true;
 }
 
 ProjectionBaseRepair::ProjectionBaseRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}

@@ -12,11 +12,12 @@ std::vector<Particle*> MutationManager::mutate(std::vector<Particle*>const& geno
 	pBest = getPBest(genomes, 0.1);
 	std::vector<Particle*> mutants(genomes.size());
 
-	for (int i = 0; i < genomes.size(); i++){
+	for (unsigned int i = 0; i < genomes.size(); i++){
 		int resamples = 0;
 		while (true){
 			Particle* m = mutate(i);
 			if (!deCH->resample(m, resamples)){
+				deCH->repair(m);
 				mutants[i] = m; 
 				break;
 			}

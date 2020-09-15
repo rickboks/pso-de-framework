@@ -12,7 +12,7 @@
 
 /*		Base 		*/
 ParticleUpdateManager::ParticleUpdateManager(std::vector<double>& x, std::vector<double>& v,
-	std::vector<double> & p, std::vector<double>& g)
+	std::vector<double>const& p, std::vector<double>const& g)
 	:x(x), v(v), p(p), g(g), D(x.size()){
 }
 
@@ -24,9 +24,15 @@ void ParticleUpdateManager::updatePosition(){
 		std::plus<double>());
 }
 
+void ParticleUpdateManager::updateVelocity(double const progress){
+		std::transform (x.begin(), x.end(),
+				v.begin(), x.begin(),
+		std::plus<double>());
+}
+
 ParticleUpdateManager* ParticleUpdateManager::createParticleUpdateManager
-	(std::vector<double>& x, std::vector<double>& v,std::vector<double> & p, 
-	std::vector<double>& g,  ParticleUpdateSettings const settings, std::vector<Particle*>& neighborhood){
+	(std::vector<double>& x, std::vector<double>& v,std::vector<double>const& p, 
+	std::vector<double>const& g,  ParticleUpdateSettings const settings, std::vector<Particle*>& neighborhood){
 
 	switch(settings.managerType){
 		case UpdateManagerType::INERTIA_WEIGHT:
@@ -46,19 +52,18 @@ ParticleUpdateManager* ParticleUpdateManager::createParticleUpdateManager
 
 /*		Inertia weight 		*/
 InertiaWeightManager::InertiaWeightManager (std::vector<double>& x, std::vector<double>& v,
-	std::vector<double> & p, std::vector<double>& g,  std::map<int, double> parameters)
+	std::vector<double>const& p, std::vector<double>const& g,  std::map<int, double> parameters)
 	: ParticleUpdateManager(x,v,p,g),
 	phi1 (parameters.find(Setting::S_INER_PHI1) != parameters.end() ? parameters[Setting::S_INER_PHI1] : INER_PHI1_DEFAULT),
 	phi2 (parameters.find(Setting::S_INER_PHI2) != parameters.end() ? parameters[Setting::S_INER_PHI2] : INER_PHI2_DEFAULT),	
 	w (parameters.find(Setting::S_INER_W) != parameters.end() ? parameters[Setting::S_INER_W] : INER_W_DEFAULT){
 }
 
-void InertiaWeightManager::updateVelocity(double progress) {
+void InertiaWeightManager::updateVelocity(double const progress) {
 	std::vector<double> pMinx(D);
 	subtract(p,x,pMinx);
 	std::vector<double> gMinx(D);	
 	subtract(g,x,gMinx);
-
 	randomMult(pMinx, 0, phi1);
 	randomMult(gMinx, 0, phi2);	
 	scale(v, w);
@@ -68,42 +73,37 @@ void InertiaWeightManager::updateVelocity(double progress) {
 
 /*	Decreasing inertia weight manager */
 DecrInertiaWeightManager::DecrInertiaWeightManager (std::vector<double>& x, std::vector<double>& v,
-	std::vector<double> & p, std::vector<double>& g,  std::map<int, double> parameters)
+	std::vector<double>const& p, std::vector<double>const& g,  std::map<int, double> parameters)
 	: ParticleUpdateManager(x,v,p,g),
 	phi1 (parameters.find(Setting::S_DINER_PHI1) != parameters.end() ? parameters[Setting::S_DINER_PHI1] : DINER_PHI2_DEFAULT),
 	phi2 (parameters.find(Setting::S_DINER_PHI2) != parameters.end() ? parameters[Setting::S_DINER_PHI2] : DINER_PHI2_DEFAULT),	
-	w (parameters.find(Setting::S_DINER_W_START) != parameters.end() ? parameters[Setting::S_DINER_W_START] : DINER_W_START_DEFAULT),
 	wMin (parameters.find(Setting::S_DINER_W_END) != parameters.end() ? parameters[Setting::S_DINER_W_END] : DINER_W_END_DEFAULT),
-	wMax(w){
-
+	wMax(parameters.find(Setting::S_DINER_W_START) != parameters.end() ? parameters[Setting::S_DINER_W_START] : DINER_W_START_DEFAULT){
 }
 
-void DecrInertiaWeightManager::updateVelocity(double progress) {
+void DecrInertiaWeightManager::updateVelocity(double const progress) {
 	std::vector<double> pMinx(D);
 	subtract(p,x,pMinx);
 	std::vector<double> gMinx(D);
 	subtract(g,x,gMinx);
 	randomMult(pMinx, 0, phi1);
 	randomMult(gMinx, 0, phi2);
-	scale(v,w);
+	scale(v,wMax - progress * (wMax - wMin));
 	add(v,pMinx, v);
 	add(v,gMinx,v);
-
-	w = wMax - progress * (wMax - wMin);
 }
 
 /*		Constriction Coefficient 		*/
 ConstrictionCoefficientManager::ConstrictionCoefficientManager(std::vector<double> & x, std::vector<double> & v,
-	std::vector<double> & p, std::vector<double> & g,  std::map<int, double> parameters)
+	std::vector<double>const& p, std::vector<double>const& g,  std::map<int, double> parameters)
 	: ParticleUpdateManager(x,v,p,g),
 	phi1 (parameters.find(Setting::S_CC_PHI1) != parameters.end() ? parameters[Setting::S_CC_PHI1] : CC_PHI1_DEFAULT),
 	phi2 (parameters.find(Setting::S_CC_PHI2) != parameters.end() ? parameters[Setting::S_CC_PHI2] : CC_PHI2_DEFAULT),
-	chi (2 / ((phi1+phi2) -2 + sqrt( pow(phi1+phi2, 2) - 4 * (phi1+phi2)))){
+	chi (2 / ((phi1+phi2) - 2 + sqrt(pow(phi1+phi2, 2) - 4 * (phi1+phi2)))){
 }
 
-void ConstrictionCoefficientManager::updateVelocity(double progress){
+void ConstrictionCoefficientManager::updateVelocity(double const progress){
 	std::vector<double> pMinx(D);
-	pMinx.resize(D);
 	subtract(p,x,pMinx);
 	std::vector<double> gMinx(D);
 	subtract(g,x,gMinx);
@@ -116,7 +116,7 @@ void ConstrictionCoefficientManager::updateVelocity(double progress){
 
 /*		Fully Informed 		*/
 FIPSManager::FIPSManager(std::vector<double> & x, std::vector<double> & v,
-	std::vector<double> & p, std::vector<double> & g,  std::map<int, double> parameters
+	std::vector<double>const& p, std::vector<double>const& g,  std::map<int, double> parameters
 	, std::vector<Particle*>& neighborhood)
 	: ParticleUpdateManager(x,v,p,g),
 	phi (parameters.find(Setting::S_FIPS_PHI) != parameters.end() ? parameters[Setting::S_FIPS_PHI] : FIPS_PHI_DEFAULT),
@@ -125,9 +125,7 @@ FIPSManager::FIPSManager(std::vector<double> & x, std::vector<double> & v,
 }
 
 
-void FIPSManager::updateVelocity(double progress){
-	double const oneOverK = 1.0/neighborhood.size();
-
+void FIPSManager::updateVelocity(double const progress){
 	std::vector<double> sum(D,0.0);
 	std::vector<double> pMinx(D);
 
@@ -142,20 +140,22 @@ void FIPSManager::updateVelocity(double progress){
 		add(sum, pMinx, sum);		
 	}
 
-	scale(sum, oneOverK);
+	scale(sum, 1.0/neighborhood.size());
 	add(v,sum,v);
 	scale(v, chi);
 }
 
 /* 		Bare Bones 		*/
 BareBonesManager::BareBonesManager(std::vector<double> & x, std::vector<double> & v,
-	std::vector<double> & p, std::vector<double> & g,  std::map<int, double> parameters) :
+	std::vector<double>const& p, std::vector<double>const& g,  std::map<int, double> parameters) :
 	ParticleUpdateManager(x,v,p,g) {
 
 }
 
-void BareBonesManager::updateVelocity(double progress){
+void BareBonesManager::updatePosition(){
 	for (int i = 0; i < D; i++){
 		x[i] = rng.normalDistribution((g[i] + p[i]) / 2.0, fabs(g[i] - p[i]));
 	}
 }
+
+void BareBonesManager::updateVelocity(double const progress){ /* Do nothing*/ }

@@ -205,9 +205,9 @@ void ParticleSwarm::logEnd(){
 void ParticleSwarm::logPositions(){
 	if (logging){
 		std::cout << std::endl;
-		for (int i = 0; i < particles.size(); i++){
+		for (unsigned int i = 0; i < particles.size(); i++){
 			std::vector<double> position = particles[i]->getX();
-			for (int j = 0; j < position.size()-1 ; j++){
+			for (unsigned int j = 0; j < position.size()-1 ; j++){
 				std::cout << position[j] << " ";
 			}
 			std::cout << position[position.size()-1] << std::endl;

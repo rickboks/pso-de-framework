@@ -72,10 +72,22 @@ void Particle::removeAllNeighbors(){
 
 void Particle::updateVelocityAndPosition(double progress){
 	evaluated = false;
-	particleUpdateManager->updateVelocity(progress);
-	psoCH->repairVelocityPre(this);
-	particleUpdateManager->updatePosition();
-	psoCH->repair(this);
+	std::vector<double> const oldV = v;
+	std::vector<double> const oldX = x;
+	int resamples = 0;
+
+	while(true){
+		particleUpdateManager->updateVelocity(progress);
+		psoCH->repairVelocityPre(this);
+		particleUpdateManager->updatePosition();
+		if (psoCH->resample(this, resamples)){
+			x = oldX; // reset position and velocity
+			v = oldV;
+			resamples++;
+		} else 
+			break;
+	}
+	psoCH->repair(this); // Generic repair
 }
 
 double Particle::getGbest() const {

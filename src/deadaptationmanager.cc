@@ -41,7 +41,7 @@ void JADEManager::update(){
 }
 
 void JADEManager::nextF(std::vector<double>& Fs){
-	int third = Fs.size()/3;
+	unsigned int third = Fs.size()/3;
 	std::vector<double> indices(Fs.size());
 	std::iota(indices.begin(), indices.end(), 0);
 	rng.shuffle(indices.begin(), indices.end());

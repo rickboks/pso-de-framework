@@ -216,9 +216,8 @@ void PSODE::runAsynchronous(int const evalBudget,
 		adaptationManager->nextCr(Crs);
 		adaptationManager->reset();
 		
-		for (int i = 0; i < popSize; i++){
-			double y = particles[i]->evaluate(problem,logger);
-		}
+		for (int i = 0; i < popSize; i++)			
+			particles[i]->evaluate(problem,logger);
 
 		p0 = copyPopulation(particles);
 		

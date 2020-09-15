@@ -63,7 +63,7 @@ void PSODE2::runAsynchronous(int const evalBudget, int const popSize, std::map<i
 
 
 	deCH = new ResamplingRepair(smallest, largest);
-	psoCH = new HyperbolicRepair(smallest, largest);
+	psoCH = new ResamplingRepair(smallest, largest);
 
 	ParticleUpdateSettings settings(config.update, particleUpdateParams, psoCH);
 	mutationManager = MutationManager::createMutationManager(config.mutation, D, deCH);
@@ -116,15 +116,12 @@ void PSODE2::runAsynchronous(int const evalBudget, int const popSize, std::map<i
 		//
 		std::vector<Particle*> donors = mutationManager->mutate(dePop, Fs);
 
-		for (Particle* const p : donors) 
-			deCH->repair(p); // generic repair
-
 		// Perform crossover
 		std::vector<Particle*> trials = crossoverManager->crossover(dePop, donors, Crs);
 
 		for (Particle* const d : donors) delete d;
 
-		for (int i = 0; i < dePop.size(); i++){
+		for (unsigned int i = 0; i < dePop.size(); i++){
 			//Evaluate the parent vector
 			dePop[i]->evaluate(problem,logger);
 
@@ -183,10 +180,10 @@ void PSODE2::share(){
 void PSODE2::logPositions(){
 	if (logging){
 		std::cout << "LOGGER: " << std::endl;
-		for (int i = 0; i < particles.size(); i++){
+		for (unsigned int i = 0; i < particles.size(); i++){
 			std::cout << "LOGGER: ";
 			std::vector<double> position = particles[i]->getX();
-			for (int j = 0; j < position.size()-1 ; j++){
+			for (unsigned int j = 0; j < position.size()-1 ; j++){
 				std::cout << position[j] << " ";
 			}
 			std::cout << position[position.size()-1] << std::endl;

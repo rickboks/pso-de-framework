@@ -60,6 +60,13 @@ void WrappingRepair::repair(Particle* const p) const{
 	}
 }
 
+ResamplingRepair::ResamplingRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
+bool ResamplingRepair::resample(Particle const* const p, int const resamples) const{
+	if (resamples >= 100 || isFeasible(p))
+		return false;
+	return true;
+}
+
 // Differential Evolution
 RandBaseRepair::RandBaseRepair(std::vector<double>const lb, std::vector<double>const ub): RepairHandler(lb, ub){}
 void RandBaseRepair::repair(Particle* const p, Particle const* const base, Particle const* const target) const{
@@ -130,17 +137,10 @@ void ProjectionMidpointRepair::repair(Particle* const p, Particle const* const b
 
 }
 
-ResamplingRepair::ResamplingRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
-bool ResamplingRepair::resample(Particle const* const p, int const resamples) const{
-	if (resamples >= 100 || isFeasible(p))
-		return false;
-	return true;
-}
-
 ProjectionBaseRepair::ProjectionBaseRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
 void ProjectionBaseRepair::repair(Particle* const p, Particle const* const base, Particle const* const target) const{
 	std::vector<double> x = p->getX();
-	std::vector<double>alphas(D+1);
+	std::vector<double> alphas(D+1);
 	alphas[D] = 1;
 
 	for (int i = 0; i < D; i++){
@@ -166,8 +166,8 @@ void ProjectionBaseRepair::repair(Particle* const p, Particle const* const base,
 HyperbolicRepair::HyperbolicRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
 void HyperbolicRepair::repairVelocityPre(Particle * const p) const{
 	for (int i = 0; i < D; i++){
-		double center = (lb[i] + ub[i])/2;
-		double v = p->getV(i);
+		double const center = (lb[i] + ub[i])/2;
+		double const v = p->getV(i);
 		if (v > center){
 			p->setV(i, v / (1 + std::fabs(v / (ub[i] - p->getX(i)))));
 		} else {

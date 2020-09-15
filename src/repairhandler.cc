@@ -163,7 +163,6 @@ void ProjectionBaseRepair::repair(Particle* const p, Particle const* const base,
 }
 
 // Particle Swarm Optimization
-
 HyperbolicRepair::HyperbolicRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
 void HyperbolicRepair::repairVelocityPre(Particle * const p) const{
 	for (int i = 0; i < D; i++){
@@ -175,4 +174,14 @@ void HyperbolicRepair::repairVelocityPre(Particle * const p) const{
 			p->setV(i, v / (1 + std::fabs(v / (p->getX(i) - lb[i]))));
 		}
 	}
+}
+
+PBestDimRepair::PBestDimRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
+void PBestDimRepair::repair(Particle* const p) const {
+	for (int i = 0; i < D; i++){
+		if (p->getX(i) < lb[i] || p->getX(i) > ub[i]){
+			p->setX(i, p->getP(i));
+			p->setV(i,0.0);
+		}
+	}	
 }

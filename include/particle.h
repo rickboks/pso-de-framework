@@ -43,6 +43,7 @@ class Particle {
 		double getPbest() const;
 		std::vector<double> getG() const;
 		std::vector<double> getP() const;
+		double getP(int const i) const;
 		void updatePbest();
 		void updateGbest();
 		void updateVelocityAndPosition(double const progress);

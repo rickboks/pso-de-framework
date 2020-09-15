@@ -83,3 +83,9 @@ class HyperbolicRepair : public RepairHandler {
 		HyperbolicRepair(std::vector<double> const lb, std::vector<double> const ub);
 		void repairVelocityPre(Particle * const p) const;
 };
+
+class PBestDimRepair : public RepairHandler {
+	public:
+		PBestDimRepair(std::vector<double> const lb, std::vector<double> const ub);
+		void repair(Particle * const p) const;
+};

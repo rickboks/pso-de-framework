@@ -86,6 +86,10 @@ double Particle::getPbest() const {
 	return pbest;
 }
 
+double Particle::getP(int const i) const {
+	return p[i];
+}
+
 std::vector<double> Particle::getG() const {
 	return g;
 }

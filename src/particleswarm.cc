@@ -5,6 +5,7 @@
 #include "topologymanager.h"
 #include "particleupdatesettings.h"
 #include "instancenamer.h"
+#include "repairhandler.h"
 #include <limits>
 #include <iostream>
 #include <fstream>
@@ -26,6 +27,8 @@ void ParticleSwarm::reset(){
 		delete particle;
 
 	particles.clear();
+
+	delete psoCH;
 }
 
 ParticleSwarm::~ParticleSwarm(){
@@ -60,11 +63,12 @@ void ParticleSwarm::runAsynchronous(int const evalBudget,
 	std::vector<double> smallest = problem->IOHprofiler_get_lowerbound(); //??
 	std::vector<double> largest = problem->IOHprofiler_get_upperbound(); //??
 
-	ParticleUpdateSettings settings(updateManagerType, particleUpdateParams, smallest, largest);
+	psoCH = new HyperbolicRepair(smallest, largest); 
+	ParticleUpdateSettings settings(updateManagerType, particleUpdateParams, psoCH);
 
 	for (int i = 0; i < popSize; i++){
 		Particle* p = new Particle(D, settings);
-		p->randomize(settings.xMax, settings.xMin);
+		p->randomize(smallest, largest);
 		particles.push_back(p);
 	}
 
@@ -120,12 +124,12 @@ void ParticleSwarm::runSynchronous(int const evalBudget, int popSize,
 	std::vector<double> smallest = problem->IOHprofiler_get_lowerbound(); //??
 	std::vector<double> largest = problem->IOHprofiler_get_upperbound(); //??
 
-	ParticleUpdateSettings settings(updateManagerType, particleUpdateParams, 
-				smallest, largest);
+	ConstraintHandler* psoCH = new HyperbolicRepair(smallest, largest); 
+	ParticleUpdateSettings settings(updateManagerType, particleUpdateParams, psoCH);
 
 	for (int i = 0; i < popSize; i++){
 		Particle* p = new Particle(D, settings);
-		p->randomize(settings.xMax, settings.xMin);
+		p->randomize(smallest, largest);
 		particles.push_back(p);
 	}
 

@@ -8,8 +8,6 @@ class RepairHandler : public ConstraintHandler {
 	public:
 		virtual ~RepairHandler();
 		RepairHandler(std::vector<double> const lb, std::vector<double> const ub); 
-		virtual void repair(Particle* const p) const; //Generic repair
-		virtual void repair(Particle* const p, Particle const* const base, Particle const* const target) const; //DE mutation repair
 };   
 
 class ReinitializationRepair : public RepairHandler {
@@ -77,4 +75,11 @@ class ResamplingRepair : public RepairHandler {
 	public:
 		ResamplingRepair(std::vector<double> const lb, std::vector<double> const ub);
 		bool resample(Particle const* const p, int const resamples) const;
+};
+
+// Particle Swarm Optimization
+class HyperbolicRepair : public RepairHandler {
+	public:
+		HyperbolicRepair(std::vector<double> const lb, std::vector<double> const ub);
+		void repairVelocityPre(Particle * const p) const;
 };

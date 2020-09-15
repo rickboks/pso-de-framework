@@ -13,28 +13,28 @@
 
 Particle::Particle(int const D, ParticleUpdateSettings& particleUpdateSettings)
 	: x(D), v(D), p(D), g(D), pbest(std::numeric_limits<double>::max()), gbest(std::numeric_limits<double>::max()), evaluated(false),
-		settings(particleUpdateSettings), vMax(particleUpdateSettings.vMax), D(D), isPSO(true){
+		settings(particleUpdateSettings), psoCH(settings.psoCH), D(D), isPSO(true){
 
 	particleUpdateManager = ParticleUpdateManager::createParticleUpdateManager(x,v,p,g,particleUpdateSettings,neighborhood);
 }
 
 Particle::Particle(const Particle& other)
-: 	x(other.x), v(other.v), p(other.p), g(other.g),
+	: x(other.x), v(other.v), p(other.p), g(other.g),
 	pbest(other.pbest), gbest(other.gbest), evaluated(other.evaluated), 
 	fitness(other.fitness), neighborhood(other.neighborhood),
-	settings(other.settings), vMax(other.vMax), D(other.D), isPSO(other.isPSO){
+	settings(other.settings), psoCH(other.psoCH), D(other.D), isPSO(other.isPSO){
 
 	particleUpdateManager = ParticleUpdateManager::createParticleUpdateManager(x,v,p,g,settings,neighborhood);
 }
 
 //for DE
 Particle::Particle(int const D)
-	: x(D), evaluated(false), fitness(std::numeric_limits<double>::max()), particleUpdateManager(NULL), D(D), isPSO(false){
+	: x(D), evaluated(false), fitness(std::numeric_limits<double>::max()), particleUpdateManager(NULL), psoCH(NULL), D(D),  isPSO(false){
 }
 
 //When using this construtor, note that only the position is initialized
 Particle::Particle(std::vector<double> x)
-: 	x(x), evaluated(false), fitness(std::numeric_limits<double>::max()), particleUpdateManager(NULL), D(x.size()), isPSO(false){
+	: x(x), evaluated(false), fitness(std::numeric_limits<double>::max()), particleUpdateManager(NULL),psoCH(NULL),D(x.size()),isPSO(false){
 }
 
 Particle::~Particle(){
@@ -72,7 +72,10 @@ void Particle::removeAllNeighbors(){
 
 void Particle::updateVelocityAndPosition(double progress){
 	evaluated = false;
-	particleUpdateManager->update(progress);
+	particleUpdateManager->updateVelocity(progress);
+	psoCH->repairVelocityPre(this);
+	particleUpdateManager->updatePosition();
+	psoCH->repair(this);
 }
 
 double Particle::getGbest() const {

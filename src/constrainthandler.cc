@@ -1,18 +1,21 @@
 #include "constrainthandler.h"
 #include "particle.h"
 
-ConstraintHandler::ConstraintHandler(std::vector<double> lb,std::vector<double> ub)
+ConstraintHandler::ConstraintHandler(std::vector<double>const lb,std::vector<double>const ub)
 : lb(lb), ub(ub), D(lb.size()){}
 
 ConstraintHandler::~ConstraintHandler(){}
 
 void ConstraintHandler::repair(Particle* const p, Particle const* const base, Particle const* const target) const{}
+
 void ConstraintHandler::repair(Particle* const p) const{}
+
 bool ConstraintHandler::resample(Particle const * const p, int const resamples) const{
 	return false;
 }
+void ConstraintHandler::repairVelocityPre(Particle* const p) const{}
 
-void ConstraintHandler::repairVelocity(Particle* const p, int const i) const{
+void ConstraintHandler::repairVelocityPost(Particle* const p, int const i) const{
 	if (p->isPSO) p->setV(i, -0.5 * p->getV(i));
 }
 

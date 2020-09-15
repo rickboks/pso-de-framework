@@ -21,7 +21,7 @@ class Particle {
 		std::vector<Particle*> neighborhood;
 		ParticleUpdateManager* particleUpdateManager;
 		ParticleUpdateSettings settings;
-		std::vector<double> vMax;		
+		ConstraintHandler const * const psoCH;
 	public:
 		int const D;
 		bool const isPSO;

@@ -6,15 +6,13 @@
 
 RepairHandler::~RepairHandler(){}
 RepairHandler::RepairHandler(std::vector<double>const lb, std::vector<double>const ub) : ConstraintHandler(lb, ub){}
-void RepairHandler::repair(Particle* const p) const{}
-void RepairHandler::repair(Particle* const p, Particle const* const base, Particle const* const target) const{}
 
 ReinitializationRepair::ReinitializationRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
 void ReinitializationRepair::repair(Particle* const p) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i] || p->getX(i) > ub[i]){
 			p->setX(i, rng.randDouble(lb[i], ub[i]));
-			repairVelocity(p, i);
+			repairVelocityPost(p, i);
 		}
 	}
 }
@@ -24,10 +22,10 @@ void ProjectionRepair::repair(Particle* const p) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i]){
 			p->setX(i, lb[i]);
-			repairVelocity(p, i);
+			repairVelocityPost(p, i);
 		} else if (p->getX(i) > ub[i]){
 			p->setX(i, ub[i]);
-			repairVelocity(p, i);
+			repairVelocityPost(p, i);
 		}
 	}
 }
@@ -45,7 +43,7 @@ void ReflectionRepair::repair(Particle* const p) const{
 			is_repaired = true;
 		}
 		if (is_repaired)
-			repairVelocity(p, i);
+			repairVelocityPost(p, i);
 	}
 }
 
@@ -54,10 +52,10 @@ void WrappingRepair::repair(Particle* const p) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i]){
 			p->setX(i, ub[i] - std::fmod(lb[i] - p->getX(i), std::fabs(ub[i]-lb[i])));
-			repairVelocity(p,i);
+			repairVelocityPost(p,i);
 		} else if (p->getX(i) > ub[i]) {
 			p->setX(i, lb[i] - std::fmod(p->getX(i) - ub[i], std::fabs(ub[i]-lb[i])));
-			repairVelocity(p,i);
+			repairVelocityPost(p,i);
 		}
 	}
 }
@@ -161,5 +159,20 @@ void ProjectionBaseRepair::repair(Particle* const p, Particle const* const base,
 		scale(x, alpha);
 		add(x, b, x);
 		p->setX(x);
+	}
+}
+
+// Particle Swarm Optimization
+
+HyperbolicRepair::HyperbolicRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
+void HyperbolicRepair::repairVelocityPre(Particle * const p) const{
+	for (int i = 0; i < D; i++){
+		double center = (lb[i] + ub[i])/2;
+		double v = p->getV(i);
+		if (v > center){
+			p->setV(i, v / (1 + std::fabs(v / (ub[i] - p->getX(i)))));
+		} else {
+			p->setV(i, v / (1 + std::fabs(v / (p->getX(i) - lb[i]))));
+		}
 	}
 }

@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <vector>
 #include "particleupdatemanager.h"
+#include "constrainthandler.h"
 
 constexpr double INER_PHI1_DEFAULT = 1.49618;
 constexpr double INER_PHI2_DEFAULT = 1.49618;
@@ -37,31 +38,18 @@ enum Setting {
 };
 
 struct ParticleUpdateSettings {
-	ParticleUpdateSettings(UpdateManagerType const managerType, std::map<int, double> const parameters, 
-		std::vector<double> xMin, std::vector<double> xMax)
-		:managerType(managerType), parameters(parameters), xMin(xMin), xMax(xMax){
-			initVMax();
+	ParticleUpdateSettings(UpdateManagerType const managerType, std::map<int, double> const parameters, ConstraintHandler* psoCH)
+		:managerType(managerType), parameters(parameters), psoCH(psoCH){
 	};
 
 	ParticleUpdateSettings(const ParticleUpdateSettings & copy)
-	: managerType(copy.managerType), parameters(copy.parameters), xMin(copy.xMin), xMax(copy.xMax), vMax(copy.vMax) {
+	: managerType(copy.managerType), parameters(copy.parameters), psoCH(copy.psoCH){
 
 	}
 
-	ParticleUpdateSettings(){	
-
-	}
-
-	void initVMax(){
-		vMax.reserve(xMin.size());
-		for (int i = 0; i < (int)xMin.size(); i++){
-			vMax.push_back(xMax[i] - xMin[i]);
-		}
-	}
+	ParticleUpdateSettings(){}
 
 	UpdateManagerType managerType;
-	std::map<int, double> const parameters;
-	std::vector<double> xMin;
-	std::vector<double> xMax;
-	std::vector<double> vMax;
+	std::map<int, double> parameters;
+	ConstraintHandler* psoCH;
 };

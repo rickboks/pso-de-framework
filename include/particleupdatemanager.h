@@ -3,13 +3,13 @@
 #include <map>
 #include <random>
 
-class ParticleUpdateSettings;
+class ConstraintHandler;
+struct ParticleUpdateSettings;
 class Particle;
 
 enum UpdateManagerType {
 	INERTIA_WEIGHT,
 	DECR_INERTIA_WEIGHT,
-	VMAX,
 	CONSTRICTION_COEFFICIENT,
 	FIPS,
 	BARE_BONES,
@@ -23,24 +23,21 @@ class ParticleUpdateManager {
 		std::vector<double> & p;
 		std::vector<double> & g;
 		int const D;
-		std::vector<double> const vMax;
-		bool const useVMax;
-		void applyVMax();
-		void updatePosition();
 	public:
 		ParticleUpdateManager(std::vector<double>& x, std::vector<double>& v,
-			std::vector<double> & p, std::vector<double>& g, std::vector<double> const vMax);
+			std::vector<double> & p, std::vector<double>& g);
 		virtual ~ParticleUpdateManager();
 
 		//This constructor is used for ParticleUpdateManagers that do not use a 
 		//velocity vector.
-		ParticleUpdateManager(std::vector<double>& x, std::vector<double> & p, std::vector<double>& g, std::vector<double> const vMax);
+		ParticleUpdateManager(std::vector<double>& x, std::vector<double> & p, std::vector<double>& g);
 
 		static ParticleUpdateManager* createParticleUpdateManager(std::vector<double>& x, 
 			std::vector<double>& v,	std::vector<double> & p, std::vector<double>& g, 
 			ParticleUpdateSettings const settings, std::vector<Particle*>& neighborhood);
 
-		virtual void update(double progress) = 0;
+		virtual void updateVelocity(double progress) = 0;
+		void updatePosition();
 };
 
 class InertiaWeightManager : public ParticleUpdateManager{
@@ -51,8 +48,8 @@ class InertiaWeightManager : public ParticleUpdateManager{
 
 	public:
 		InertiaWeightManager(std::vector<double>& x, std::vector<double>& v,
-			std::vector<double> & p, std::vector<double>& g, std::map<int, double> paramaters, std::vector<double> const vMax);
-		void update (double progress);
+			std::vector<double> & p, std::vector<double>& g, std::map<int, double> paramaters);
+		void updateVelocity(double progress);
 };
 
 class DecrInertiaWeightManager : public ParticleUpdateManager {
@@ -65,22 +62,9 @@ class DecrInertiaWeightManager : public ParticleUpdateManager {
 
 	public:
 		DecrInertiaWeightManager(std::vector<double>& x, std::vector<double>& v,
-			std::vector<double> & p, std::vector<double>& g, std::map<int, double> paramaters, std::vector<double> const vMax);
-		void update (double progress);
+			std::vector<double> & p, std::vector<double>& g, std::map<int, double> paramaters);
+		void updateVelocity(double progress);
 
-};
-
-class VmaxManager : public ParticleUpdateManager {
-	private:		
-		double const phi1;
-		double const phi2;
-	public:
-
-		VmaxManager(std::vector<double> & x, std::vector<double> & v,
-			std::vector<double> & p, std::vector<double> & g, 
-			std::map<int, double> paramaters, std::vector<double> const vMax);
-
-		void update(double progress);
 };
 
 class ConstrictionCoefficientManager : public ParticleUpdateManager {
@@ -91,10 +75,9 @@ class ConstrictionCoefficientManager : public ParticleUpdateManager {
 	public: 
 
 		ConstrictionCoefficientManager(std::vector<double> & x, std::vector<double> & v,
-			std::vector<double> & p, std::vector<double> & g, 
-			std::map<int, double> paramaters, std::vector<double> const vMax);
+			std::vector<double> & p, std::vector<double> & g, std::map<int, double> paramaters);
 
-		void update(double progress);
+		void updateVelocity(double progress);
 };
 
 class FIPSManager : public ParticleUpdateManager {
@@ -105,8 +88,8 @@ class FIPSManager : public ParticleUpdateManager {
 	public:
 		FIPSManager(std::vector<double> & x, std::vector<double> & v,
 			std::vector<double> & p, std::vector<double> & g, 
-			std::map<int, double> paramaters, std::vector<Particle*>& neighborhood, std::vector<double> const vMax);
-		void update(double progress);
+			std::map<int, double> paramaters, std::vector<Particle*>& neighborhood);
+		void updateVelocity(double progress);
 };
 
 
@@ -116,7 +99,6 @@ class BareBonesManager : public ParticleUpdateManager {
 		
 	public: 
 		BareBonesManager(std::vector<double> & x, std::vector<double> & v,
-			std::vector<double> & p, std::vector<double> & g, 
-			std::map<int, double> paramaters, std::vector<double> const vMax);
-		void update(double progress);
+			std::vector<double> & p, std::vector<double> & g, std::map<int, double> paramaters);
+		void updateVelocity(double progress);
 };

@@ -23,7 +23,6 @@ std::string InstanceNamer::updateID(UpdateManagerType const update){
 	switch (update){
 		case UpdateManagerType::INERTIA_WEIGHT: return "I";
 		case UpdateManagerType::DECR_INERTIA_WEIGHT: return "D";
-		case UpdateManagerType::VMAX: return "V";
 		case UpdateManagerType::CONSTRICTION_COEFFICIENT: return "C";
 		case UpdateManagerType::FIPS: return "F";
 		case UpdateManagerType::BARE_BONES: return "B";

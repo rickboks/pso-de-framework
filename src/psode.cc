@@ -84,22 +84,20 @@ void PSODE::runSynchronous(int const evalBudget, int popSize,
 	std::vector<double> smallest = problem->IOHprofiler_get_lowerbound();
 	std::vector<double> largest = problem->IOHprofiler_get_upperbound();
 
-	ParticleUpdateSettings settings(config.update, particleUpdateParams, 
-				smallest, largest);
+	deCH = new MidpointBaseRepair(smallest, largest);
+	psoCH = new ReinitializationRepair(smallest, largest);
+
+	ParticleUpdateSettings settings(config.update, particleUpdateParams, psoCH);
 
 	for (int i = 0; i < popSize; i++)
 		particles.push_back(new Particle(D, settings));
 
 	for (Particle* const p : particles)
-		p->randomize(settings.xMax, settings.xMin);
+		p->randomize(smallest, largest);
 	for (Particle* const p : particles)
 		p->updateGbest();
 
 	topologyManager->initialize();
-
-
-	deCH = new MidpointBaseRepair(smallest, largest);
-	psoCH = new ReinitializationRepair(smallest, largest);
 
 	mutationManager = MutationManager::createMutationManager(config.mutation, D, deCH);
 	crossoverManager = CrossoverManager::createCrossoverManager(config.crossover, D);
@@ -190,13 +188,16 @@ void PSODE::runAsynchronous(int const evalBudget,
 	std::vector<double> smallest = problem->IOHprofiler_get_lowerbound();
 	std::vector<double> largest = problem->IOHprofiler_get_upperbound();
 
-	ParticleUpdateSettings settings(config.update, particleUpdateParams, smallest, largest);
+	deCH = new MidpointBaseRepair(smallest, largest);
+	psoCH = new ReinitializationRepair(smallest, largest);
+	
+	ParticleUpdateSettings settings(config.update, particleUpdateParams, psoCH);
 
 	for (int i = 0; i < popSize; i++)
 		particles.push_back(new Particle(D, settings));
 
 	for (Particle* const p : particles)
-		p->randomize(settings.xMax, settings.xMin);
+		p->randomize(smallest, largest);
 
 	topologyManager->initialize();
 	mutationManager = MutationManager::createMutationManager(config.mutation, D, deCH);

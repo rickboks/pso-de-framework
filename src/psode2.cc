@@ -61,11 +61,11 @@ void PSODE2::runAsynchronous(int const evalBudget, int const popSize, std::map<i
 	std::vector<double> smallest = problem->IOHprofiler_get_lowerbound();
 	std::vector<double> largest = problem->IOHprofiler_get_upperbound();
 
-	ParticleUpdateSettings settings(config.update, particleUpdateParams, smallest, largest);
 
 	deCH = new ResamplingRepair(smallest, largest);
-	psoCH = new DeathPenalty(smallest, largest);
+	psoCH = new HyperbolicRepair(smallest, largest);
 
+	ParticleUpdateSettings settings(config.update, particleUpdateParams, psoCH);
 	mutationManager = MutationManager::createMutationManager(config.mutation, D, deCH);
 	crossoverManager = CrossoverManager::createCrossoverManager(config.crossover, D);
 	adaptationManager = DEAdaptationManager::createDEAdaptationManager(config.adaptation);
@@ -80,7 +80,7 @@ void PSODE2::runAsynchronous(int const evalBudget, int const popSize, std::map<i
 	particles.insert(particles.end(), dePop.begin(), dePop.end());
 
 	for (Particle* const p : particles)
-		p->randomize(settings.xMax, settings.xMin);
+		p->randomize(smallest, largest);
 
 	for (Particle* const p : particles)
 		p->evaluate(problem, logger);
@@ -109,7 +109,6 @@ void PSODE2::runAsynchronous(int const evalBudget, int const popSize, std::map<i
 			p->updatePbest();
 			p->updateGbest();
 			p->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));			
-			psoCH->repair(p); // generic repair
 			p->evaluate(problem,logger);
 		}
 
@@ -118,7 +117,7 @@ void PSODE2::runAsynchronous(int const evalBudget, int const popSize, std::map<i
 		std::vector<Particle*> donors = mutationManager->mutate(dePop, Fs);
 
 		for (Particle* const p : donors) 
-			psoCH->repair(p); // generic repair
+			deCH->repair(p); // generic repair
 
 		// Perform crossover
 		std::vector<Particle*> trials = crossoverManager->crossover(dePop, donors, Crs);

@@ -24,7 +24,7 @@ class PSODE : public HybridAlgorithm {
 		PSODE(UpdateManagerType const updateManagerType, 
 			Topology topologyManager, Synchronicity const synchronous, 
 			MutationType const mutationType, CrossoverType const crossoverType, 
-			SelectionType const selection, DEAdaptationType adaptionType);
+			SelectionType const selection, DEAdaptationType adaptionType, std::string const psoCH, std::string const deCH);
 
 		PSODE(hybrid_config);
 

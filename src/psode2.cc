@@ -1,5 +1,6 @@
 #include <IOHprofiler_problem.h>
 #include <IOHprofiler_csv_logger.h>
+#include "constrainthandler.h"
 #include "hybridalgorithm.h"
 #include "repairhandler.h"
 #include "particle.h"
@@ -16,9 +17,9 @@
 
 PSODE2::PSODE2(UpdateManagerType const updateManagerType, 
 	Topology topologyManagerType, Synchronicity const synchronicity, MutationType const mutationType, 
-	CrossoverType const crossoverType, SelectionType const selection,DEAdaptationType const adaptionType):
-		HybridAlgorithm(updateManagerType, topologyManagerType, synchronicity, 
-			mutationType, crossoverType, selection, adaptionType){}
+	CrossoverType const crossoverType, SelectionType const selection,DEAdaptationType const adaptionType, std::string const psoCH, std::string const deCH)
+		: HybridAlgorithm(updateManagerType, topologyManagerType, synchronicity, 
+			mutationType, crossoverType, selection, adaptionType, psoCH, deCH){}
 
 PSODE2::PSODE2(hybrid_config const config):
 		HybridAlgorithm(config){
@@ -61,9 +62,8 @@ void PSODE2::runAsynchronous(int const evalBudget, int const popSize, std::map<i
 	std::vector<double> smallest = problem->IOHprofiler_get_lowerbound();
 	std::vector<double> largest = problem->IOHprofiler_get_upperbound();
 
-
-	deCH = new ResamplingRepair(smallest, largest);
-	psoCH = new ResamplingRepair(smallest, largest);
+	deCH = deCHs.at(config.deCH)(smallest,largest);
+	psoCH = psoCHs.at(config.psoCH)(smallest,largest);
 
 	ParticleUpdateSettings settings(config.update, particleUpdateParams, psoCH);
 	mutationManager = MutationManager::createMutationManager(config.mutation, D, deCH);

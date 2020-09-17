@@ -15,9 +15,10 @@
 
 PSODE::PSODE(UpdateManagerType const updateManagerType, 
 	Topology topologyManagerType, Synchronicity const synchronicity, MutationType const mutationType, 
-	CrossoverType const crossoverType, SelectionType selection,DEAdaptationType adaptionType):
-		HybridAlgorithm(updateManagerType, topologyManagerType, synchronicity, 
-			mutationType, crossoverType, selection, adaptionType){
+	CrossoverType const crossoverType, SelectionType const selection,DEAdaptationType const adaptionType,
+	std::string const psoCH, std::string const deCH)
+	: HybridAlgorithm(updateManagerType, topologyManagerType, synchronicity, 
+			mutationType, crossoverType, selection, adaptionType, psoCH, deCH){
 }
 
 PSODE::PSODE(hybrid_config config):

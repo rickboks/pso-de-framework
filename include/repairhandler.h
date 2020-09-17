@@ -1,6 +1,8 @@
 #pragma once
+#include <functional>
 #include <vector>
 #include "constrainthandler.h"
+
 
 class Particle;
 
@@ -34,6 +36,11 @@ class WrappingRepair : public RepairHandler {
 		void repair(Particle* const p) const;
 };
 
+class ResamplingRepair : public RepairHandler {
+	public:
+		ResamplingRepair(std::vector<double> const lb, std::vector<double> const ub);
+		bool resample(Particle const* const p, int const resamples) const;
+};
 // Differential Evolution
 class RandBaseRepair : public RepairHandler {
 	public:
@@ -69,12 +76,6 @@ class ProjectionBaseRepair: public RepairHandler {
 	public:
 		ProjectionBaseRepair(std::vector<double> const lb, std::vector<double> const ub);
 		void repair(Particle* const p, Particle const* const base, Particle const* const target) const;
-};
-
-class ResamplingRepair : public RepairHandler {
-	public:
-		ResamplingRepair(std::vector<double> const lb, std::vector<double> const ub);
-		bool resample(Particle const* const p, int const resamples) const;
 };
 
 // Particle Swarm Optimization

@@ -11,25 +11,22 @@
 //typedef std::tuple<UpdateManagerType, Topology, Synchronicity, MutationType, 
 	//CrossoverType, SelectionType, DEAdaptationType> hybrid_config;
 struct hybrid_config {
-	UpdateManagerType update;
-	Topology topology;
-	Synchronicity synchronicity;
-	MutationType mutation;
-	CrossoverType crossover;
-	SelectionType selection;
-	DEAdaptationType adaptation;
+	UpdateManagerType const update;
+	Topology const topology;
+	Synchronicity const synchronicity;
+	MutationType const mutation;
+	CrossoverType const crossover;
+	SelectionType const selection;
+	DEAdaptationType const adaptation;
+	std::string const psoCH, deCH;
 
-	hybrid_config( UpdateManagerType update, Topology topology,
+	hybrid_config(UpdateManagerType update, Topology topology,
 		Synchronicity synchronicity, MutationType mutation,
-		CrossoverType crossover, SelectionType selection, DEAdaptationType adaptation){
-		
-		this->update = update;
-		this->topology = topology;
-		this->synchronicity = synchronicity;
-		this->mutation = mutation;
-		this->crossover = crossover;
-		this->selection = selection;
-		this->adaptation = adaptation;
+		CrossoverType crossover, SelectionType selection, DEAdaptationType adaptation,
+		std::string psoCH, std::string deCH):
+		update(update), topology(topology), synchronicity(synchronicity),
+		mutation(mutation), crossover(crossover), selection(selection),
+		adaptation(adaptation), psoCH(psoCH), deCH(deCH){
 	}
 };
 
@@ -50,7 +47,7 @@ class HybridAlgorithm {
 		HybridAlgorithm(UpdateManagerType const updateManagerType, 
 			Topology topologyManager, Synchronicity const synchronous, 
 			MutationType const mutationType, CrossoverType const crossoverType, 
-			SelectionType const selection, DEAdaptationType adaptionType);
+			SelectionType const selection, DEAdaptationType const adaptionType, std::string const psoCH, std::string const deCH);
 
 		HybridAlgorithm(hybrid_config config);
 

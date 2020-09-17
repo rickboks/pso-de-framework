@@ -23,17 +23,17 @@ void algorithm
 }
 
 void _run_experiment(bool log) {
-    psode2 = new PSODE2(INERTIA_WEIGHT, VON_NEUMANN, ASYNCHRONOUS, TTB_1, BINOMIAL, P3, JADE);
-    psode = new PSODE(INERTIA_WEIGHT, VON_NEUMANN, ASYNCHRONOUS, TTB_1, BINOMIAL, P3, JADE);
-    pso = new ParticleSwarm(INERTIA_WEIGHT, VON_NEUMANN, ASYNCHRONOUS);
-	de = new DifferentialEvolution(TTB_1, BINOMIAL, JADE);
+    psode2 = new PSODE2(INERTIA_WEIGHT, VON_NEUMANN, ASYNCHRONOUS, TTB_1, BINOMIAL, P3, JADE, "resampling", "resampling");
+    //psode = new PSODE(INERTIA_WEIGHT, VON_NEUMANN, ASYNCHRONOUS, TTB_1, BINOMIAL, P3, JADE);
+    //pso = new ParticleSwarm(INERTIA_WEIGHT, LBEST, ASYNCHRONOUS);
+	//de = new DifferentialEvolution(TTB_1, BINOMIAL, JADE);
 
     if (log)
 		pso->enableLogging();
 
     std::string configName = "./configuration.ini";
     IOHprofiler_experimenter<double> experimenter(configName,algorithm); 
-    experimenter._set_independent_runs(10);
+    experimenter._set_independent_runs(1);
     experimenter._run();
     delete pso;
 	delete de;

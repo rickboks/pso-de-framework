@@ -1,5 +1,8 @@
 #include "constrainthandler.h"
 #include "particle.h"
+#include "repairhandler.h"
+#include "penaltyhandler.h"
+#define LC(X) [](std::vector<double>lb, std::vector<double>ub){return new X(lb,ub);}
 
 ConstraintHandler::ConstraintHandler(std::vector<double>const lb,std::vector<double>const ub)
 : lb(lb), ub(ub), D(lb.size()){}
@@ -28,6 +31,37 @@ bool ConstraintHandler::isFeasible(Particle const * const p) const{
 	return true;
 }
 
+std::map<std::string, std::function<ConstraintHandler* (std::vector<double>, std::vector<double>)>> const psoCHs ({
+		// Generic
+		{"reinitialization", LC(ReinitializationRepair)},
+		{"projection", LC(ProjectionRepair)},
+		{"reflection", LC(ReflectionRepair)},
+		{"wrapping", LC(WrappingRepair)},
+		{"death penalty", LC(DeathPenalty)},
+		{"resampling", LC(ResamplingRepair)},
+
+		// PSO
+		{"hyperbolic", LC(HyperbolicRepair)},
+		{"pbest", LC(PBestDimRepair)},
+});
+
+std::map<std::string, std::function<ConstraintHandler* (std::vector<double>, std::vector<double>)>> const deCHs ({
+		// Generic
+		{"reinitialization", LC(ReinitializationRepair)},
+		{"projection", LC(ProjectionRepair)},
+		{"reflection", LC(ReflectionRepair)},
+		{"wrapping", LC(WrappingRepair)},
+		{"death penalty", LC(DeathPenalty)},
+		{"resampling", LC(ResamplingRepair)},
+
+		// DE
+		{"rand base", LC(RandBaseRepair)},
+		{"midpoint base", LC(MidpointBaseRepair)},
+		{"midpoint target", LC(MidpointTargetRepair)},
+		{"conservatism", LC(ConservatismRepair)},
+		{"projection midpoint", LC(ProjectionMidpointRepair)},
+		{"projection base", LC(ProjectionBaseRepair)},
+});
 
 //GenericConstraintHandler::GenericConstraintHandler(std::vector<double> lb,std::vector<double> ub)
 //: ConstraintHandler(lb,ub){}

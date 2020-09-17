@@ -16,7 +16,7 @@ ParticleSwarm::ParticleSwarm(UpdateManagerType const updateManagerType,
 	updateManagerType(updateManagerType),
 	topologyManagerType(topologyManagerType), topologyManager(NULL), synchronicity(synchronicity){
 
-	logging = false;
+	logging = true;
 }
 
 void ParticleSwarm::reset(){
@@ -120,9 +120,9 @@ void ParticleSwarm::runSynchronous(int const evalBudget, int popSize,
 	this->topologyManager = TopologyManager::createTopologyManager(topologyManagerType, particles);
 	popSize = this->topologyManager->getClosestValidPopulationSize(popSize);
 
-	int const D = problem->IOHprofiler_get_number_of_variables(); /// dimension
-	std::vector<double> smallest = problem->IOHprofiler_get_lowerbound(); //??
-	std::vector<double> largest = problem->IOHprofiler_get_upperbound(); //??
+	int const D = problem->IOHprofiler_get_number_of_variables(); 
+	std::vector<double> smallest = problem->IOHprofiler_get_lowerbound(); 
+	std::vector<double> largest = problem->IOHprofiler_get_upperbound(); 
 
 	ConstraintHandler* psoCH = new HyperbolicRepair(smallest, largest); 
 	ParticleUpdateSettings settings(updateManagerType, particleUpdateParams, psoCH);
@@ -190,22 +190,21 @@ void ParticleSwarm::enableLogging(){
 }
 
 void ParticleSwarm::logStart(){
-	if (logging){
-		std::cout << "START" << std::endl;
+	if (logging)
+		std::cout << "LOGGER: START" << std::endl;
 		// TODO: information about run
-	}
 }
 
 void ParticleSwarm::logEnd(){
-	if (logging){
-		std::cout << "END" << std::endl;
-	}
+	if (logging)
+		std::cout << "LOGGER: END" << std::endl;
 }
 
 void ParticleSwarm::logPositions(){
 	if (logging){
-		std::cout << std::endl;
+		std::cout << "LOGGER: " << std::endl;
 		for (unsigned int i = 0; i < particles.size(); i++){
+			std::cout << "LOGGER: ";
 			std::vector<double> position = particles[i]->getX();
 			for (unsigned int j = 0; j < position.size()-1 ; j++){
 				std::cout << position[j] << " ";

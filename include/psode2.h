@@ -31,7 +31,7 @@ class PSODE2 : public HybridAlgorithm {
 		PSODE2(UpdateManagerType const updateManagerType, 
 			Topology topologyManager, Synchronicity const synchronous, 
 			MutationType const mutationType, CrossoverType const crossoverType, 
-			SelectionType const selection, DEAdaptationType const adaptionType);
+			SelectionType const selection, DEAdaptationType const adaptionType, std::string const psoCH, std::string const deCH);
 
 		PSODE2(hybrid_config const config);
 

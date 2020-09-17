@@ -18,6 +18,7 @@ class ConstraintHandler {
 		std::vector<double> const ub;
 		int const D;
 	public:
+		std::string shorthand;
 		ConstraintHandler(std::vector<double>const lb,std::vector<double>const ub);
 		virtual ~ConstraintHandler();
 		virtual void repair(Particle* const p) const;// Generic constraint handler

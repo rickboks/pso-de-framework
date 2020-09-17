@@ -16,6 +16,7 @@ class CrossoverManager {
 	protected:
 		int const D;
 	public:
+		std::string shorthand;
 		CrossoverManager(int const D);
 		virtual ~CrossoverManager();
 
@@ -24,9 +25,9 @@ class CrossoverManager {
 
 		virtual std::vector<double> singleCrossover(std::vector<double>const& target, 
 			std::vector<double>const& donor, double const Cr) =0;
-
-		static CrossoverManager* createCrossoverManager(CrossoverType const crossoverType, int const D);
 };
+
+extern std::map<std::string, std::function<CrossoverManager* (int const)>> const crossovers;
 
 class BinomialCrossoverManager : public CrossoverManager {
 	public:

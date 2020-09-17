@@ -1,11 +1,9 @@
 #pragma once
 #include <vector>
 #include <set>
+#include <map>
+#include <functional>
 #include <stdexcept>
-
-enum DEAdaptationType {
-	JADE, NO, DEA_END
-};
 
 class DEAdaptationManager {
 protected:
@@ -15,6 +13,7 @@ protected:
 	std::vector<double> previousFs;
 	std::vector<double> previousCrs;
 public:
+	std::string shorthand;
 	virtual ~DEAdaptationManager(){};
 	virtual void successfulIndex(int i)=0;
 	virtual void succesfulValues(double F, double Cr)=0;
@@ -22,8 +21,9 @@ public:
 	virtual void nextCr(std::vector<double>& Crs)=0;
 	virtual void reset()=0;
 	virtual void update()=0;
-	static DEAdaptationManager* createDEAdaptationManager(DEAdaptationType type);
 };
+
+extern std::map<std::string, std::function<DEAdaptationManager*()>> const deAdaptations;
 
 class JADEManager : public DEAdaptationManager{
 private:

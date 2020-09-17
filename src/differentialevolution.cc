@@ -13,9 +13,8 @@
 #include <string>
 #include "repairhandler.h"
 
-DifferentialEvolution::DifferentialEvolution( MutationType const mutationType, CrossoverType const crossoverType, 
-	DEAdaptationType const adaptationType)
-	: mutationType(mutationType), crossoverType(crossoverType), adaptationType(adaptationType){
+DifferentialEvolution::DifferentialEvolution(DEConfig config)
+	: config(config){
 }
 
 void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > problem, 
@@ -37,11 +36,11 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > pr
 	std::vector<Particle*> donors;
 	std::vector<Particle*> trials;
 
-	deCH = new ReflectionRepair(problem->IOHprofiler_get_lowerbound(), problem->IOHprofiler_get_upperbound());
+	deCH = deCHs.at(config.constraintHandler)(problem->IOHprofiler_get_lowerbound(), problem->IOHprofiler_get_upperbound());
 
-	crossoverManager = CrossoverManager::createCrossoverManager(crossoverType, dimension);
-	mutationManager = MutationManager::createMutationManager(mutationType, dimension, deCH);
-	adaptationManager = DEAdaptationManager::createDEAdaptationManager(adaptationType);
+	crossoverManager = crossovers.at(config.crossover)(dimension);
+	mutationManager = mutations.at(config.mutation)(dimension, deCH);
+	adaptationManager = deAdaptations.at(config.adaptation)();
 
 	std::vector<double> Fs(popSize);
 	std::vector<double> Crs(popSize);

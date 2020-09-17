@@ -10,13 +10,9 @@
 #include <iostream>
 #include <fstream>
 
-ParticleSwarm::ParticleSwarm(UpdateManagerType const updateManagerType,
-	Topology topologyManagerType, Synchronicity const synchronicity):
-
-	updateManagerType(updateManagerType),
-	topologyManagerType(topologyManagerType), topologyManager(NULL), synchronicity(synchronicity){
-
-	logging = true;
+ParticleSwarm::ParticleSwarm(PSOConfig config)
+	: config(config), topologyManager(NULL){
+	logging = false;
 }
 
 void ParticleSwarm::reset(){
@@ -48,23 +44,23 @@ void ParticleSwarm::run(std::shared_ptr<IOHprofiler_problem<double> > problem,
 	this->problem=problem;
 	this->logger=logger;
 
-	if (synchronicity == SYNCHRONOUS)
+	if (config.synchronous)
 		runSynchronous(evalBudget, popSize, particleUpdateParams);
-	else if (synchronicity == ASYNCHRONOUS)
+	else 
 		runAsynchronous(evalBudget, popSize, particleUpdateParams);
 }
 
 void ParticleSwarm::runAsynchronous(int const evalBudget, 
 			int popSize, std::map<int,double> particleUpdateParams){
-	this->topologyManager = TopologyManager::createTopologyManager(topologyManagerType, particles);
+	this->topologyManager = topologies.at(config.topology)(particles);
 	popSize = this->topologyManager->getClosestValidPopulationSize(popSize);
 
-	int const D = problem->IOHprofiler_get_number_of_variables(); /// dimension
+	int const D = problem->IOHprofiler_get_number_of_variables(); 
 	std::vector<double> smallest = problem->IOHprofiler_get_lowerbound(); //??
 	std::vector<double> largest = problem->IOHprofiler_get_upperbound(); //??
 
-	psoCH = new HyperbolicRepair(smallest, largest); 
-	ParticleUpdateSettings settings(updateManagerType, particleUpdateParams, psoCH);
+	psoCH = psoCHs.at(config.constraintHandler)(smallest, largest); 
+	ParticleUpdateSettings settings(config.update, particleUpdateParams, psoCH);
 
 	for (int i = 0; i < popSize; i++){
 		Particle* p = new Particle(D, settings);
@@ -117,15 +113,15 @@ void ParticleSwarm::runAsynchronous(int const evalBudget,
 void ParticleSwarm::runSynchronous(int const evalBudget, int popSize, 
 			std::map<int,double> particleUpdateParams){
 
-	this->topologyManager = TopologyManager::createTopologyManager(topologyManagerType, particles);
+	this->topologyManager = topologies.at(config.topology)(particles);
 	popSize = this->topologyManager->getClosestValidPopulationSize(popSize);
 
 	int const D = problem->IOHprofiler_get_number_of_variables(); 
 	std::vector<double> smallest = problem->IOHprofiler_get_lowerbound(); 
 	std::vector<double> largest = problem->IOHprofiler_get_upperbound(); 
 
-	ConstraintHandler* psoCH = new HyperbolicRepair(smallest, largest); 
-	ParticleUpdateSettings settings(updateManagerType, particleUpdateParams, psoCH);
+	ConstraintHandler* psoCH = psoCHs.at(config.constraintHandler)(smallest, largest); 
+	ParticleUpdateSettings settings(config.update, particleUpdateParams, psoCH);
 
 	for (int i = 0; i < popSize; i++){
 		Particle* p = new Particle(D, settings);

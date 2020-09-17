@@ -5,13 +5,6 @@
 #include "topologymanager.h"
 #include <memory>
 
-
-enum Synchronicity {
-	SYNCHRONOUS,
-	ASYNCHRONOUS,
-	SYNC_END
-};
-
 struct Problem;
 class Particle;
 struct ParticleUpdateSettings;
@@ -19,14 +12,20 @@ template <typename T>
 class IOHprofiler_problem;
 class IOHprofiler_csv_logger;
 
+struct PSOConfig {
+	PSOConfig(std::string const update, std::string const topology, std::string constraintHandler, bool const synchronous) 
+	: update(update), topology(topology), constraintHandler(constraintHandler), synchronous(synchronous){}
+	std::string const update, topology, constraintHandler;
+	bool const synchronous;
+};
+
 class ParticleSwarm {
 	private:
-		UpdateManagerType const updateManagerType;
-		Topology topologyManagerType;
+		PSOConfig const config;
 		std::vector<Particle*> particles;
 		TopologyManager* topologyManager;
-		Synchronicity const synchronicity;
 		ConstraintHandler* psoCH;
+
 		std::shared_ptr<IOHprofiler_problem<double> > problem;
     	std::shared_ptr<IOHprofiler_csv_logger> logger;
 		bool logging;
@@ -36,9 +35,7 @@ class ParticleSwarm {
 		void runAsynchronous(int const evalBudget, int const popSize, 
     		std::map<int,double> particleUpdateParams);
 	public:
-		ParticleSwarm(UpdateManagerType const updateManagerType, 
-			Topology topologyManager, Synchronicity const synchronous);
-
+		ParticleSwarm(PSOConfig config);
 		~ParticleSwarm();
 
 		void run(std::shared_ptr<IOHprofiler_problem<double> > problem, 

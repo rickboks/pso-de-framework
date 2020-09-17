@@ -3,24 +3,17 @@
 #include "deadaptationmanager.h"
 #include <tuple>
 //BASE
-SelectionManager::SelectionManager(int const D, DEAdaptationManager* dam)
+SelectionManager::SelectionManager(int const D, DEAdaptationManager* const dam)
 : D(D), dam(dam){
 }
 
-SelectionManager* SelectionManager::createSelectionManager(SelectionType type, int const D, DEAdaptationManager* dam){
-	switch(type){
-		case P2:
-			return new Pairwise2SelectionManager(D, dam);
-		case P3:
-			return new Pairwise3SelectionManager(D, dam);
-		case U2:
-			return new Union2SelectionManager(D, dam);
-		case U3:
-			return new Union3SelectionManager(D, dam);
-		default:
-			throw std::invalid_argument("Error: Invalid DE mutation type");
-	}
-}
+#define LC(X) [](int const D, DEAdaptationManager* const adap){return new X(D,adap);}
+std::map<std::string, std::function<SelectionManager* (int const, DEAdaptationManager *const)>> const selections ({
+		{"p2", LC(Pairwise2SelectionManager)},
+		{"p2", LC(Pairwise3SelectionManager)},
+		{"u2", LC(Union2SelectionManager)},
+		{"u3", LC(Union3SelectionManager)},
+});
 
 void SelectionManager::selection(std::vector<Particle*>& particles, 
 		std::vector<Particle*>const& p0, std::vector<Particle*>const& p2){
@@ -37,7 +30,7 @@ void SelectionManager::selection(std::vector<Particle*>& particles,
 //Pairwise 2
 Pairwise2SelectionManager::Pairwise2SelectionManager(int const D, DEAdaptationManager* dam)
 : SelectionManager(D, dam){
-
+	this->shorthand = "P2";
 }
 
 void Pairwise2SelectionManager::select(std::vector<Particle*>& particles, 
@@ -58,7 +51,7 @@ void Pairwise2SelectionManager::select(std::vector<Particle*>& particles,
 //Pairwise 3
 Pairwise3SelectionManager::Pairwise3SelectionManager(int const D, DEAdaptationManager* dam)
 : SelectionManager(D, dam){
-
+	this->shorthand = "P3";
 }
 
 void Pairwise3SelectionManager::select(std::vector<Particle*>& particles, 
@@ -83,7 +76,7 @@ void Pairwise3SelectionManager::select(std::vector<Particle*>& particles,
 //Union 2
 Union2SelectionManager::Union2SelectionManager(int const D, DEAdaptationManager* dam)
 : SelectionManager(D, dam){
-
+	this->shorthand = "U2";
 }
 
 bool sortbyFirstElement(const std::tuple<Particle*, int, int>& a,  
@@ -118,11 +111,10 @@ void Union2SelectionManager::select(std::vector<Particle*>& particles,
 	}
 }
 
-
 //Union 3
 Union3SelectionManager::Union3SelectionManager(int const D, DEAdaptationManager* dam)
 : SelectionManager(D, dam){
-
+	this->shorthand = "U3";
 }
 
 void Union3SelectionManager::select(std::vector<Particle*>& particles, 
@@ -154,5 +146,4 @@ void Union3SelectionManager::select(std::vector<Particle*>& particles,
 			// do nothing: original is best
 		}
 	}
-
 }

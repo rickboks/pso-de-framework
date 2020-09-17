@@ -13,16 +13,8 @@
 #include <iostream>
 #include <algorithm> 
 
-PSODE::PSODE(UpdateManagerType const updateManagerType, 
-	Topology topologyManagerType, Synchronicity const synchronicity, MutationType const mutationType, 
-	CrossoverType const crossoverType, SelectionType const selection,DEAdaptationType const adaptionType,
-	std::string const psoCH, std::string const deCH)
-	: HybridAlgorithm(updateManagerType, topologyManagerType, synchronicity, 
-			mutationType, crossoverType, selection, adaptionType, psoCH, deCH){
-}
-
-PSODE::PSODE(hybrid_config config):
-		HybridAlgorithm(config){
+PSODE::PSODE(HybridConfig const config)
+	: HybridAlgorithm(config){
 }
 
 std::vector<Particle*> PSODE::copyPopulation(std::vector<Particle*>const& particles){
@@ -65,9 +57,9 @@ void PSODE::run(std::shared_ptr<IOHprofiler_problem<double> > problem,
 
 	this->problem=problem;
 	this->logger=logger;
-	if (config.synchronicity == SYNCHRONOUS)
+	if (config.synchronous)
 		runSynchronous(evalBudget, popSize, particleUpdateParams);
-	else if (config.synchronicity == ASYNCHRONOUS)
+	else
 		runAsynchronous(evalBudget, popSize, particleUpdateParams);
 }
 
@@ -78,15 +70,15 @@ void PSODE::runSynchronous(int const evalBudget, int popSize,
 	std::vector<Particle*> p1;
 	std::vector<Particle*> p2;
 		
-	topologyManager = TopologyManager::createTopologyManager(config.topology, particles);
+	topologyManager = topologies.at(config.topology)(particles);
 	popSize = topologyManager->getClosestValidPopulationSize(popSize);	
 
 	int const D = problem->IOHprofiler_get_number_of_variables();
 	std::vector<double> smallest = problem->IOHprofiler_get_lowerbound();
 	std::vector<double> largest = problem->IOHprofiler_get_upperbound();
 
-	deCH = new MidpointBaseRepair(smallest, largest);
-	psoCH = new ReinitializationRepair(smallest, largest);
+	deCH = deCHs.at(config.deCH)(smallest, largest);
+	psoCH = psoCHs.at(config.psoCH)(smallest, largest);
 
 	ParticleUpdateSettings settings(config.update, particleUpdateParams, psoCH);
 
@@ -95,15 +87,16 @@ void PSODE::runSynchronous(int const evalBudget, int popSize,
 
 	for (Particle* const p : particles)
 		p->randomize(smallest, largest);
+
 	for (Particle* const p : particles)
 		p->updateGbest();
 
 	topologyManager->initialize();
 
-	mutationManager = MutationManager::createMutationManager(config.mutation, D, deCH);
-	crossoverManager = CrossoverManager::createCrossoverManager(config.crossover, D);
-	adaptationManager = DEAdaptationManager::createDEAdaptationManager(config.adaptation);
-	selectionManager = SelectionManager::createSelectionManager(config.selection, D, adaptationManager);
+	mutationManager = mutations.at(config.mutation)(D, deCH);
+	crossoverManager = crossovers.at(config.crossover)(D);
+	adaptationManager = deAdaptations.at(config.adaptation)();
+	selectionManager = selections.at(config.selection)(D, adaptationManager);
 
 	int iterations = 0;
 	double bestFitness = std::numeric_limits<double>::max();
@@ -113,7 +106,7 @@ void PSODE::runSynchronous(int const evalBudget, int popSize,
 	std::vector<double> Fs(popSize);
 	std::vector<double> Crs(popSize);	
 
-	while (	problem->IOHprofiler_get_evaluations() < evalBudget &&
+	while (problem->IOHprofiler_get_evaluations() < evalBudget &&
 			!problem->IOHprofiler_hit_optimal()){
 		
 		improved = false;
@@ -182,7 +175,7 @@ void PSODE::runAsynchronous(int const evalBudget,
 	std::vector<Particle*> p1;
 	std::vector<Particle*> p2;
 		
-	topologyManager = TopologyManager::createTopologyManager(config.topology, particles);
+	topologyManager = topologies.at(config.topology)(particles);
 	popSize = topologyManager->getClosestValidPopulationSize(popSize);	
 
 	int const D = problem->IOHprofiler_get_number_of_variables(); /// dimension
@@ -201,10 +194,10 @@ void PSODE::runAsynchronous(int const evalBudget,
 		p->randomize(smallest, largest);
 
 	topologyManager->initialize();
-	mutationManager = MutationManager::createMutationManager(config.mutation, D, deCH);
-	crossoverManager = CrossoverManager::createCrossoverManager(config.crossover, D);
-	adaptationManager = DEAdaptationManager::createDEAdaptationManager(config.adaptation);
-	selectionManager = SelectionManager::createSelectionManager(config.selection, D, adaptationManager);
+	mutationManager = mutations.at(config.mutation)(D, deCH);
+	crossoverManager = crossovers.at(config.crossover)(D);
+	adaptationManager = deAdaptations.at(config.adaptation)();
+	selectionManager = selections.at(config.selection)(D, adaptationManager);
 
 	int iterations = 0;
 

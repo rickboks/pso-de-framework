@@ -10,12 +10,17 @@ class IOHprofiler_problem;
 
 class IOHprofiler_csv_logger;
 
+struct DEConfig {
+	DEConfig(std::string const mutation, std::string const crossover, std::string const adaptation, std::string const constraintHandler)
+	: mutation(mutation), crossover(crossover), adaptation(adaptation), constraintHandler(constraintHandler){}
+
+	std::string const mutation, crossover, adaptation, constraintHandler;
+};
+
 class DifferentialEvolution {
 	private:
+		DEConfig const config;
 		std::vector<Particle*> genomes;
-		MutationType const mutationType;
-		CrossoverType const crossoverType;
-		DEAdaptationType const adaptationType;
 		MutationManager* mutationManager;
 		CrossoverManager* crossoverManager;
 		DEAdaptationManager* adaptationManager;
@@ -25,7 +30,7 @@ class DifferentialEvolution {
 		std::shared_ptr<IOHprofiler_csv_logger> logger;
 		std::shared_ptr<IOHprofiler_problem<double> > problem;
 	public:
-		DifferentialEvolution(MutationType const mutationType, CrossoverType const crossoverType, DEAdaptationType adaptationType);
+		DifferentialEvolution(DEConfig config);
 		void run(std::shared_ptr<IOHprofiler_problem<double> > problem, 
     		std::shared_ptr<IOHprofiler_csv_logger> logger,
     		int const evalBudget, int const popSize);

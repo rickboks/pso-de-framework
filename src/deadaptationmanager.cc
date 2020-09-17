@@ -4,18 +4,16 @@
 #include <iostream>
 #include "rng.h"
 
-DEAdaptationManager* DEAdaptationManager::createDEAdaptationManager(DEAdaptationType type){
-	switch(type){
-		case JADE: return new JADEManager();
-		case NO: return new NoAdaptationManager();
-		default:
-			throw std::invalid_argument("Error: Invalid DE adaptation type");
-	}
-}
+#define LC(X) [](){return new X();}
+std::map<std::string, std::function<DEAdaptationManager*()>> const deAdaptations({
+		{"jade", LC(JADEManager)},
+		{"none", LC(NoAdaptationManager)},
+});
 
 //JADE
 JADEManager::JADEManager()
  : DEAdaptationManager(), MuCr(0.5), MuF(0.6), c(0.1){
+	this->shorthand = "J";
 }
 
 void JADEManager::successfulIndex(int i){
@@ -78,7 +76,7 @@ void JADEManager::reset(){
 //NO ADAPTATION
 NoAdaptationManager::NoAdaptationManager()
  : DEAdaptationManager(), F(0.5), Cr(0.9){
-
+	this->shorthand="N";
 }
 
 void NoAdaptationManager::succesfulValues(double F, double Cr){

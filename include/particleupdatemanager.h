@@ -2,19 +2,11 @@
 #include <vector>
 #include <map>
 #include <random>
+#include <functional>
 
 class ConstraintHandler;
 struct ParticleUpdateSettings;
 class Particle;
-
-enum UpdateManagerType {
-	INERTIA_WEIGHT,
-	DECR_INERTIA_WEIGHT,
-	CONSTRICTION_COEFFICIENT,
-	FIPS,
-	BARE_BONES,
-	MAN_END
-};
 
 class ParticleUpdateManager {
 	protected:
@@ -24,6 +16,7 @@ class ParticleUpdateManager {
 		std::vector<double> const& g;
 		int const D;
 	public:
+		std::string shorthand;
 		ParticleUpdateManager(std::vector<double>& x, std::vector<double>& v,
 			std::vector<double>const& p, std::vector<double>const& g);
 		virtual ~ParticleUpdateManager();
@@ -32,13 +25,12 @@ class ParticleUpdateManager {
 		//velocity vector.
 		ParticleUpdateManager(std::vector<double>& x, std::vector<double> & p, std::vector<double>& g);
 
-		static ParticleUpdateManager* createParticleUpdateManager(std::vector<double>& x, 
-			std::vector<double>& v,	std::vector<double>const & p, std::vector<double>const& g, 
-			ParticleUpdateSettings const settings, std::vector<Particle*>& neighborhood);
-
 		virtual void updateVelocity(double const progress);
 		virtual void updatePosition();
 };
+
+extern std::map<std::string, std::function<ParticleUpdateManager* (std::vector<double>&, std::vector<double>&,
+		std::vector<double>const&, std::vector<double>const&, std::map<int,double>, std::vector<Particle*>&)>> const updateManagers;
 
 class InertiaWeightManager : public ParticleUpdateManager{
 	private:
@@ -48,7 +40,7 @@ class InertiaWeightManager : public ParticleUpdateManager{
 
 	public:
 		InertiaWeightManager(std::vector<double>& x, std::vector<double>& v,
-			std::vector<double>const& p, std::vector<double>const& g, std::map<int, double> paramaters);
+			std::vector<double>const& p, std::vector<double>const& g, std::map<int, double> paramaters, std::vector<Particle*>& neighborhood);
 		void updateVelocity(double const progress);
 };
 
@@ -60,7 +52,7 @@ class DecrInertiaWeightManager : public ParticleUpdateManager {
 		double const wMax;
 	public:
 		DecrInertiaWeightManager(std::vector<double>& x, std::vector<double>& v,
-			std::vector<double>const& p, std::vector<double>const& g, std::map<int, double> paramaters);
+			std::vector<double>const& p, std::vector<double>const& g, std::map<int, double> paramaters, std::vector<Particle*>& neighborhood);
 		void updateVelocity(double const progress);
 
 };
@@ -73,7 +65,7 @@ class ConstrictionCoefficientManager : public ParticleUpdateManager {
 	public: 
 
 		ConstrictionCoefficientManager(std::vector<double> & x, std::vector<double> & v,
-			std::vector<double>const& p, std::vector<double>const& g, std::map<int, double> paramaters);
+			std::vector<double>const& p, std::vector<double>const& g, std::map<int, double> paramaters, std::vector<Particle*>& neighborhood);
 
 		void updateVelocity(double const progress);
 };
@@ -97,7 +89,8 @@ class BareBonesManager : public ParticleUpdateManager {
 		
 	public: 
 		BareBonesManager(std::vector<double> & x, std::vector<double> & v,
-			std::vector<double>const& p, std::vector<double>const& g, std::map<int, double> paramaters);
+			std::vector<double>const& p, std::vector<double>const& g, 
+			std::map<int, double> paramaters, std::vector<Particle*>& neighborhood);
 		void updatePosition();
 		void updateVelocity(double const progress);
 };

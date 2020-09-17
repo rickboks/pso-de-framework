@@ -21,13 +21,7 @@ class PSODE : public HybridAlgorithm {
 		std::vector<Particle*> copyPopulation(std::vector<Particle*>const& particles);
 
 		public:
-		PSODE(UpdateManagerType const updateManagerType, 
-			Topology topologyManager, Synchronicity const synchronous, 
-			MutationType const mutationType, CrossoverType const crossoverType, 
-			SelectionType const selection, DEAdaptationType adaptionType, std::string const psoCH, std::string const deCH);
-
-		PSODE(hybrid_config);
-
+		PSODE(HybridConfig const config);
 		~PSODE();
 
 		void run(std::shared_ptr<IOHprofiler_problem<double> > problem, 

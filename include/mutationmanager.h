@@ -8,21 +8,6 @@
 #include "rng.h"
 #include "util.h"
 
-enum MutationType {
-	RAND_1,
-	BEST_1,
-	TTB_1,
-	TTPB_1,
-	BEST_2,
-	RAND_2,
-	RAND_2_DIR,
-	NSDE,
-	TRIGONOMETRIC,
-	TO1,
-	TO2,
-	MUT_END,
-};
-
 class MutationManager {
 	protected:
 		int const D;
@@ -33,11 +18,13 @@ class MutationManager {
 		Particle const* pBest;
 		virtual Particle* mutate(int const i) const=0;
 	public:
+		std::string shorthand;
 		MutationManager(int const D, ConstraintHandler const* const deCH);
 		virtual ~MutationManager();
 		std::vector<Particle*> mutate(std::vector<Particle*> const& genomes, std::vector<double>const& Fs);
-		static MutationManager* createMutationManager(MutationType const mutationType, int const D, ConstraintHandler const*const deCH);
 };
+
+extern std::map<std::string, std::function<MutationManager* (int const, ConstraintHandler const*const)>> const mutations;
 
 class Rand1MutationManager : public MutationManager {
 	public:

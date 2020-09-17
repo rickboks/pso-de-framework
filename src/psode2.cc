@@ -15,15 +15,8 @@
 #include <iostream>
 #include <algorithm> 
 
-PSODE2::PSODE2(UpdateManagerType const updateManagerType, 
-	Topology topologyManagerType, Synchronicity const synchronicity, MutationType const mutationType, 
-	CrossoverType const crossoverType, SelectionType const selection,DEAdaptationType const adaptionType, std::string const psoCH, std::string const deCH)
-		: HybridAlgorithm(updateManagerType, topologyManagerType, synchronicity, 
-			mutationType, crossoverType, selection, adaptionType, psoCH, deCH){}
-
-PSODE2::PSODE2(hybrid_config const config):
-		HybridAlgorithm(config){
-}
+PSODE2::PSODE2(HybridConfig const config)
+		: HybridAlgorithm(config){}
 
 void PSODE2::reset(){
 	delete topologyManager;
@@ -66,11 +59,11 @@ void PSODE2::runAsynchronous(int const evalBudget, int const popSize, std::map<i
 	psoCH = psoCHs.at(config.psoCH)(smallest,largest);
 
 	ParticleUpdateSettings settings(config.update, particleUpdateParams, psoCH);
-	mutationManager = MutationManager::createMutationManager(config.mutation, D, deCH);
-	crossoverManager = CrossoverManager::createCrossoverManager(config.crossover, D);
-	adaptationManager = DEAdaptationManager::createDEAdaptationManager(config.adaptation);
+	mutationManager = mutations.at(config.mutation)(D, deCH);
+	crossoverManager = crossovers.at(config.crossover)(D);
+	adaptationManager = deAdaptations.at(config.adaptation)();
 
-	int split = popSize / 2;
+	int const split = popSize / 2;
 
 	for (int i = 0; i < split; i++) psoPop.push_back(new Particle(D, settings));
 	for (int i = split; i < popSize; i++) dePop.push_back(new Particle(D));
@@ -85,7 +78,7 @@ void PSODE2::runAsynchronous(int const evalBudget, int const popSize, std::map<i
 	for (Particle* const p : particles)
 		p->evaluate(problem, logger);
 
-	topologyManager = TopologyManager::createTopologyManager(config.topology, psoPop);
+	topologyManager = topologies.at(config.topology)(psoPop);
 	topologyManager->initialize();
 
 	std::vector<double> Fs(dePop.size());

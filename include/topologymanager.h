@@ -1,5 +1,7 @@
 #pragma once
 #include<vector>
+#include<functional>
+#include<map>
 #include<random>
 
 enum Topology {
@@ -20,19 +22,20 @@ class TopologyManager {
 	protected:
 		std::vector<Particle*> const & particles;
 	public:
+		std::string shorthand;
 		TopologyManager(std::vector<Particle*> const & particles);
 		virtual ~TopologyManager();
 		virtual void initialize() = 0;
 		virtual void update(double progress);
-		virtual int getClosestValidPopulationSize(int const popSize);
 		static TopologyManager* createTopologyManager(int const type, std::vector<Particle*> const & particles);
 };
+
+extern std::map<std::string, std::function<TopologyManager* (std::vector<Particle*> const)>> const topologies;
 
 class LbestTopologyManager : public TopologyManager {
 	public:
 		LbestTopologyManager(std::vector<Particle*> const & particles);
 		void initialize();
-		int getClosestValidPopulationSize(int const popSize);
 };
 
 class GbestTopologyManager : public TopologyManager {
@@ -47,7 +50,6 @@ class RandomTopologyManager : public TopologyManager {
 	public:
 		RandomTopologyManager(std::vector<Particle*> const & particles);
 		void initialize();
-		int getClosestValidPopulationSize(int const popSize);
 };
 
 class VonNeumannTopologyManager : public TopologyManager {
@@ -91,7 +93,6 @@ class MultiSwarmTopologyManager : public TopologyManager {
 	public:
 		MultiSwarmTopologyManager(std::vector<Particle*> const & particles);
 		void initialize();
-		void update(double progress);		;
-		int getClosestValidPopulationSize(int const popSize);
+		void update(double progress);
 };
 

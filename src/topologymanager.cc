@@ -32,16 +32,19 @@ TopologyManager* TopologyManager::createTopologyManager(int const type, std::vec
 	}
 }
 
-TopologyManager::~TopologyManager() = default;
+#define LC(X) [](std::vector<Particle*> const p){return new X(p);}
+std::map<std::string, std::function<TopologyManager* (std::vector<Particle*> const)>> const topologies{
+	{"lbest", LC(LbestTopologyManager)},
+	{"gbest", LC(GbestTopologyManager)},
+	{"random", LC(RandomTopologyManager)},
+	{"von neumann", LC(VonNeumannTopologyManager)},
+	{"wheel", LC(WheelTopologyManager)},
+	{"increasing", LC(IncreasingTopologyManager)},
+	{"decreasing", LC(DecreasingTopologyManager)},
+	{"multiswarm", LC(MultiSwarmTopologyManager)},
+};
 
-int TopologyManager::getClosestValidPopulationSize(int const popSize){
-	if (popSize > 0)
-		return popSize;
-	else {
-		std::cerr << "Warning: population size needs to be greater or equal to 1. Setting population size to 1." << std::endl;
-		return 1;
-	}
-}
+TopologyManager::~TopologyManager() = default;
 
 void TopologyManager::update(double progress){
 	// default: do nothing. (static topologies)
@@ -50,7 +53,7 @@ void TopologyManager::update(double progress){
 /*		Lbest 		*/
 LbestTopologyManager::LbestTopologyManager(std::vector<Particle*> const & particles)
 	:TopologyManager(particles){
-
+	this->shorthand = "L";
 }
 
 void LbestTopologyManager::initialize(){
@@ -68,20 +71,10 @@ void LbestTopologyManager::initialize(){
 	}
 }
 
-int LbestTopologyManager::getClosestValidPopulationSize(int const popSize){
-	if (popSize >= 3)
-		return popSize;
-	else {
-		std::cerr << "Warning: Lbest topology needs a population size greater or equal to " << 3 <<
-		". Setting population size to " << 3 << "." << std::endl;
-		return 3;
-	}
-}
-
 /*		Gbest 		*/
 GbestTopologyManager::GbestTopologyManager(std::vector<Particle*> const & particles)
 	:TopologyManager(particles){
-
+	this->shorthand = "G";
 }
 
 void GbestTopologyManager::initialize(){
@@ -98,7 +91,7 @@ void GbestTopologyManager::initialize(){
 /*		Random 		*/
 RandomTopologyManager::RandomTopologyManager(std::vector<Particle*> const & particles)
 	:TopologyManager(particles), connections(3){
-
+	this->shorthand = "R";
 }
 
 void RandomTopologyManager::initialize(){
@@ -121,19 +114,10 @@ void RandomTopologyManager::initialize(){
 	}
 }
 
-int RandomTopologyManager::getClosestValidPopulationSize(int const popSize){
-	if (popSize > connections){
-		return popSize;
-	} else {
-		std::cerr << "Warning: Random graph topology needs a population size of at least " << connections+1 << ". "
-		<< "Setting population size to " << connections +1 << "." << std::endl;
-		return connections+1;
-	}
-}
-
 /*		Von Neumann		*/
 VonNeumannTopologyManager::VonNeumannTopologyManager(std::vector<Particle*> const & particles)
 	:TopologyManager(particles){
+	this->shorthand = "N";
 }
 
 void VonNeumannTopologyManager::initialize(){
@@ -171,6 +155,7 @@ void VonNeumannTopologyManager::initialize(){
 /*		Wheel 		*/
 WheelTopologyManager::WheelTopologyManager(std::vector<Particle*> const & particles)
 	:TopologyManager(particles){
+	this->shorthand = "W";
 }
 
 void WheelTopologyManager::initialize(){
@@ -184,6 +169,7 @@ void WheelTopologyManager::initialize(){
 /*		Increasing connectivity 	*/
 IncreasingTopologyManager::IncreasingTopologyManager(std::vector<Particle*> const & particles)
 	:TopologyManager(particles), currentConnectivity(2), minConnectivity(2){
+	this->shorthand = "I";
 }
 
 void IncreasingTopologyManager::initialize(){
@@ -201,8 +187,6 @@ void IncreasingTopologyManager::initialize(){
 		else
 			particles[i]->addNeighbor(particles[i+1]);
 	}
-
-
 }
 
 void IncreasingTopologyManager::update(double progress){
@@ -237,6 +221,7 @@ void IncreasingTopologyManager::update(double progress){
 
 DecreasingTopologyManager::DecreasingTopologyManager(std::vector<Particle*> const & particles)
 	:TopologyManager(particles){
+	this->shorthand = "D";
 }
 
 void DecreasingTopologyManager::initialize(){
@@ -272,10 +257,8 @@ void DecreasingTopologyManager::update(double progress){
 				int randIndex = rng.randInt(0,possibilities.size()-1);
 				particles[i]->removeNeighbor(possibilities[randIndex]);
 				possibilities.erase(possibilities.begin() + randIndex);
-
 			}
 			possibilities.clear();
-			
 		}
 		currentConnectivity = newConnectivity;
 	}
@@ -286,7 +269,7 @@ void DecreasingTopologyManager::update(double progress){
 
 MultiSwarmTopologyManager::MultiSwarmTopologyManager(std::vector<Particle*> const & particles)
 	:TopologyManager(particles), clusterSize(3), count(0){
-
+	this->shorthand = "M";
 }
 
 void MultiSwarmTopologyManager::createClusters(){
@@ -330,15 +313,5 @@ void MultiSwarmTopologyManager::update(double progress){
 			p->removeAllNeighbors();
 		createClusters();
 		count = 0;
-	}
-}
-
-int MultiSwarmTopologyManager::getClosestValidPopulationSize(int const popSize){
-	if (popSize >= clusterSize){
-		return popSize;
-	} else {
-		std::cerr << "Warning: multiswarm topology needs a population size of at least " << clusterSize << ". "
-		<< "Setting population size to " << clusterSize << "." << std::endl;
-		return clusterSize;
 	}
 }

@@ -30,33 +30,27 @@ void ParticleUpdateManager::updateVelocity(double const progress){
 		std::plus<double>());
 }
 
-ParticleUpdateManager* ParticleUpdateManager::createParticleUpdateManager
-	(std::vector<double>& x, std::vector<double>& v,std::vector<double>const& p, 
-	std::vector<double>const& g,  ParticleUpdateSettings const settings, std::vector<Particle*>& neighborhood){
+#define LC(X) [](std::vector<double>& x, std::vector<double>& v,\
+			std::vector<double>const& p, std::vector<double>const& g, \
+			std::map<int, double> parameters, std::vector<Particle*>& neighborhood){return new X(x,v,p,g, parameters, neighborhood);}
 
-	switch(settings.managerType){
-		case UpdateManagerType::INERTIA_WEIGHT:
-			return new InertiaWeightManager(x,v,p,g,settings.parameters);
-		case UpdateManagerType::DECR_INERTIA_WEIGHT:
-			return new DecrInertiaWeightManager(x,v,p,g,settings.parameters);
-		case UpdateManagerType::CONSTRICTION_COEFFICIENT:
-			return new ConstrictionCoefficientManager(x,v,p,g,settings.parameters);
-		case UpdateManagerType::FIPS:
-			return new FIPSManager(x,v,p,g,settings.parameters, neighborhood);
-		case UpdateManagerType::BARE_BONES:
-			return new BareBonesManager(x,v,p,g,settings.parameters);
-		default: 
-			throw std::invalid_argument("Error: Invalid particle update manager type");
-	}
-}
+std::map<std::string, std::function<ParticleUpdateManager* (std::vector<double>&, std::vector<double>&,
+		std::vector<double>const&, std::vector<double>const&, std::map<int,double>, std::vector<Particle*>&)>> const updateManagers({
+		{"inertia", LC(InertiaWeightManager)},
+		{"decreasing inertia", LC(DecrInertiaWeightManager)},
+		{"constriction", LC(ConstrictionCoefficientManager)},
+		{"fips", LC(FIPSManager)},
+		{"barebones", LC(BareBonesManager)}
+});
 
 /*		Inertia weight 		*/
 InertiaWeightManager::InertiaWeightManager (std::vector<double>& x, std::vector<double>& v,
-	std::vector<double>const& p, std::vector<double>const& g,  std::map<int, double> parameters)
+	std::vector<double>const& p, std::vector<double>const& g,  std::map<int, double> parameters, std::vector<Particle*>& neighborhood)
 	: ParticleUpdateManager(x,v,p,g),
 	phi1 (parameters.find(Setting::S_INER_PHI1) != parameters.end() ? parameters[Setting::S_INER_PHI1] : INER_PHI1_DEFAULT),
 	phi2 (parameters.find(Setting::S_INER_PHI2) != parameters.end() ? parameters[Setting::S_INER_PHI2] : INER_PHI2_DEFAULT),	
 	w (parameters.find(Setting::S_INER_W) != parameters.end() ? parameters[Setting::S_INER_W] : INER_W_DEFAULT){
+	this->shorthand = "I";
 }
 
 void InertiaWeightManager::updateVelocity(double const progress) {
@@ -73,12 +67,13 @@ void InertiaWeightManager::updateVelocity(double const progress) {
 
 /*	Decreasing inertia weight manager */
 DecrInertiaWeightManager::DecrInertiaWeightManager (std::vector<double>& x, std::vector<double>& v,
-	std::vector<double>const& p, std::vector<double>const& g,  std::map<int, double> parameters)
+	std::vector<double>const& p, std::vector<double>const& g,  std::map<int, double> parameters, std::vector<Particle*>& neighborhood)
 	: ParticleUpdateManager(x,v,p,g),
 	phi1 (parameters.find(Setting::S_DINER_PHI1) != parameters.end() ? parameters[Setting::S_DINER_PHI1] : DINER_PHI2_DEFAULT),
 	phi2 (parameters.find(Setting::S_DINER_PHI2) != parameters.end() ? parameters[Setting::S_DINER_PHI2] : DINER_PHI2_DEFAULT),	
 	wMin (parameters.find(Setting::S_DINER_W_END) != parameters.end() ? parameters[Setting::S_DINER_W_END] : DINER_W_END_DEFAULT),
 	wMax(parameters.find(Setting::S_DINER_W_START) != parameters.end() ? parameters[Setting::S_DINER_W_START] : DINER_W_START_DEFAULT){
+	this->shorthand = "D";
 }
 
 void DecrInertiaWeightManager::updateVelocity(double const progress) {
@@ -95,11 +90,12 @@ void DecrInertiaWeightManager::updateVelocity(double const progress) {
 
 /*		Constriction Coefficient 		*/
 ConstrictionCoefficientManager::ConstrictionCoefficientManager(std::vector<double> & x, std::vector<double> & v,
-	std::vector<double>const& p, std::vector<double>const& g,  std::map<int, double> parameters)
+	std::vector<double>const& p, std::vector<double>const& g,  std::map<int, double> parameters, std::vector<Particle*>& neighborhood)
 	: ParticleUpdateManager(x,v,p,g),
 	phi1 (parameters.find(Setting::S_CC_PHI1) != parameters.end() ? parameters[Setting::S_CC_PHI1] : CC_PHI1_DEFAULT),
 	phi2 (parameters.find(Setting::S_CC_PHI2) != parameters.end() ? parameters[Setting::S_CC_PHI2] : CC_PHI2_DEFAULT),
 	chi (2 / ((phi1+phi2) - 2 + sqrt(pow(phi1+phi2, 2) - 4 * (phi1+phi2)))){
+	this->shorthand = "C";
 }
 
 void ConstrictionCoefficientManager::updateVelocity(double const progress){
@@ -122,6 +118,7 @@ FIPSManager::FIPSManager(std::vector<double> & x, std::vector<double> & v,
 	phi (parameters.find(Setting::S_FIPS_PHI) != parameters.end() ? parameters[Setting::S_FIPS_PHI] : FIPS_PHI_DEFAULT),
 	chi (2 / ((phi) -2 + sqrt( pow(phi, 2) - 4 * (phi)))),
 	neighborhood(neighborhood){
+	this->shorthand = "F";
 }
 
 
@@ -147,9 +144,9 @@ void FIPSManager::updateVelocity(double const progress){
 
 /* 		Bare Bones 		*/
 BareBonesManager::BareBonesManager(std::vector<double> & x, std::vector<double> & v,
-	std::vector<double>const& p, std::vector<double>const& g,  std::map<int, double> parameters) :
+	std::vector<double>const& p, std::vector<double>const& g,  std::map<int, double> parameters, std::vector<Particle*>& neighborhood) :
 	ParticleUpdateManager(x,v,p,g) {
-
+	this->shorthand = "B";
 }
 
 void BareBonesManager::updatePosition(){

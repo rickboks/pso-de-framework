@@ -11,11 +11,11 @@
 #include <cmath>
 #include <IOHprofiler_experimenter.h>
 
-Particle::Particle(int const D, ParticleUpdateSettings& particleUpdateSettings)
+Particle::Particle(int const D, ParticleUpdateSettings& settings)
 	: x(D), v(D), p(D), g(D), pbest(std::numeric_limits<double>::max()), gbest(std::numeric_limits<double>::max()), evaluated(false),
-		settings(particleUpdateSettings), psoCH(settings.psoCH), D(D), isPSO(true){
+		settings(settings), psoCH(settings.psoCH), D(D), isPSO(true){
 
-	particleUpdateManager = ParticleUpdateManager::createParticleUpdateManager(x,v,p,g,particleUpdateSettings,neighborhood);
+	particleUpdateManager = updateManagers.at(settings.managerType)(x,v,p,g,settings.parameters,neighborhood);
 }
 
 Particle::Particle(const Particle& other)
@@ -24,7 +24,7 @@ Particle::Particle(const Particle& other)
 	fitness(other.fitness), neighborhood(other.neighborhood),
 	settings(other.settings), psoCH(other.psoCH), D(other.D), isPSO(other.isPSO){
 
-	particleUpdateManager = ParticleUpdateManager::createParticleUpdateManager(x,v,p,g,settings,neighborhood);
+	particleUpdateManager = updateManagers.at(settings.managerType)(x,v,p,g,settings.parameters,neighborhood);
 }
 
 //for DE

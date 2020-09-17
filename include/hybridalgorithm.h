@@ -8,31 +8,22 @@
 #include "constrainthandler.h"
 #include <memory>
 
-//typedef std::tuple<UpdateManagerType, Topology, Synchronicity, MutationType, 
-	//CrossoverType, SelectionType, DEAdaptationType> hybrid_config;
-struct hybrid_config {
-	UpdateManagerType const update;
-	Topology const topology;
-	Synchronicity const synchronicity;
-	MutationType const mutation;
-	CrossoverType const crossover;
-	SelectionType const selection;
-	DEAdaptationType const adaptation;
-	std::string const psoCH, deCH;
+struct HybridConfig {
+	std::string const update, topology, psoCH;
+	bool const synchronous;
+	std::string const  mutation, crossover, selection, adaptation, deCH;
 
-	hybrid_config(UpdateManagerType update, Topology topology,
-		Synchronicity synchronicity, MutationType mutation,
-		CrossoverType crossover, SelectionType selection, DEAdaptationType adaptation,
-		std::string psoCH, std::string deCH):
-		update(update), topology(topology), synchronicity(synchronicity),
-		mutation(mutation), crossover(crossover), selection(selection),
-		adaptation(adaptation), psoCH(psoCH), deCH(deCH){
-	}
+	HybridConfig(std::string const update, std::string const topology, std::string const psoCH, bool const synchronous, 
+			std::string const mutation, std::string const crossover, std::string const selection, 
+			std::string const adaptation, std::string const deCH):
+				update(update), topology(topology), psoCH(psoCH), synchronous(synchronous),
+				mutation(mutation), crossover(crossover), selection(selection),
+				adaptation(adaptation), deCH(deCH){}
 };
 
 class HybridAlgorithm {
 	protected:
-		hybrid_config const config;
+		HybridConfig const config;
 		TopologyManager* topologyManager;
 		MutationManager* mutationManager;
 		CrossoverManager* crossoverManager;
@@ -43,14 +34,8 @@ class HybridAlgorithm {
 		std::shared_ptr<IOHprofiler_problem<double> > problem; 
 		std::shared_ptr<IOHprofiler_csv_logger> logger;
 
-		public:
-		HybridAlgorithm(UpdateManagerType const updateManagerType, 
-			Topology topologyManager, Synchronicity const synchronous, 
-			MutationType const mutationType, CrossoverType const crossoverType, 
-			SelectionType const selection, DEAdaptationType const adaptionType, std::string const psoCH, std::string const deCH);
-
-		HybridAlgorithm(hybrid_config config);
-
+	public:
+		HybridAlgorithm(HybridConfig config);
 		virtual ~HybridAlgorithm() = 0;
 
 		virtual void run(std::shared_ptr<IOHprofiler_problem<double> > problem, 

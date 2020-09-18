@@ -6,31 +6,7 @@
 
 /*		Base 		*/
 TopologyManager::TopologyManager(std::vector<Particle*> const & particles)
-	:particles(particles){	
-}
-
-TopologyManager* TopologyManager::createTopologyManager(int const type, std::vector<Particle*> const & particles){
-	switch(type){
-		case Topology::LBEST:
-			return new LbestTopologyManager(particles);
-		case Topology::GBEST:
-			return new GbestTopologyManager(particles);
-		case Topology::RANDOM_GRAPH:
-			return new RandomTopologyManager(particles);
-		case Topology::VON_NEUMANN:
-			return new VonNeumannTopologyManager(particles);
-		case Topology::WHEEL:
-			return new WheelTopologyManager(particles);
-		case Topology::INCREASING:
-			return new IncreasingTopologyManager(particles);
-		case Topology::DECREASING:
-			return new DecreasingTopologyManager(particles);
-		case Topology::MULTI_SWARM:
-			return new MultiSwarmTopologyManager(particles);
-		default:
-			throw std::invalid_argument("Error: Invalid topology manager type");
-	}
-}
+	:particles(particles){}
 
 #define LC(X) [](std::vector<Particle*> const p){return new X(p);}
 std::map<std::string, std::function<TopologyManager* (std::vector<Particle*> const)>> const topologies{
@@ -53,10 +29,6 @@ void TopologyManager::update(double progress){
 /*		Lbest 		*/
 LbestTopologyManager::LbestTopologyManager(std::vector<Particle*> const & particles)
 	:TopologyManager(particles){
-	this->shorthand = "L";
-}
-
-void LbestTopologyManager::initialize(){
 	int const popSize = particles.size();
 	for (int i = 0; i < popSize; i++){
 		if (i ==0)
@@ -74,10 +46,6 @@ void LbestTopologyManager::initialize(){
 /*		Gbest 		*/
 GbestTopologyManager::GbestTopologyManager(std::vector<Particle*> const & particles)
 	:TopologyManager(particles){
-	this->shorthand = "G";
-}
-
-void GbestTopologyManager::initialize(){
 	int const popSize = particles.size();
 	for (int i = 0; i < popSize; i++){
 		for (int j = 0; j < popSize; j++){
@@ -91,10 +59,6 @@ void GbestTopologyManager::initialize(){
 /*		Random 		*/
 RandomTopologyManager::RandomTopologyManager(std::vector<Particle*> const & particles)
 	:TopologyManager(particles), connections(3){
-	this->shorthand = "R";
-}
-
-void RandomTopologyManager::initialize(){
 	int const popSize = particles.size();
 
 	for (int i = 0; i < popSize; i++){
@@ -117,10 +81,6 @@ void RandomTopologyManager::initialize(){
 /*		Von Neumann		*/
 VonNeumannTopologyManager::VonNeumannTopologyManager(std::vector<Particle*> const & particles)
 	:TopologyManager(particles){
-	this->shorthand = "N";
-}
-
-void VonNeumannTopologyManager::initialize(){
 	int rows = (int)sqrt(particles.size());
 	  while (particles.size() % rows != 0) {
 	    rows--;
@@ -155,10 +115,6 @@ void VonNeumannTopologyManager::initialize(){
 /*		Wheel 		*/
 WheelTopologyManager::WheelTopologyManager(std::vector<Particle*> const & particles)
 	:TopologyManager(particles){
-	this->shorthand = "W";
-}
-
-void WheelTopologyManager::initialize(){
 	int const popSize = particles.size();
 	for (int i = 1; i < popSize; i++){
 		particles[i]->addNeighbor(particles[0]);
@@ -169,10 +125,6 @@ void WheelTopologyManager::initialize(){
 /*		Increasing connectivity 	*/
 IncreasingTopologyManager::IncreasingTopologyManager(std::vector<Particle*> const & particles)
 	:TopologyManager(particles), currentConnectivity(2), minConnectivity(2){
-	this->shorthand = "I";
-}
-
-void IncreasingTopologyManager::initialize(){
 	maxConnectivity = particles.size() -1;
 
 	int const popSize = particles.size();
@@ -221,10 +173,6 @@ void IncreasingTopologyManager::update(double progress){
 
 DecreasingTopologyManager::DecreasingTopologyManager(std::vector<Particle*> const & particles)
 	:TopologyManager(particles){
-	this->shorthand = "D";
-}
-
-void DecreasingTopologyManager::initialize(){
 	int const popSize = particles.size();
 	maxConnectivity = popSize;
 	currentConnectivity = popSize-1;
@@ -269,7 +217,7 @@ void DecreasingTopologyManager::update(double progress){
 
 MultiSwarmTopologyManager::MultiSwarmTopologyManager(std::vector<Particle*> const & particles)
 	:TopologyManager(particles), clusterSize(3), count(0){
-	this->shorthand = "M";
+	createClusters();
 }
 
 void MultiSwarmTopologyManager::createClusters(){
@@ -300,10 +248,6 @@ void MultiSwarmTopologyManager::createClusters(){
 
 		cluster.clear();
 	}
-}
-
-void MultiSwarmTopologyManager::initialize(){
-	createClusters();
 }
 
 void MultiSwarmTopologyManager::update(double progress){

@@ -10,7 +10,7 @@ SelectionManager::SelectionManager(int const D, DEAdaptationManager* const dam)
 #define LC(X) [](int const D, DEAdaptationManager* const adap){return new X(D,adap);}
 std::map<std::string, std::function<SelectionManager* (int const, DEAdaptationManager *const)>> const selections ({
 		{"p2", LC(Pairwise2SelectionManager)},
-		{"p2", LC(Pairwise3SelectionManager)},
+		{"p3", LC(Pairwise3SelectionManager)},
 		{"u2", LC(Union2SelectionManager)},
 		{"u3", LC(Union3SelectionManager)},
 });
@@ -29,9 +29,7 @@ void SelectionManager::selection(std::vector<Particle*>& particles,
 
 //Pairwise 2
 Pairwise2SelectionManager::Pairwise2SelectionManager(int const D, DEAdaptationManager* dam)
-: SelectionManager(D, dam){
-	this->shorthand = "P2";
-}
+: SelectionManager(D, dam){}
 
 void Pairwise2SelectionManager::select(std::vector<Particle*>& particles, 
 		std::vector<Particle*>const& p0, std::vector<Particle*>const& p2){
@@ -50,9 +48,7 @@ void Pairwise2SelectionManager::select(std::vector<Particle*>& particles,
 
 //Pairwise 3
 Pairwise3SelectionManager::Pairwise3SelectionManager(int const D, DEAdaptationManager* dam)
-: SelectionManager(D, dam){
-	this->shorthand = "P3";
-}
+: SelectionManager(D, dam){}
 
 void Pairwise3SelectionManager::select(std::vector<Particle*>& particles, 
 		std::vector<Particle*>const& p0, std::vector<Particle*>const& p2){
@@ -75,9 +71,7 @@ void Pairwise3SelectionManager::select(std::vector<Particle*>& particles,
 
 //Union 2
 Union2SelectionManager::Union2SelectionManager(int const D, DEAdaptationManager* dam)
-: SelectionManager(D, dam){
-	this->shorthand = "U2";
-}
+: SelectionManager(D, dam){}
 
 bool sortbyFirstElement(const std::tuple<Particle*, int, int>& a,  
                const std::tuple<Particle*, int, int>& b) { 
@@ -113,9 +107,7 @@ void Union2SelectionManager::select(std::vector<Particle*>& particles,
 
 //Union 3
 Union3SelectionManager::Union3SelectionManager(int const D, DEAdaptationManager* dam)
-: SelectionManager(D, dam){
-	this->shorthand = "U3";
-}
+: SelectionManager(D, dam){}
 
 void Union3SelectionManager::select(std::vector<Particle*>& particles, 
 		std::vector<Particle*>const& p0, std::vector<Particle*>const& p2){

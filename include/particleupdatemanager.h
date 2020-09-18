@@ -16,7 +16,6 @@ class ParticleUpdateManager {
 		std::vector<double> const& g;
 		int const D;
 	public:
-		std::string shorthand;
 		ParticleUpdateManager(std::vector<double>& x, std::vector<double>& v,
 			std::vector<double>const& p, std::vector<double>const& g);
 		virtual ~ParticleUpdateManager();

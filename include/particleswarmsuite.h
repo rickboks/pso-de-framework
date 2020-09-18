@@ -1,24 +1,23 @@
 #pragma once
-
 #include <vector>
 #include <map>
 #include "particleupdatemanager.h"
 #include "topologymanager.h"
 #include "particleswarm.h"
-typedef std::tuple<UpdateManagerType, Topology, Synchronicity> pso_configuration;
 
 class ParticleSwarmSuite {
 	private:		
-		std::vector<UpdateManagerType> updateManagers;
-		std::vector<Topology> topologyManagers;
-		std::vector<Synchronicity> synchronicities;
-
-		std::vector<pso_configuration> configurations;
-		public:
+		std::vector<std::string> updateManagers;
+		std::vector<std::string> topologyManagers;
+		std::vector<std::string> constraintHandlers;
+		std::vector<bool> synchronicities;
+		std::vector<PSOConfig> configurations;
+	public:
 		ParticleSwarmSuite();
-		void setUpdateManagers(std::vector<UpdateManagerType> updateManagers);
-		void setTopologyManagers(std::vector<Topology> topologyManagers);
-		void setSynchronicities(std::vector<Synchronicity> synchronicities);
+		void setUpdateManagers(std::vector<std::string> updateManagers);
+		void setTopologyManagers(std::vector<std::string> topologyManagers);
+		void setSynchronicities(std::vector<bool> synchronicities);
+		void setConstraintHandlers(std::vector<std::string> chs);
 		void generateConfigurations();
 		ParticleSwarm getParticleSwarm(int const i);	
 		int size() const;

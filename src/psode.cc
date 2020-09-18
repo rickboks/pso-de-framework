@@ -6,7 +6,6 @@
 #include "particleupdatesettings.h"
 #include "util.h"
 #include "mutationmanager.h"
-#include "instancenamer.h"
 #include "repairhandler.h"
 #include "psode.h"
 #include <limits>
@@ -51,34 +50,31 @@ void PSODE::reset(){
 
 PSODE::~PSODE(){}
 
-void PSODE::run(std::shared_ptr<IOHprofiler_problem<double> > problem, 
-    		std::shared_ptr<IOHprofiler_csv_logger> logger,
-    		int const evalBudget, int popSize, std::map<int,double> particleUpdateParams){
-
+void PSODE::run(std::shared_ptr<IOHprofiler_problem<double>> const problem, 
+    		std::shared_ptr<IOHprofiler_csv_logger> const logger,
+    		int const evalBudget, int const popSize, std::map<int,double> const particleUpdateParams){
 	this->problem=problem;
 	this->logger=logger;
+
 	if (config.synchronous)
 		runSynchronous(evalBudget, popSize, particleUpdateParams);
 	else
 		runAsynchronous(evalBudget, popSize, particleUpdateParams);
 }
 
-void PSODE::runSynchronous(int const evalBudget, int popSize, 
-	std::map<int,double> particleUpdateParams){
+void PSODE::runSynchronous(int const evalBudget, int const popSize, 
+	std::map<int,double> const particleUpdateParams){
 
 	std::vector<Particle*> p0;
 	std::vector<Particle*> p1;
 	std::vector<Particle*> p2;
 		
-	topologyManager = topologies.at(config.topology)(particles);
-	popSize = topologyManager->getClosestValidPopulationSize(popSize);	
-
 	int const D = problem->IOHprofiler_get_number_of_variables();
-	std::vector<double> smallest = problem->IOHprofiler_get_lowerbound();
-	std::vector<double> largest = problem->IOHprofiler_get_upperbound();
+	std::vector<double> const lowerBound = problem->IOHprofiler_get_lowerbound();
+	std::vector<double> const upperBound = problem->IOHprofiler_get_upperbound();
 
-	deCH = deCHs.at(config.deCH)(smallest, largest);
-	psoCH = psoCHs.at(config.psoCH)(smallest, largest);
+	deCH = deCHs.at(config.deCH)(lowerBound, upperBound);
+	psoCH = psoCHs.at(config.psoCH)(lowerBound, upperBound);
 
 	ParticleUpdateSettings settings(config.update, particleUpdateParams, psoCH);
 
@@ -86,13 +82,9 @@ void PSODE::runSynchronous(int const evalBudget, int popSize,
 		particles.push_back(new Particle(D, settings));
 
 	for (Particle* const p : particles)
-		p->randomize(smallest, largest);
+		p->randomize(lowerBound, upperBound);
 
-	for (Particle* const p : particles)
-		p->updateGbest();
-
-	topologyManager->initialize();
-
+	topologyManager = topologies.at(config.topology)(particles);
 	mutationManager = mutations.at(config.mutation)(D, deCH);
 	crossoverManager = crossovers.at(config.crossover)(D);
 	adaptationManager = deAdaptations.at(config.adaptation)();
@@ -169,31 +161,27 @@ void PSODE::runSynchronous(int const evalBudget, int popSize,
 }
 
 void PSODE::runAsynchronous(int const evalBudget, 
-	int popSize, std::map<int,double> particleUpdateParams){
+	int const popSize, std::map<int,double> const particleUpdateParams){
 
 	std::vector<Particle*> p0;
 	std::vector<Particle*> p1;
 	std::vector<Particle*> p2;
-		
-	topologyManager = topologies.at(config.topology)(particles);
-	popSize = topologyManager->getClosestValidPopulationSize(popSize);	
 
 	int const D = problem->IOHprofiler_get_number_of_variables(); /// dimension
-	std::vector<double> smallest = problem->IOHprofiler_get_lowerbound();
-	std::vector<double> largest = problem->IOHprofiler_get_upperbound();
+	std::vector<double> const lowerBound = problem->IOHprofiler_get_lowerbound();
+	std::vector<double> const upperBound = problem->IOHprofiler_get_upperbound();
 
-	deCH = new MidpointBaseRepair(smallest, largest);
-	psoCH = new ReinitializationRepair(smallest, largest);
-	
+	deCH = deCHs.at(config.deCH)(lowerBound, upperBound);
+	psoCH = psoCHs.at(config.deCH)(lowerBound, upperBound);
 	ParticleUpdateSettings settings(config.update, particleUpdateParams, psoCH);
 
 	for (int i = 0; i < popSize; i++)
 		particles.push_back(new Particle(D, settings));
 
 	for (Particle* const p : particles)
-		p->randomize(smallest, largest);
+		p->randomize(lowerBound, upperBound);
 
-	topologyManager->initialize();
+	topologyManager = topologies.at(config.topology)(particles);
 	mutationManager = mutations.at(config.mutation)(D, deCH);
 	crossoverManager = crossovers.at(config.crossover)(D);
 	adaptationManager = deAdaptations.at(config.adaptation)();
@@ -246,5 +234,5 @@ void PSODE::runAsynchronous(int const evalBudget,
 }
 
 std::string PSODE::getIdString() const{
-	return InstanceNamer::getName(config);
+	return "PSODE";
 }

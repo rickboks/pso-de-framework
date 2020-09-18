@@ -31,16 +31,16 @@ class ParticleSwarm {
 		bool logging;
 
 		void runSynchronous(int const evalBudget, int const popSize, 
-    		std::map<int,double> particleUpdateParams);
+    		std::map<int,double> const particleUpdateParams);
 		void runAsynchronous(int const evalBudget, int const popSize, 
-    		std::map<int,double> particleUpdateParams);
+    		std::map<int,double> const particleUpdateParams);
 	public:
-		ParticleSwarm(PSOConfig config);
+		ParticleSwarm(PSOConfig const config);
 		~ParticleSwarm();
 
-		void run(std::shared_ptr<IOHprofiler_problem<double> > problem, 
-    		std::shared_ptr<IOHprofiler_csv_logger> logger,
-    		int const evalBudget, int const popSize, std::map<int,double> particleUpdateParams);
+		void run(std::shared_ptr<IOHprofiler_problem<double> > const problem, 
+    		std::shared_ptr<IOHprofiler_csv_logger> const logger,
+    		int const evalBudget, int const popSize, std::map<int,double> const particleUpdateParams);
 
 		void reset();
 		std::string getIdString() const;

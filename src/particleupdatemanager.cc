@@ -49,9 +49,7 @@ InertiaWeightManager::InertiaWeightManager (std::vector<double>& x, std::vector<
 	: ParticleUpdateManager(x,v,p,g),
 	phi1 (parameters.find(Setting::S_INER_PHI1) != parameters.end() ? parameters[Setting::S_INER_PHI1] : INER_PHI1_DEFAULT),
 	phi2 (parameters.find(Setting::S_INER_PHI2) != parameters.end() ? parameters[Setting::S_INER_PHI2] : INER_PHI2_DEFAULT),	
-	w (parameters.find(Setting::S_INER_W) != parameters.end() ? parameters[Setting::S_INER_W] : INER_W_DEFAULT){
-	this->shorthand = "I";
-}
+	w (parameters.find(Setting::S_INER_W) != parameters.end() ? parameters[Setting::S_INER_W] : INER_W_DEFAULT){}
 
 void InertiaWeightManager::updateVelocity(double const progress) {
 	std::vector<double> pMinx(D);
@@ -72,9 +70,7 @@ DecrInertiaWeightManager::DecrInertiaWeightManager (std::vector<double>& x, std:
 	phi1 (parameters.find(Setting::S_DINER_PHI1) != parameters.end() ? parameters[Setting::S_DINER_PHI1] : DINER_PHI2_DEFAULT),
 	phi2 (parameters.find(Setting::S_DINER_PHI2) != parameters.end() ? parameters[Setting::S_DINER_PHI2] : DINER_PHI2_DEFAULT),	
 	wMin (parameters.find(Setting::S_DINER_W_END) != parameters.end() ? parameters[Setting::S_DINER_W_END] : DINER_W_END_DEFAULT),
-	wMax(parameters.find(Setting::S_DINER_W_START) != parameters.end() ? parameters[Setting::S_DINER_W_START] : DINER_W_START_DEFAULT){
-	this->shorthand = "D";
-}
+	wMax(parameters.find(Setting::S_DINER_W_START) != parameters.end() ? parameters[Setting::S_DINER_W_START] : DINER_W_START_DEFAULT){}
 
 void DecrInertiaWeightManager::updateVelocity(double const progress) {
 	std::vector<double> pMinx(D);
@@ -94,9 +90,7 @@ ConstrictionCoefficientManager::ConstrictionCoefficientManager(std::vector<doubl
 	: ParticleUpdateManager(x,v,p,g),
 	phi1 (parameters.find(Setting::S_CC_PHI1) != parameters.end() ? parameters[Setting::S_CC_PHI1] : CC_PHI1_DEFAULT),
 	phi2 (parameters.find(Setting::S_CC_PHI2) != parameters.end() ? parameters[Setting::S_CC_PHI2] : CC_PHI2_DEFAULT),
-	chi (2 / ((phi1+phi2) - 2 + sqrt(pow(phi1+phi2, 2) - 4 * (phi1+phi2)))){
-	this->shorthand = "C";
-}
+	chi (2 / ((phi1+phi2) - 2 + sqrt(pow(phi1+phi2, 2) - 4 * (phi1+phi2)))){}
 
 void ConstrictionCoefficientManager::updateVelocity(double const progress){
 	std::vector<double> pMinx(D);
@@ -117,9 +111,7 @@ FIPSManager::FIPSManager(std::vector<double> & x, std::vector<double> & v,
 	: ParticleUpdateManager(x,v,p,g),
 	phi (parameters.find(Setting::S_FIPS_PHI) != parameters.end() ? parameters[Setting::S_FIPS_PHI] : FIPS_PHI_DEFAULT),
 	chi (2 / ((phi) -2 + sqrt( pow(phi, 2) - 4 * (phi)))),
-	neighborhood(neighborhood){
-	this->shorthand = "F";
-}
+	neighborhood(neighborhood){}
 
 
 void FIPSManager::updateVelocity(double const progress){
@@ -145,9 +137,7 @@ void FIPSManager::updateVelocity(double const progress){
 /* 		Bare Bones 		*/
 BareBonesManager::BareBonesManager(std::vector<double> & x, std::vector<double> & v,
 	std::vector<double>const& p, std::vector<double>const& g,  std::map<int, double> parameters, std::vector<Particle*>& neighborhood) :
-	ParticleUpdateManager(x,v,p,g) {
-	this->shorthand = "B";
-}
+	ParticleUpdateManager(x,v,p,g) {}
 
 void BareBonesManager::updatePosition(){
 	for (int i = 0; i < D; i++){

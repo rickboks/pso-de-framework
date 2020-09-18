@@ -4,30 +4,15 @@
 #include<map>
 #include<random>
 
-enum Topology {
-	LBEST,
-	GBEST,
-	RANDOM_GRAPH,
-	VON_NEUMANN,
-	WHEEL,
-	INCREASING,
-	DECREASING,
-	MULTI_SWARM,
-	TOP_END
-};
-
 class Particle;
 
 class TopologyManager {
 	protected:
 		std::vector<Particle*> const & particles;
 	public:
-		std::string shorthand;
 		TopologyManager(std::vector<Particle*> const & particles);
 		virtual ~TopologyManager();
-		virtual void initialize() = 0;
 		virtual void update(double progress);
-		static TopologyManager* createTopologyManager(int const type, std::vector<Particle*> const & particles);
 };
 
 extern std::map<std::string, std::function<TopologyManager* (std::vector<Particle*> const)>> const topologies;
@@ -35,13 +20,11 @@ extern std::map<std::string, std::function<TopologyManager* (std::vector<Particl
 class LbestTopologyManager : public TopologyManager {
 	public:
 		LbestTopologyManager(std::vector<Particle*> const & particles);
-		void initialize();
 };
 
 class GbestTopologyManager : public TopologyManager {
 	public:
 		GbestTopologyManager(std::vector<Particle*> const & particles);
-		void initialize();
 };
 
 class RandomTopologyManager : public TopologyManager {
@@ -49,19 +32,16 @@ class RandomTopologyManager : public TopologyManager {
 		int const connections; //Amount of neigbors every particle gets
 	public:
 		RandomTopologyManager(std::vector<Particle*> const & particles);
-		void initialize();
 };
 
 class VonNeumannTopologyManager : public TopologyManager {
 	public:
 		VonNeumannTopologyManager(std::vector<Particle*> const & particles);
-		void initialize();
 };
 
 class WheelTopologyManager : public TopologyManager {
 	public:
 		WheelTopologyManager(std::vector<Particle*> const & particles);
-		void initialize();
 };
 
 class IncreasingTopologyManager : public TopologyManager {
@@ -71,7 +51,6 @@ class IncreasingTopologyManager : public TopologyManager {
 		int minConnectivity;
 	public:
 		IncreasingTopologyManager(std::vector<Particle*> const & particles);
-		void initialize();
 		void update(double progress);
 };
 
@@ -81,7 +60,6 @@ class DecreasingTopologyManager : public TopologyManager {
 		int maxConnectivity;
 	public:
 		DecreasingTopologyManager(std::vector<Particle*> const & particles);
-		void initialize();
 		void update(double progress);
 };
 
@@ -92,7 +70,6 @@ class MultiSwarmTopologyManager : public TopologyManager {
 		void createClusters();
 	public:
 		MultiSwarmTopologyManager(std::vector<Particle*> const & particles);
-		void initialize();
 		void update(double progress);
 };
 

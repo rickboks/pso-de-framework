@@ -1,9 +1,11 @@
 #pragma once
 #include <vector>
 #include <map>
+#include "deadaptationmanager.h"
 #include "mutationmanager.h"
 #include "crossovermanager.h"
 #include "particleupdatemanager.h"
+#include "selectionmanager.h"
 #include "topologymanager.h"
 #include "particleswarm.h"
 #include "hybridalgorithm.h"
@@ -11,31 +13,42 @@
 template <typename T>
 class HybridSuite {
 	private:		
-		std::vector<UpdateManagerType> updateManagers;
-		std::vector<Topology> topologyManagers;
-		std::vector<Synchronicity> synchronicities;
-		std::vector<MutationType> mutationManagers;
-		std::vector<CrossoverType> crossoverManagers;
-		std::vector<SelectionType> selectionManagers;
-		std::vector<DEAdaptationType> adaptationManagers;
-		std::vector<hybrid_config> configurations;
+		std::vector<std::string> updateManagers;
+		std::vector<std::string> topologyManagers;
+		std::vector<std::string> psoCHs;
+		std::vector<bool> synchronicities;
+		std::vector<std::string> mutationManagers;
+		std::vector<std::string> crossoverManagers;
+		std::vector<std::string> selectionManagers;
+		std::vector<std::string> adaptationManagers;
+		std::vector<std::string> deCHs;
+		std::vector<HybridConfig> configurations;
 
 		public:
 		HybridSuite(){
-			for (int i = 0; i < MUT_END; i++)
-				mutationManagers.push_back((MutationType)i);
-			for (int i = 0; i < CROSS_END; i++)
-				crossoverManagers.push_back((CrossoverType)i);
-			for (int i = 0; i < MAN_END; i++)
-				updateManagers.push_back((UpdateManagerType)i);
-			for (int i = 0; i < TOP_END; i++)
-				topologyManagers.push_back((Topology) i);
-			for (int i = 0; i < SYNC_END; i++)
-				synchronicities.push_back((Synchronicity)i);
-			for (int i = 0; i < SEL_END; i++)
-				selectionManagers.push_back((SelectionType)i);
-			for (int i = 0; i < DEA_END; i++)
-				adaptationManagers.push_back((DEAdaptationType)i);
+			for (auto&i : ::updateManagers)
+				updateManagers.push_back(i.first);
+
+			for (auto&i : ::topologies)
+				topologyManagers.push_back(i.first);
+
+			for (auto&i : ::psoCHs)
+				psoCHs.push_back(i.first);
+
+			for (auto&i : ::deCHs)
+				deCHs.push_back(i.first);
+
+			synchronicities.push_back(true);
+			synchronicities.push_back(false);
+
+			for (auto&i : ::mutations)
+				mutationManagers.push_back(i.first);
+			for (auto&i : ::crossovers)
+				crossoverManagers.push_back(i.first);
+			for (auto&i : ::selections)
+				selectionManagers.push_back(i.first);
+			for (auto&i : ::deAdaptations)
+				adaptationManagers.push_back(i.first);
 
 			generateConfigurations();
 		}
@@ -49,9 +62,10 @@ class HybridSuite {
 							for (auto synchronicity : synchronicities)
 								for (auto selection : selectionManagers)
 									for (auto adaptation : adaptationManagers)
-										configurations.push_back(
-											hybrid_config(update, topology, synchronicity, mutation, 
-												crossover, selection, adaptation));
+										for (auto deCH : deCHs)
+											for (auto psoCH : psoCHs)
+												configurations.push_back(HybridConfig(update, topology, psoCH, synchronicity, mutation, 
+														crossover, selection, adaptation, deCH));
 
 		}
 
@@ -59,38 +73,47 @@ class HybridSuite {
 			return T(configurations[i]);
 		}
 
-		void setMutationManagers(std::vector<MutationType> mutationManagers){
+		void setMutationManagers(std::vector<std::string> mutationManagers){
 			this->mutationManagers = mutationManagers;
 			generateConfigurations();
 		}
 
-		void setCrossoverManagers(std::vector<CrossoverType> crossoverManagers){
+		void setCrossoverManagers(std::vector<std::string> crossoverManagers){
 			this->crossoverManagers = crossoverManagers;
 			generateConfigurations();
 		}
 
-		void setUpdateManagers(std::vector<UpdateManagerType> updateManagers){
+		void setUpdateManagers(std::vector<std::string> updateManagers){
 			this->updateManagers = updateManagers;
 			generateConfigurations();
 		}
 
-		void setTopologyManagers(std::vector<Topology> topologyManagers){
+		void setTopologyManagers(std::vector<std::string> topologyManagers){
 			this->topologyManagers = topologyManagers;
 			generateConfigurations();
 		}
 
-		void setSynchronicities(std::vector<Synchronicity> synchronicities){
+		void setSynchronicities(std::vector<std::string> synchronicities){
 			this->synchronicities = synchronicities;
 			generateConfigurations();
 		}
 
-		void setSelectionManagers(std::vector<SelectionType> selectionManagers){
+		void setSelectionManagers(std::vector<std::string> selectionManagers){
 			this->selectionManagers = selectionManagers;
 			generateConfigurations();
 		}
 
-		void setDEAdaptationManagers(std::vector<DEAdaptationType> adaptationManagers){
+		void setDEAdaptationManagers(std::vector<std::string> adaptationManagers){
 			this->adaptationManagers = adaptationManagers;
+			generateConfigurations();
+		}
+		void setDEContraintHandlers(std::vector<std::string> deCHs){
+			this->deCHs = deCHs;
+			generateConfigurations();
+		}
+
+		void setPSOConstraintHandlers(std::vector<std::string> psoCHs){
+			this->psoCHs = psoCHs;
 			generateConfigurations();
 		}
 

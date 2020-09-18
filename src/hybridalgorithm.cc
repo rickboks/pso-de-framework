@@ -1,6 +1,6 @@
 #include "hybridalgorithm.h"
 
-HybridAlgorithm::HybridAlgorithm(HybridConfig config)
+HybridAlgorithm::HybridAlgorithm(HybridConfig const config)
 		: config(config){}
 
 HybridAlgorithm::~HybridAlgorithm(){}

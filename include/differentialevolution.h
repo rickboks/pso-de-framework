@@ -25,14 +25,10 @@ class DifferentialEvolution {
 		CrossoverManager* crossoverManager;
 		DEAdaptationManager* adaptationManager;
 		ConstraintHandler* deCH;
-		int dimension;
-		int popSize;
-		std::shared_ptr<IOHprofiler_csv_logger> logger;
-		std::shared_ptr<IOHprofiler_problem<double> > problem;
 	public:
-		DifferentialEvolution(DEConfig config);
-		void run(std::shared_ptr<IOHprofiler_problem<double> > problem, 
-    		std::shared_ptr<IOHprofiler_csv_logger> logger,
+		DifferentialEvolution(DEConfig const config);
+		void run(std::shared_ptr<IOHprofiler_problem<double> > const problem, 
+    		std::shared_ptr<IOHprofiler_csv_logger> const logger,
     		int const evalBudget, int const popSize);
 		std::string getIdString() const;
 };

@@ -20,14 +20,14 @@ class Particle {
 
 		std::vector<Particle*> neighborhood;
 		ParticleUpdateManager* particleUpdateManager;
-		ParticleUpdateSettings settings;
+		ParticleUpdateSettings const settings;
 		ConstraintHandler const * const psoCH;
 	public:
 		int const D;
 		bool const isPSO;
 		Particle(int const D, ParticleUpdateSettings& particleUpdateSettings);
 		Particle(int const D);
-		Particle(const Particle& other);
+		Particle(Particle const & other);
 		Particle(std::vector<double> x); 
 		~Particle();
 		std::vector<double> getV() const;

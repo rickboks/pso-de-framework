@@ -11,7 +11,7 @@ OBJ = $(SRC:$(SRC_DIR)/%.cc=$(OBJ_DIR)/%.o)
 INC = -I $(INC_DIR)
 
 CC      = g++
-CFLAGS  = -Wall -std=c++20 -g# -O2
+CFLAGS  = -Wall -std=c++17 -g# -O2
 
 .PHONY: all
 all: $(OBJ_DIR) $(RESULT_DIR) $(EXE)

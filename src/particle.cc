@@ -18,7 +18,7 @@ Particle::Particle(int const D, ParticleUpdateSettings& settings)
 	particleUpdateManager = updateManagers.at(settings.managerType)(x,v,p,g,settings.parameters,neighborhood);
 }
 
-Particle::Particle(const Particle& other)
+Particle::Particle(Particle const & other)
 	: x(other.x), v(other.v), p(other.p), g(other.g),
 	pbest(other.pbest), gbest(other.gbest), evaluated(other.evaluated), 
 	fitness(other.fitness), neighborhood(other.neighborhood),
@@ -114,13 +114,13 @@ void Particle::updateGbest(){
 	int bestNeighbor = -1;
 	int const size = neighborhood.size();
 
-	if (fitness < gbest){
+	if (fitness < gbest){ // First check own fitness
 		gbest = fitness;
 		g = x;
 	}
 
 	double bestScore = gbest;
-	for (int i = 0; i < size; i++){
+	for (int i = 0; i < size; i++){ // Check neighbors fitness
 		double const currentScore = neighborhood[i]->getPbest();
 		if (currentScore < bestScore){
 			bestScore = currentScore;
@@ -128,7 +128,7 @@ void Particle::updateGbest(){
 		}
 	}
 
-	if (bestNeighbor != -1){
+	if (bestNeighbor != -1){ // Update gbest
 		gbest = bestScore;
 		g = neighborhood[bestNeighbor]->getG();
 	}

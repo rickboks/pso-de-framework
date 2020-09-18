@@ -7,9 +7,7 @@
 RepairHandler::~RepairHandler(){}
 RepairHandler::RepairHandler(std::vector<double>const lb, std::vector<double>const ub) : ConstraintHandler(lb, ub){}
 
-ReinitializationRepair::ReinitializationRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){
-	this->shorthand = "RI";
-}
+ReinitializationRepair::ReinitializationRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
 void ReinitializationRepair::repair(Particle* const p) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i] || p->getX(i) > ub[i]){
@@ -19,9 +17,7 @@ void ReinitializationRepair::repair(Particle* const p) const{
 	}
 }
 
-ProjectionRepair::ProjectionRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){
-	this->shorthand = "PR";
-}
+ProjectionRepair::ProjectionRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
 void ProjectionRepair::repair(Particle* const p) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i]){
@@ -34,9 +30,7 @@ void ProjectionRepair::repair(Particle* const p) const{
 	}
 }
 
-ReflectionRepair::ReflectionRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){
-	this->shorthand = "RF";
-}
+ReflectionRepair::ReflectionRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
 void ReflectionRepair::repair(Particle* const p) const{
 	for (int i = 0; i < D; i++){
 		bool is_repaired = false;
@@ -53,9 +47,7 @@ void ReflectionRepair::repair(Particle* const p) const{
 	}
 }
 
-WrappingRepair::WrappingRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){
-	this->shorthand = "WR";
-}
+WrappingRepair::WrappingRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
 void WrappingRepair::repair(Particle* const p) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i]){
@@ -68,9 +60,7 @@ void WrappingRepair::repair(Particle* const p) const{
 	}
 }
 
-ResamplingRepair::ResamplingRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){
-	this->shorthand = "RS";
-}
+ResamplingRepair::ResamplingRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
 bool ResamplingRepair::resample(Particle const* const p, int const resamples) const{
 	if (resamples >= 100 || isFeasible(p))
 		return false;
@@ -78,9 +68,7 @@ bool ResamplingRepair::resample(Particle const* const p, int const resamples) co
 }
 
 // Differential Evolution
-RandBaseRepair::RandBaseRepair(std::vector<double>const lb, std::vector<double>const ub): RepairHandler(lb, ub){
-	this->shorthand = "RB";
-}
+RandBaseRepair::RandBaseRepair(std::vector<double>const lb, std::vector<double>const ub): RepairHandler(lb, ub){}
 void RandBaseRepair::repair(Particle* const p, Particle const* const base, Particle const* const target) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) > ub[i]){
@@ -91,9 +79,7 @@ void RandBaseRepair::repair(Particle* const p, Particle const* const base, Parti
 	}
 }
 
-MidpointBaseRepair::MidpointBaseRepair(std::vector<double>const lb, std::vector<double>const ub): RepairHandler(lb, ub){
-	this->shorthand = "MB";
-}
+MidpointBaseRepair::MidpointBaseRepair(std::vector<double>const lb, std::vector<double>const ub): RepairHandler(lb, ub){}
 void MidpointBaseRepair::repair(Particle* const p, Particle const* const base, Particle const* const target) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) > ub[i]){
@@ -104,9 +90,7 @@ void MidpointBaseRepair::repair(Particle* const p, Particle const* const base, P
 	}
 }
 
-MidpointTargetRepair::MidpointTargetRepair(std::vector<double>const lb, std::vector<double>const ub): RepairHandler(lb, ub){
-	this->shorthand = "MT";
-}
+MidpointTargetRepair::MidpointTargetRepair(std::vector<double>const lb, std::vector<double>const ub): RepairHandler(lb, ub){}
 void MidpointTargetRepair::repair(Particle* const p, Particle const* const base, Particle const* const target) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) > ub[i]){
@@ -117,9 +101,7 @@ void MidpointTargetRepair::repair(Particle* const p, Particle const* const base,
 	}
 }
 
-ConservatismRepair::ConservatismRepair(std::vector<double>const lb, std::vector<double>const ub): RepairHandler(lb, ub){
-	this->shorthand = "CO";
-}
+ConservatismRepair::ConservatismRepair(std::vector<double>const lb, std::vector<double>const ub): RepairHandler(lb, ub){}
 void ConservatismRepair::repair(Particle* const p, Particle const* const base, Particle const* const target) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) > ub[i] || p->getX(i) < lb[i]){
@@ -128,9 +110,7 @@ void ConservatismRepair::repair(Particle* const p, Particle const* const base, P
 	}
 }
 
-ProjectionMidpointRepair::ProjectionMidpointRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){
-	this->shorthand = "PM";
-}
+ProjectionMidpointRepair::ProjectionMidpointRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
 void ProjectionMidpointRepair::repair(Particle* const p, Particle const* const base, Particle const* const target) const{
 	std::vector<double> x = p->getX();
 	std::vector<double>alphas(D+1);
@@ -157,9 +137,7 @@ void ProjectionMidpointRepair::repair(Particle* const p, Particle const* const b
 
 }
 
-ProjectionBaseRepair::ProjectionBaseRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){
-	this->shorthand = "PB";
-}
+ProjectionBaseRepair::ProjectionBaseRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
 void ProjectionBaseRepair::repair(Particle* const p, Particle const* const base, Particle const* const target) const{
 	std::vector<double> x = p->getX();
 	std::vector<double> alphas(D+1);
@@ -185,9 +163,7 @@ void ProjectionBaseRepair::repair(Particle* const p, Particle const* const base,
 }
 
 // Particle Swarm Optimization
-HyperbolicRepair::HyperbolicRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){
-	this->shorthand = "HY";
-}
+HyperbolicRepair::HyperbolicRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
 void HyperbolicRepair::repairVelocityPre(Particle * const p) const{
 	for (int i = 0; i < D; i++){
 		double const center = (lb[i] + ub[i])/2;
@@ -200,9 +176,7 @@ void HyperbolicRepair::repairVelocityPre(Particle * const p) const{
 	}
 }
 
-PBestDimRepair::PBestDimRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){
-	this->shorthand = "PD";
-}
+PBestDimRepair::PBestDimRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
 void PBestDimRepair::repair(Particle* const p) const {
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i] || p->getX(i) > ub[i]){

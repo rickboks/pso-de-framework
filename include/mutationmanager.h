@@ -18,7 +18,6 @@ class MutationManager {
 		Particle const* pBest;
 		virtual Particle* mutate(int const i) const=0;
 	public:
-		std::string shorthand;
 		MutationManager(int const D, ConstraintHandler const* const deCH);
 		virtual ~MutationManager();
 		std::vector<Particle*> mutate(std::vector<Particle*> const& genomes, std::vector<double>const& Fs);

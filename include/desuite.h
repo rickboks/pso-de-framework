@@ -7,20 +7,20 @@
 #include "crossovermanager.h"
 #include "deadaptationmanager.h"
 
-typedef std::tuple<MutationType, CrossoverType, DEAdaptationType> de_configuration;
-
 class DESuite {
 	private:		
-		std::vector<MutationType> mutationManagers;
-		std::vector<CrossoverType> crossoverManagers;
-		std::vector<DEAdaptationType> adaptationManagers;
-		std::vector<de_configuration> configurations;
+		std::vector<std::string> mutationManagers;
+		std::vector<std::string> crossoverManagers;
+		std::vector<std::string> adaptationManagers;
+		std::vector<std::string> constraintHandlers;
+		std::vector<DEConfig> configurations;
 	public:
 		DESuite();
 		void generateConfigurations();
-		void setMutationManagers(std::vector<MutationType> mutationManagers);
-		void setCrossoverManagers(std::vector<CrossoverType> crossoverManagers);
-		void setDEAdaptationManagers(std::vector<DEAdaptationType> adaptationManagers);
+		void setMutationManagers(std::vector<std::string> mutationManagers);
+		void setCrossoverManagers(std::vector<std::string> crossoverManagers);
+		void setDEAdaptationManagers(std::vector<std::string> adaptationManagers);
+		void setConstraintHandlers(std::vector<std::string> adaptationManagers);
 		DifferentialEvolution getDE(int const i);	
 		int size() const;
 };

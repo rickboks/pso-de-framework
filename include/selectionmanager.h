@@ -7,7 +7,6 @@ protected:
 	int const D;
 	DEAdaptationManager* const dam;	
 public:
-	std::string shorthand;
 	SelectionManager(int const D, DEAdaptationManager* const dam);
 	void selection(std::vector<Particle*>& particles, 
 		std::vector<Particle*>const& p0, std::vector<Particle*>const& p2);

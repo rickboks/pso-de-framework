@@ -12,9 +12,7 @@ std::map<std::string, std::function<DEAdaptationManager*()>> const deAdaptations
 
 //JADE
 JADEManager::JADEManager()
- : DEAdaptationManager(), MuCr(0.5), MuF(0.6), c(0.1){
-	this->shorthand = "J";
-}
+ : DEAdaptationManager(), MuCr(0.5), MuF(0.6), c(0.1){}
 
 void JADEManager::successfulIndex(int i){
 	succesfulValues(previousFs[i], previousCrs[i]);
@@ -75,9 +73,7 @@ void JADEManager::reset(){
 
 //NO ADAPTATION
 NoAdaptationManager::NoAdaptationManager()
- : DEAdaptationManager(), F(0.5), Cr(0.9){
-	this->shorthand="N";
-}
+ : DEAdaptationManager(), F(0.5), Cr(0.9){}
 
 void NoAdaptationManager::succesfulValues(double F, double Cr){
 	//ignore

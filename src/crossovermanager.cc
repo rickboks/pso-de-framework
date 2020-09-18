@@ -10,9 +10,7 @@ std::map<std::string, std::function<CrossoverManager* (int const)>> const crosso
 		{"exponential", LC(ExponentialCrossoverManager)},
 });
 
-BinomialCrossoverManager::BinomialCrossoverManager(int const D) : CrossoverManager(D){
-	this->shorthand = "B";
-}
+BinomialCrossoverManager::BinomialCrossoverManager(int const D) : CrossoverManager(D){}
 
 std::vector<Particle*> BinomialCrossoverManager::crossover(std::vector<Particle*>const& genomes, std::vector<Particle*>const& mutants, std::vector<double>const& Crs){
 	std::vector<Particle*> trials;
@@ -41,9 +39,7 @@ std::vector<double> BinomialCrossoverManager::singleCrossover(std::vector<double
 	return x;
 }
 
-ExponentialCrossoverManager::ExponentialCrossoverManager(int const D): CrossoverManager(D){
-	this->shorthand = "E";
-}
+ExponentialCrossoverManager::ExponentialCrossoverManager(int const D): CrossoverManager(D){}
 
 std::vector<Particle*> ExponentialCrossoverManager::crossover(std::vector<Particle*>const& genomes, std::vector<Particle*>const& mutants, std::vector<double>const& Crs){
 	std::vector<Particle*> trials;

@@ -1,14 +1,19 @@
 #include "desuite.h"
+#include "crossovermanager.h"
+#include "deadaptationmanager.h"
 #include <iostream>
 #include <algorithm>
+#include <pthread.h>
 
 DESuite::DESuite(){
-	for (int i = 0; i < MUT_END; i++)
-		mutationManagers.push_back((MutationType)i);
-	for (int i = 0; i < CROSS_END; i++)
-		crossoverManagers.push_back((CrossoverType)i);
-	for (int i = 0; i < DEA_END; i++)
-		adaptationManagers.push_back((DEAdaptationType)i);
+	for (auto&i : ::mutations)
+		this->mutationManagers.push_back(i.first);
+	for (auto&i : ::crossovers)
+		this->crossoverManagers.push_back(i.first);
+	for (auto&i : ::deAdaptations)
+		this->adaptationManagers.push_back(i.first);
+	for (auto&i : ::deCHs)
+		this->constraintHandlers.push_back(i.first);
 
 	generateConfigurations();
 }
@@ -18,31 +23,31 @@ void DESuite::generateConfigurations(){
 	for (auto mutation : mutationManagers)
 		for (auto crossover : crossoverManagers)
 				for (auto adaptation : adaptationManagers)
-						configurations.push_back(std::make_tuple(mutation, crossover, adaptation));
-						//configurations.push_back(std::make_tuple(initialization, mutation, crossover, adaptation, true));
-
+					for (auto ch : constraintHandlers)
+							configurations.push_back(DEConfig(mutation, crossover, adaptation, ch));
 }
 
 DifferentialEvolution DESuite::getDE(int const i) {
-	//auto [initialization, mutation, crossover, adapt, jump] = configurations[i];
-	MutationType mutation = std::get<0>(configurations[i]);
-	CrossoverType crossover = std::get<1>(configurations[i]);
-	DEAdaptationType adapt = std::get<2>(configurations[i]);
-	return DifferentialEvolution (mutation, crossover, adapt);
+	return DifferentialEvolution (configurations[i]);
 }
 
-void DESuite::setMutationManagers(std::vector<MutationType> mutationManagers){
+void DESuite::setMutationManagers(std::vector<std::string> mutationManagers){
 	this->mutationManagers = mutationManagers;
 	generateConfigurations();
 }
 
-void DESuite::setCrossoverManagers(std::vector<CrossoverType> crossoverManagers){
+void DESuite::setCrossoverManagers(std::vector<std::string> crossoverManagers){
 	this->crossoverManagers = crossoverManagers;
 	generateConfigurations();
 }
 
-void DESuite::setDEAdaptationManagers(std::vector<DEAdaptationType> adaptationManagers){
+void DESuite::setDEAdaptationManagers(std::vector<std::string> adaptationManagers){
 	this->adaptationManagers = adaptationManagers;
+	generateConfigurations();
+}
+
+void DESuite::setConstraintHandlers(std::vector<std::string> chs){
+	this->constraintHandlers = chs;
 	generateConfigurations();
 }
 

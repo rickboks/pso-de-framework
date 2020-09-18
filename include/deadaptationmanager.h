@@ -13,7 +13,6 @@ protected:
 	std::vector<double> previousFs;
 	std::vector<double> previousCrs;
 public:
-	std::string shorthand;
 	virtual ~DEAdaptationManager(){};
 	virtual void successfulIndex(int i)=0;
 	virtual void succesfulValues(double F, double Cr)=0;

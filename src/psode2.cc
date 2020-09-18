@@ -8,7 +8,6 @@
 #include "particleupdatesettings.h"
 #include "util.h"
 #include "mutationmanager.h"
-#include "instancenamer.h"
 #include "penaltyhandler.h"
 #include "psode2.h"
 #include <limits>
@@ -52,19 +51,14 @@ void PSODE2::runAsynchronous(int const evalBudget, int const popSize, std::map<i
 	int const D = problem->IOHprofiler_get_number_of_variables(); /// dimension
 	logging=false;
 
-	std::vector<double> smallest = problem->IOHprofiler_get_lowerbound();
-	std::vector<double> largest = problem->IOHprofiler_get_upperbound();
+	std::vector<double> lowerBound = problem->IOHprofiler_get_lowerbound();
+	std::vector<double> upperBound = problem->IOHprofiler_get_upperbound();
 
-	deCH = deCHs.at(config.deCH)(smallest,largest);
-	psoCH = psoCHs.at(config.psoCH)(smallest,largest);
-
+	deCH = deCHs.at(config.deCH)(lowerBound,upperBound);
+	psoCH = psoCHs.at(config.psoCH)(lowerBound,upperBound);
 	ParticleUpdateSettings settings(config.update, particleUpdateParams, psoCH);
-	mutationManager = mutations.at(config.mutation)(D, deCH);
-	crossoverManager = crossovers.at(config.crossover)(D);
-	adaptationManager = deAdaptations.at(config.adaptation)();
 
 	int const split = popSize / 2;
-
 	for (int i = 0; i < split; i++) psoPop.push_back(new Particle(D, settings));
 	for (int i = split; i < popSize; i++) dePop.push_back(new Particle(D));
 	
@@ -73,20 +67,21 @@ void PSODE2::runAsynchronous(int const evalBudget, int const popSize, std::map<i
 	particles.insert(particles.end(), dePop.begin(), dePop.end());
 
 	for (Particle* const p : particles)
-		p->randomize(smallest, largest);
+		p->randomize(lowerBound, upperBound);
 
 	for (Particle* const p : particles)
 		p->evaluate(problem, logger);
 
 	topologyManager = topologies.at(config.topology)(psoPop);
-	topologyManager->initialize();
+	mutationManager = mutations.at(config.mutation)(D, deCH);
+	crossoverManager = crossovers.at(config.crossover)(D);
+	adaptationManager = deAdaptations.at(config.adaptation)();
 
 	std::vector<double> Fs(dePop.size());
 	std::vector<double> Crs(dePop.size());
 
 	logStart();
 	int iterations = 0;
-
 	while (problem->IOHprofiler_get_evaluations() < evalBudget &&
 			!problem->IOHprofiler_hit_optimal()){
 
@@ -145,7 +140,7 @@ void PSODE2::runAsynchronous(int const evalBudget, int const popSize, std::map<i
 }
 
 std::string PSODE2::getIdString() const{
-	return InstanceNamer::getName(config);
+	return "PSODE2";
 }
 
 void PSODE2::logStart(){

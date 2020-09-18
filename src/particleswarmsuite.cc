@@ -3,12 +3,15 @@
 #include <algorithm>
 
 ParticleSwarmSuite::ParticleSwarmSuite(){
-	for (int i = 0; i < MAN_END; i++)
-		updateManagers.push_back((UpdateManagerType)i);
-	for (int i = 0; i < TOP_END; i++)
-		topologyManagers.push_back((Topology) i);
-	for (int i = 0; i < SYNC_END; i++)
-		synchronicities.push_back((Synchronicity)i);
+	for (auto& i : ::updateManagers)
+		this->updateManagers.push_back(i.first);
+	for (auto& i : ::topologies)
+		this->topologyManagers.push_back(i.first);
+	for (auto& i : ::psoCHs)
+		this->constraintHandlers.push_back(i.first);
+
+	this->synchronicities.push_back(true);
+	this->synchronicities.push_back(false);
 
 	generateConfigurations();
 }
@@ -17,30 +20,31 @@ void ParticleSwarmSuite::generateConfigurations(){
 	configurations.clear();
 	for (auto update : updateManagers)
 		for (auto topology : topologyManagers)
-			for (auto synchronicity : synchronicities)
-					configurations.push_back(
-						std::make_tuple(update, topology, synchronicity));
+			for (auto ch : constraintHandlers)
+				for (auto synchronicity : synchronicities)
+					configurations.push_back(PSOConfig(update, topology, ch, synchronicity));
 }
 
 ParticleSwarm ParticleSwarmSuite::getParticleSwarm(int const i) {
-	UpdateManagerType update = std::get<0>(configurations[i]);
-	Topology topology = std::get<1>(configurations[i]);
-	Synchronicity sync = std::get<2>(configurations[i]);
-
-	return ParticleSwarm(update, topology, sync);
+	return ParticleSwarm(configurations[i]);
 }
 
-void ParticleSwarmSuite::setUpdateManagers(std::vector<UpdateManagerType> updateManagers){
+void ParticleSwarmSuite::setUpdateManagers(std::vector<std::string> updateManagers){
 	this->updateManagers = updateManagers;
 	generateConfigurations();
 }
 
-void ParticleSwarmSuite::setTopologyManagers(std::vector<Topology> topologyManagers){
+void ParticleSwarmSuite::setTopologyManagers(std::vector<std::string> topologyManagers){
 	this->topologyManagers = topologyManagers;
 	generateConfigurations();
 }
 
-void ParticleSwarmSuite::setSynchronicities(std::vector<Synchronicity> synchronicities){
+void ParticleSwarmSuite::setConstraintHandlers(std::vector<std::string> chs){
+	this->constraintHandlers = chs;
+	generateConfigurations();
+}
+
+void ParticleSwarmSuite::setSynchronicities(std::vector<bool> synchronicities){
 	this->synchronicities = synchronicities;
 	generateConfigurations();
 }

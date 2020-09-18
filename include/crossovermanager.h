@@ -16,7 +16,6 @@ class CrossoverManager {
 	protected:
 		int const D;
 	public:
-		std::string shorthand;
 		CrossoverManager(int const D);
 		virtual ~CrossoverManager();
 

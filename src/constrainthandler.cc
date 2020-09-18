@@ -32,35 +32,35 @@ bool ConstraintHandler::isFeasible(Particle const * const p) const{
 }
 
 std::map<std::string, std::function<ConstraintHandler* (std::vector<double>, std::vector<double>)>> const psoCHs ({
-		// Generic
-		{"reinitialization", LC(ReinitializationRepair)},
-		{"projection", LC(ProjectionRepair)},
-		{"reflection", LC(ReflectionRepair)},
-		{"wrapping", LC(WrappingRepair)},
-		{"death penalty", LC(DeathPenalty)},
-		{"resampling", LC(ResamplingRepair)},
+	// Generic
+	{"RI", LC(ReinitializationRepair)},
+	{"PR", LC(ProjectionRepair)},
+	{"RF", LC(ReflectionRepair)},
+	{"WR", LC(WrappingRepair)},
+	{"DP", LC(DeathPenalty)},
+	{"RS", LC(ResamplingRepair)},
 
-		// PSO
-		{"hyperbolic", LC(HyperbolicRepair)},
-		{"pbest", LC(PBestDimRepair)},
+	// PSO
+	{"HY", LC(HyperbolicRepair)},
+	{"PD", LC(PBestDimRepair)},
 });
 
 std::map<std::string, std::function<ConstraintHandler* (std::vector<double>, std::vector<double>)>> const deCHs ({
-		// Generic
-		{"reinitialization", LC(ReinitializationRepair)},
-		{"projection", LC(ProjectionRepair)},
-		{"reflection", LC(ReflectionRepair)},
-		{"wrapping", LC(WrappingRepair)},
-		{"death penalty", LC(DeathPenalty)},
-		{"resampling", LC(ResamplingRepair)},
+	// Generic
+	{"RI", LC(ReinitializationRepair)},
+	{"PR", LC(ProjectionRepair)},
+	{"RF", LC(ReflectionRepair)},
+	{"WR", LC(WrappingRepair)},
+	{"DP", LC(DeathPenalty)},
+	{"RS", LC(ResamplingRepair)},
 
-		// DE
-		{"rand base", LC(RandBaseRepair)},
-		{"midpoint base", LC(MidpointBaseRepair)},
-		{"midpoint target", LC(MidpointTargetRepair)},
-		{"conservatism", LC(ConservatismRepair)},
-		{"projection midpoint", LC(ProjectionMidpointRepair)},
-		{"projection base", LC(ProjectionBaseRepair)},
+	// DE
+	{"RB", LC(RandBaseRepair)},
+	{"MB", LC(MidpointBaseRepair)},
+	{"MT", LC(MidpointTargetRepair)},
+	{"CO", LC(ConservatismRepair)},
+	{"PM", LC(ProjectionMidpointRepair)},
+	{"PB", LC(ProjectionBaseRepair)},
 });
 
 //GenericConstraintHandler::GenericConstraintHandler(std::vector<double> lb,std::vector<double> ub)

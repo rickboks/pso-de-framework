@@ -13,10 +13,9 @@ class IOHprofiler_problem;
 class IOHprofiler_csv_logger;
 
 struct PSOConfig {
-	PSOConfig(std::string const update, std::string const topology, std::string constraintHandler, bool const synchronous) 
-	: update(update), topology(topology), constraintHandler(constraintHandler), synchronous(synchronous){}
-	std::string const update, topology, constraintHandler;
-	bool const synchronous;
+	PSOConfig(std::string const update, std::string const topology, std::string constraintHandler, std::string const synchronicity) 
+	: update(update), topology(topology), constraintHandler(constraintHandler), synchronicity(synchronicity){}
+	std::string const update, topology, constraintHandler, synchronicity;
 };
 
 class ParticleSwarm {

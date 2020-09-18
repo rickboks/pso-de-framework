@@ -1,15 +1,15 @@
 #include <IOHprofiler_problem.h>
 #include <IOHprofiler_csv_logger.h>
-#include "differentialevolution.h"
-#include "rng.h"
-#include "utilities.h"
-#include "deadaptationmanager.h"
-#include "util.h"
 #include <random>
 #include <algorithm>
 #include <iostream>
 #include <functional>
 #include <string>
+#include "differentialevolution.h"
+#include "rng.h"
+#include "utilities.h"
+#include "deadaptationmanager.h"
+#include "util.h"
 #include "repairhandler.h"
 
 DifferentialEvolution::DifferentialEvolution(DEConfig const config)
@@ -56,7 +56,6 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 		for (int i = 0; i < popSize; i++){
 			double const parentF = genomes[i]->evaluate(problem,logger);
 			double const trialF = trials[i]->evaluate(problem,logger);
-
 			if (trialF < parentF){
 				genomes[i]->setX(trials[i]->getX(), trials[i]->getFitness(), false);
 				adaptationManager->successfulIndex(i);				
@@ -81,5 +80,5 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 }
 
 std::string DifferentialEvolution::getIdString() const {
-	return "DE";
+	return "D_" + config.mutation + "_" + config.crossover + "_" + config.adaptation + "_" + config.constraintHandler;
 }

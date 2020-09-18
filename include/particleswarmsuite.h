@@ -10,13 +10,13 @@ class ParticleSwarmSuite {
 		std::vector<std::string> updateManagers;
 		std::vector<std::string> topologyManagers;
 		std::vector<std::string> constraintHandlers;
-		std::vector<bool> synchronicities;
+		std::vector<std::string> synchronicities;
 		std::vector<PSOConfig> configurations;
 	public:
 		ParticleSwarmSuite();
 		void setUpdateManagers(std::vector<std::string> updateManagers);
 		void setTopologyManagers(std::vector<std::string> topologyManagers);
-		void setSynchronicities(std::vector<bool> synchronicities);
+		void setSynchronicities(std::vector<std::string> synchronicities);
 		void setConstraintHandlers(std::vector<std::string> chs);
 		void generateConfigurations();
 		ParticleSwarm getParticleSwarm(int const i);	

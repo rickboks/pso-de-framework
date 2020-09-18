@@ -9,16 +9,19 @@
 #include <memory>
 
 struct HybridConfig {
-	std::string const update, topology, psoCH;
-	bool const synchronous;
-	std::string const  mutation, crossover, selection, adaptation, deCH;
+	std::string const update, topology, psoCH, synchronicity, mutation, crossover, selection, adaptation, deCH;
 
-	HybridConfig(std::string const update, std::string const topology, std::string const psoCH, bool const synchronous, 
+	HybridConfig(std::string const update, std::string const topology, std::string const psoCH, std::string const synchronicity, 
 			std::string const mutation, std::string const crossover, std::string const selection, 
 			std::string const adaptation, std::string const deCH):
-				update(update), topology(topology), psoCH(psoCH), synchronous(synchronous),
+				update(update), topology(topology), psoCH(psoCH), synchronicity(synchronicity),
 				mutation(mutation), crossover(crossover), selection(selection),
 				adaptation(adaptation), deCH(deCH){}
+
+	HybridConfig(std::string const update, std::string const topology, std::string const psoCH, std::string const synchronicity, 
+			std::string const mutation, std::string const crossover, std::string const adaptation, std::string const deCH):
+				update(update), topology(topology), psoCH(psoCH), synchronicity(synchronicity),
+				mutation(mutation), crossover(crossover), selection(""), adaptation(adaptation), deCH(deCH){}
 };
 
 class HybridAlgorithm {

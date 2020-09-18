@@ -6,8 +6,8 @@ CrossoverManager::~CrossoverManager(){}
 
 #define LC(X) [](int const D){return new X(D);}
 std::map<std::string, std::function<CrossoverManager* (int const)>> const crossovers({
-		{"binomial", LC(BinomialCrossoverManager)},
-		{"exponential", LC(ExponentialCrossoverManager)},
+		{"B", LC(BinomialCrossoverManager)},
+		{"E", LC(ExponentialCrossoverManager)},
 });
 
 BinomialCrossoverManager::BinomialCrossoverManager(int const D) : CrossoverManager(D){}

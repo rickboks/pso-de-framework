@@ -41,7 +41,7 @@ void ParticleSwarm::run(std::shared_ptr<IOHprofiler_problem<double> > const prob
 	this->problem=problem;
 	this->logger=logger;
 
-	if (config.synchronous)
+	if (config.synchronicity == "A")
 		runSynchronous(evalBudget, popSize, particleUpdateParams);
 	else 
 		runAsynchronous(evalBudget, popSize, particleUpdateParams);
@@ -158,7 +158,7 @@ void ParticleSwarm::runSynchronous(int const evalBudget, int const popSize, std:
 }
 
 std::string ParticleSwarm::getIdString() const {
-	return "PSO";
+	return "P_" + config.update + "_" + config.topology + "_" + config.constraintHandler + "_" + config.synchronicity;
 }
 
 void ParticleSwarm::enableLogging(){

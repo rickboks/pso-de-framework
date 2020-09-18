@@ -9,10 +9,10 @@ SelectionManager::SelectionManager(int const D, DEAdaptationManager* const dam)
 
 #define LC(X) [](int const D, DEAdaptationManager* const adap){return new X(D,adap);}
 std::map<std::string, std::function<SelectionManager* (int const, DEAdaptationManager *const)>> const selections ({
-		{"p2", LC(Pairwise2SelectionManager)},
-		{"p3", LC(Pairwise3SelectionManager)},
-		{"u2", LC(Union2SelectionManager)},
-		{"u3", LC(Union3SelectionManager)},
+		{"P2", LC(Pairwise2SelectionManager)},
+		{"P3", LC(Pairwise3SelectionManager)},
+		{"U2", LC(Union2SelectionManager)},
+		{"U3", LC(Union3SelectionManager)},
 });
 
 void SelectionManager::selection(std::vector<Particle*>& particles, 

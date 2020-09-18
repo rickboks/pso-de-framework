@@ -6,8 +6,8 @@
 
 #define LC(X) [](){return new X();}
 std::map<std::string, std::function<DEAdaptationManager*()>> const deAdaptations({
-		{"jade", LC(JADEManager)},
-		{"none", LC(NoAdaptationManager)},
+		{"J", LC(JADEManager)},
+		{"N", LC(NoAdaptationManager)},
 });
 
 //JADE

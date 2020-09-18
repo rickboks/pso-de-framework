@@ -16,7 +16,7 @@ class HybridSuite {
 		std::vector<std::string> updateManagers;
 		std::vector<std::string> topologyManagers;
 		std::vector<std::string> psoCHs;
-		std::vector<bool> synchronicities;
+		std::vector<std::string> synchronicities;
 		std::vector<std::string> mutationManagers;
 		std::vector<std::string> crossoverManagers;
 		std::vector<std::string> selectionManagers;
@@ -38,8 +38,8 @@ class HybridSuite {
 			for (auto&i : ::deCHs)
 				deCHs.push_back(i.first);
 
-			synchronicities.push_back(true);
-			synchronicities.push_back(false);
+			synchronicities.push_back("A");
+			synchronicities.push_back("S");
 
 			for (auto&i : ::mutations)
 				mutationManagers.push_back(i.first);

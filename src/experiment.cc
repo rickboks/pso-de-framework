@@ -22,18 +22,18 @@ void algorithm
     //pso->run(problem, logger, D*10000, D*5, std::map<int,double>()); 
 }
 
-void _run_experiment(bool log) {
-    psode2 = new PSODE2(HybridConfig("inertia", "von neumann", "hyperbolic", false, "ttb/1", "binomial", "p3", "jade", "reinitialization"));
-    psode = new PSODE(HybridConfig("inertia", "von neumann", "hyperbolic", false, "ttb/1", "binomial", "p3", "jade", "reinitialization"));    
-    pso = new ParticleSwarm(PSOConfig("inertia", "von neumann", "hyperbolic", true));
-    de = new DifferentialEvolution(DEConfig("ttb/1", "binomial", "jade", "projection base"));
+void _run_experiment(bool const log) {
+    psode2 = new PSODE2(HybridConfig("I", "N", "HY", "A", "T1", "B", "J", "RI"));
+    //psode = new PSODE(HybridConfig("I", "N", "HY", "A", "T1", "B", "P3", "J", "RI"));    
+    //pso = new ParticleSwarm(PSOConfig("I", "N", "HY", "A"));
+    //de = new DifferentialEvolution(DEConfig("P1", "B", "J", "PB"));
 
     if (log)
 		pso->enableLogging();
 
     std::string configName = "./configuration.ini";
     IOHprofiler_experimenter<double> experimenter(configName,algorithm); 
-    experimenter._set_independent_runs(5);
+    experimenter._set_independent_runs(10);
     experimenter._run();
     //delete pso;
 	//delete de;
@@ -42,6 +42,6 @@ void _run_experiment(bool log) {
 }
 
 int main(int argc, char** argv){
-    bool log = false;
+    bool const log = false;
     _run_experiment(log);	
 }

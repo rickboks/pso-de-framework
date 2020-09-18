@@ -3,21 +3,21 @@
 #define LC(X) [](int const D, ConstraintHandler const * const ch){return new X(D,ch);}
 
 std::map<std::string, std::function<MutationManager* (int const, ConstraintHandler const*const)>> const mutations ({
-		{"rand/1", LC(Rand1MutationManager)},
-		{"ttb/1", LC(TTB1MutationManager)},
-		{"ttpb/1", LC(TTPB1MutationManager)},
-		{"best/1", LC(Best1MutationManager)},
-		{"best/2", LC(Best2MutationManager)},
-		{"rand/2", LC(Rand2MutationManager)},
-		{"rand/2/dir", LC(Rand2DirMutationManager)},
-		{"nsde", LC(NSDEMutationManager)},
-		{"trigonometric", LC(TrigonometricMutationManager)},
-		{"two-opt/1", LC(TwoOpt1MutationManager)},
-		{"two-opt/2", LC(TwoOpt2MutationManager)},
+		{"R1", LC(Rand1MutationManager)},
+		{"T1", LC(TTB1MutationManager)},
+		{"P1", LC(TTPB1MutationManager)},
+		{"B1", LC(Best1MutationManager)},
+		{"B2", LC(Best2MutationManager)},
+		{"R2", LC(Rand2MutationManager)},
+		{"RD", LC(Rand2DirMutationManager)},
+		{"NS", LC(NSDEMutationManager)},
+		{"TR", LC(TrigonometricMutationManager)},
+		{"O1", LC(TwoOpt1MutationManager)},
+		{"O2", LC(TwoOpt2MutationManager)},
 });
 
 MutationManager::MutationManager(int const D, ConstraintHandler const* const deCH)
-			:D(D), deCH(deCH){}
+	:D(D), deCH(deCH){}
 
 std::vector<Particle*> MutationManager::mutate(std::vector<Particle*>const& genomes, std::vector<double>const& Fs){
 	this->genomes = genomes;
@@ -97,7 +97,7 @@ Particle* TTPB1MutationManager::mutate(int const i) const{
 
 	std::vector<double> mutant = genomes[i]->getX();
 	std::vector<double> subtraction(this->D);
-	subtract(best->getX(), genomes[i]->getX(), subtraction);
+	subtract(pBest->getX(), genomes[i]->getX(), subtraction);
 	scale(subtraction, Fs[i]);
 	add(mutant, subtraction, mutant);
 
@@ -209,8 +209,7 @@ Particle* Rand2DirMutationManager::mutate(int const i) const{
 
 // NSDE
 NSDEMutationManager::NSDEMutationManager(int const D, ConstraintHandler const* const deCH):MutationManager(D, deCH){}
-
-Particle* NSDEMutationManager::mutate(int const i) const{
+Particle* NSDEMutationManager::mutate(int const i) const {
 	std::vector<Particle*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);
 
@@ -220,13 +219,13 @@ Particle* NSDEMutationManager::mutate(int const i) const{
 	std::vector<double> subtraction(this->D);
 	subtract(xr[1]->getX(), xr[2]->getX(), subtraction);
 
-	if (rng.randDouble(0,1) < 0.5){
-		double n = rng.normalDistribution(0.5,0.5);
-		scale(subtraction, n);
-	} else {
-		double c = rng.cauchyDistribution(0,1);
-		scale(subtraction, c);
-	}
+	double randomVar;
+	if (rng.randDouble(0,1) < 0.5)
+		randomVar = rng.normalDistribution(0.5,0.5);
+	else 
+		randomVar = rng.cauchyDistribution(0,1);
+
+	scale(subtraction, randomVar);
 
 	add(mutant, subtraction, mutant);
 
@@ -263,7 +262,7 @@ Particle* TrigonometricMutationManager::trigonometricMutation(int const i) const
 	scale(temp, 1.0/3.0);
 	mutant = temp;
 
-	Particle base = Particle(mutant);
+	Particle base = Particle(mutant); // only used for correction strategies
 
 	subtract(xr[0]->getX(), xr[1]->getX(), temp);
 	scale(temp, p1-p0);
@@ -324,7 +323,6 @@ Particle* TwoOpt1MutationManager::mutate(int const i) const{
 
 // Two-opt/2
 TwoOpt2MutationManager::TwoOpt2MutationManager(int const D, ConstraintHandler const* const deCH): MutationManager(D, deCH){}
-
 Particle* TwoOpt2MutationManager::mutate(int const i) const{
 	std::vector<Particle*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);

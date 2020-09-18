@@ -56,7 +56,7 @@ void PSODE::run(std::shared_ptr<IOHprofiler_problem<double>> const problem,
 	this->problem=problem;
 	this->logger=logger;
 
-	if (config.synchronous)
+	if (config.synchronicity == "S")
 		runSynchronous(evalBudget, popSize, particleUpdateParams);
 	else
 		runAsynchronous(evalBudget, popSize, particleUpdateParams);
@@ -234,5 +234,7 @@ void PSODE::runAsynchronous(int const evalBudget,
 }
 
 std::string PSODE::getIdString() const{
-	return "PSODE";
+	return "H_" + config.update + "_" + config.topology + "_" + config.psoCH + "_" + config.synchronicity + "_" + 
+		config.mutation + "_" + config.crossover + "_"  + config.selection + "_" + config.adaptation + "_" + config.deCH; 
+
 }

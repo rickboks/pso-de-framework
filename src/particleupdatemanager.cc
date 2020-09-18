@@ -36,11 +36,11 @@ void ParticleUpdateManager::updateVelocity(double const progress){
 
 std::map<std::string, std::function<ParticleUpdateManager* (std::vector<double>&, std::vector<double>&,
 		std::vector<double>const&, std::vector<double>const&, std::map<int,double>, std::vector<Particle*>&)>> const updateManagers({
-		{"inertia", LC(InertiaWeightManager)},
-		{"decreasing inertia", LC(DecrInertiaWeightManager)},
-		{"constriction", LC(ConstrictionCoefficientManager)},
-		{"fips", LC(FIPSManager)},
-		{"barebones", LC(BareBonesManager)}
+		{"I", LC(InertiaWeightManager)},
+		{"D", LC(DecrInertiaWeightManager)},
+		{"C", LC(ConstrictionCoefficientManager)},
+		{"F", LC(FIPSManager)},
+		{"B", LC(BareBonesManager)}
 });
 
 /*		Inertia weight 		*/

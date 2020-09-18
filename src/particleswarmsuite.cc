@@ -10,8 +10,8 @@ ParticleSwarmSuite::ParticleSwarmSuite(){
 	for (auto& i : ::psoCHs)
 		this->constraintHandlers.push_back(i.first);
 
-	this->synchronicities.push_back(true);
-	this->synchronicities.push_back(false);
+	this->synchronicities.push_back("A");
+	this->synchronicities.push_back("S");
 
 	generateConfigurations();
 }
@@ -44,7 +44,7 @@ void ParticleSwarmSuite::setConstraintHandlers(std::vector<std::string> chs){
 	generateConfigurations();
 }
 
-void ParticleSwarmSuite::setSynchronicities(std::vector<bool> synchronicities){
+void ParticleSwarmSuite::setSynchronicities(std::vector<std::string> synchronicities){
 	this->synchronicities = synchronicities;
 	generateConfigurations();
 }

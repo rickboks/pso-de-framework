@@ -140,7 +140,8 @@ void PSODE2::runAsynchronous(int const evalBudget, int const popSize, std::map<i
 }
 
 std::string PSODE2::getIdString() const{
-	return "PSODE2";
+	return "H2_" + config.update + "_" + config.topology + "_" + config.psoCH + "_" + config.synchronicity 
+		+ "_" + config.mutation + "_" + config.crossover + "_" + config.adaptation + "_" + config.deCH;
 }
 
 void PSODE2::logStart(){

@@ -10,14 +10,14 @@ TopologyManager::TopologyManager(std::vector<Particle*> const & particles)
 
 #define LC(X) [](std::vector<Particle*> const p){return new X(p);}
 std::map<std::string, std::function<TopologyManager* (std::vector<Particle*> const)>> const topologies{
-	{"lbest", LC(LbestTopologyManager)},
-	{"gbest", LC(GbestTopologyManager)},
-	{"random", LC(RandomTopologyManager)},
-	{"von neumann", LC(VonNeumannTopologyManager)},
-	{"wheel", LC(WheelTopologyManager)},
-	{"increasing", LC(IncreasingTopologyManager)},
-	{"decreasing", LC(DecreasingTopologyManager)},
-	{"multiswarm", LC(MultiSwarmTopologyManager)},
+	{"L", LC(LbestTopologyManager)},
+	{"G", LC(GbestTopologyManager)},
+	{"R", LC(RandomTopologyManager)},
+	{"N", LC(VonNeumannTopologyManager)},
+	{"W", LC(WheelTopologyManager)},
+	{"I", LC(IncreasingTopologyManager)},
+	{"D", LC(DecreasingTopologyManager)},
+	{"M", LC(MultiSwarmTopologyManager)},
 };
 
 TopologyManager::~TopologyManager() = default;

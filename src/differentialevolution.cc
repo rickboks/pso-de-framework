@@ -28,12 +28,12 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 		genomes.push_back(new Particle(D));
 
 	for (Particle* const p : genomes)
-		p->randomize(problem->IOHprofiler_get_lowerbound(), problem->IOHprofiler_get_upperbound());
+		p->randomize(lowerBound, upperBound);
 
 	std::vector<Particle*> donors;
 	std::vector<Particle*> trials;
 
-	deCH = deCHs.at(config.constraintHandler)(problem->IOHprofiler_get_lowerbound(), problem->IOHprofiler_get_upperbound());
+	deCH = deCHs.at(config.constraintHandler)(lowerBound, upperBound);
 	crossoverManager = crossovers.at(config.crossover)(D);
 	mutationManager = mutations.at(config.mutation)(D, deCH);
 	adaptationManager = deAdaptations.at(config.adaptation)();

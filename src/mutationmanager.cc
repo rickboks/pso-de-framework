@@ -22,8 +22,9 @@ MutationManager::MutationManager(int const D, ConstraintHandler const* const deC
 std::vector<Particle*> MutationManager::mutate(std::vector<Particle*>const& genomes, std::vector<double>const& Fs){
 	this->genomes = genomes;
 	this->Fs = Fs;
-	best = getBest(genomes);
-	pBest = getPBest(genomes, 0.1);
+
+	best = new Particle(*getBest(genomes));
+	pBest = new Particle(*getPBest(genomes, 0.1));
 	std::vector<Particle*> mutants(genomes.size());
 
 	for (unsigned int i = 0; i < genomes.size(); i++){
@@ -39,6 +40,10 @@ std::vector<Particle*> MutationManager::mutate(std::vector<Particle*>const& geno
 			delete m;
 		}
 	}
+
+	delete best;
+	delete pBest;
+	
 	return mutants;
 }
 

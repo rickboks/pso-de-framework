@@ -56,7 +56,7 @@ void ParticleSwarm::runAsynchronous(int const evalBudget, int const popSize, std
 	ParticleUpdateSettings settings(config.update, particleUpdateParams, psoCH);
 
 	for (int i = 0; i < popSize; i++){
-		Particle* p = new Particle(D, settings);
+		Particle* p = new Particle(D, &settings);
 		p->randomize(lowerBound, upperBound);
 		particles.push_back(p);
 	}
@@ -109,7 +109,7 @@ void ParticleSwarm::runSynchronous(int const evalBudget, int const popSize, std:
 	ParticleUpdateSettings settings(config.update, particleUpdateParams, psoCH);
 
 	for (int i = 0; i < popSize; i++){
-		Particle* p = new Particle(D, settings);
+		Particle* p = new Particle(D, &settings);
 		p->randomize(lowerBound, upperBound);
 		particles.push_back(p);
 	}

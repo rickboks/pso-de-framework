@@ -25,15 +25,15 @@ void algorithm
 void _run_experiment(bool const log) {
     //psode2 = new PSODE2(HybridConfig("I", "N", "HY", "A", "T1", "B", "J", "RI"));
     //psode = new PSODE(HybridConfig("I", "N", "HY", "A", "T1", "B", "P3", "J", "RI"));    
-    //pso = new ParticleSwarm(PSOConfig("I", "N", "HY", "A"));
-    de = new DifferentialEvolution(DEConfig("P1", "B", "J", "PB"));
+    //pso = new ParticleSwarm(PSOConfig("I", "N", "PR", "A"));
+    de = new DifferentialEvolution(DEConfig("R1", "B", "N", "RI"));
 
     if (log)
 		pso->enableLogging();
 
     std::string configName = "./configuration.ini";
     IOHprofiler_experimenter<double> experimenter(configName,algorithm); 
-    experimenter._set_independent_runs(10);
+    experimenter._set_independent_runs(5);
     experimenter._run();
     //delete pso;
 	//delete de;

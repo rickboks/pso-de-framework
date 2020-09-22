@@ -11,30 +11,30 @@
 #include <cmath>
 #include <IOHprofiler_experimenter.h>
 
-Particle::Particle(int const D, ParticleUpdateSettings& settings)
+Particle::Particle(int const D, ParticleUpdateSettings const*const settings)
 	: x(D), v(D), p(D), g(D), pbest(std::numeric_limits<double>::max()), gbest(std::numeric_limits<double>::max()), evaluated(false),
-		settings(settings), psoCH(settings.psoCH), D(D), isPSO(true){
-
-	particleUpdateManager = updateManagers.at(settings.managerType)(x,v,p,g,settings.parameters,neighborhood);
+		settings(settings), psoCH(settings->psoCH), D(D), isPSO(true){
+	particleUpdateManager = updateManagers.at(settings->managerType)(x,v,p,g,settings->parameters,neighborhood);
 }
 
 Particle::Particle(Particle const & other)
 	: x(other.x), v(other.v), p(other.p), g(other.g),
 	pbest(other.pbest), gbest(other.gbest), evaluated(other.evaluated), 
-	fitness(other.fitness), neighborhood(other.neighborhood),
+	fitness(other.fitness), neighborhood(other.neighborhood), particleUpdateManager(NULL),
 	settings(other.settings), psoCH(other.psoCH), D(other.D), isPSO(other.isPSO){
 
-	particleUpdateManager = updateManagers.at(settings.managerType)(x,v,p,g,settings.parameters,neighborhood);
+	if (settings != NULL) // This constructor is used also by DE
+		particleUpdateManager = updateManagers.at(settings->managerType)(x,v,p,g,settings->parameters,neighborhood);
 }
 
 //for DE
 Particle::Particle(int const D)
-	: x(D), evaluated(false), fitness(std::numeric_limits<double>::max()), particleUpdateManager(NULL), psoCH(NULL), D(D),  isPSO(false){
+	: x(D), evaluated(false), fitness(std::numeric_limits<double>::max()), particleUpdateManager(NULL), settings(NULL), psoCH(NULL), D(D), isPSO(false){
 }
 
 //When using this construtor, note that only the position is initialized
 Particle::Particle(std::vector<double> x)
-	: x(x), evaluated(false), fitness(std::numeric_limits<double>::max()), particleUpdateManager(NULL),psoCH(NULL),D(x.size()),isPSO(false){
+	: x(x), evaluated(false), fitness(std::numeric_limits<double>::max()), particleUpdateManager(NULL), settings(NULL), psoCH(NULL), D(x.size()), isPSO(false){
 }
 
 Particle::~Particle(){

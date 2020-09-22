@@ -12,20 +12,20 @@ class Particle {
 		std::vector<double> v;
 		std::vector<double> p;		
 		std::vector<double> g;
+
 		double pbest;
 		double gbest;
-
 		bool evaluated;
 		double fitness;
 
 		std::vector<Particle*> neighborhood;
 		ParticleUpdateManager* particleUpdateManager;
-		ParticleUpdateSettings const settings;
+		ParticleUpdateSettings const * const settings;
 		ConstraintHandler const * const psoCH;
 	public:
 		int const D;
 		bool const isPSO;
-		Particle(int const D, ParticleUpdateSettings& particleUpdateSettings);
+		Particle(int const D, ParticleUpdateSettings const*const particleUpdateSettings);
 		Particle(int const D);
 		Particle(Particle const & other);
 		Particle(std::vector<double> x); 

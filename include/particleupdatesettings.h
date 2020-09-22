@@ -42,11 +42,6 @@ struct ParticleUpdateSettings {
 		:managerType(managerType), parameters(parameters), psoCH(psoCH){
 	};
 
-	ParticleUpdateSettings(const ParticleUpdateSettings & copy)
-	: managerType(copy.managerType), parameters(copy.parameters), psoCH(copy.psoCH){
-
-	}
-
 	ParticleUpdateSettings(){}
 
 	std::string managerType;

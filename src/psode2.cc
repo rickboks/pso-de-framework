@@ -59,7 +59,7 @@ void PSODE2::runAsynchronous(int const evalBudget, int const popSize, std::map<i
 	ParticleUpdateSettings settings(config.update, particleUpdateParams, psoCH);
 
 	int const split = popSize / 2;
-	for (int i = 0; i < split; i++) psoPop.push_back(new Particle(D, settings));
+	for (int i = 0; i < split; i++) psoPop.push_back(new Particle(D, &settings));
 	for (int i = split; i < popSize; i++) dePop.push_back(new Particle(D));
 	
 	// append the two populations

@@ -79,7 +79,7 @@ void PSODE::runSynchronous(int const evalBudget, int const popSize,
 	ParticleUpdateSettings settings(config.update, particleUpdateParams, psoCH);
 
 	for (int i = 0; i < popSize; i++)
-		particles.push_back(new Particle(D, settings));
+		particles.push_back(new Particle(D, &settings));
 
 	for (Particle* const p : particles)
 		p->randomize(lowerBound, upperBound);
@@ -176,7 +176,7 @@ void PSODE::runAsynchronous(int const evalBudget,
 	ParticleUpdateSettings settings(config.update, particleUpdateParams, psoCH);
 
 	for (int i = 0; i < popSize; i++)
-		particles.push_back(new Particle(D, settings));
+		particles.push_back(new Particle(D, &settings));
 
 	for (Particle* const p : particles)
 		p->randomize(lowerBound, upperBound);

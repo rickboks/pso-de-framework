@@ -58,7 +58,7 @@ void JADEManager::nextCr(std::vector<double>& Crs){
 		Crs[i] = std::max(rng.normalDistribution(MuCr, 0.1),0.0);
 		
 	}
-	previousCrs = Crs
+	previousCrs = Crs;
 }
 
 double JADEManager::lehmerMean(){
@@ -74,7 +74,7 @@ void JADEManager::reset(){
 
 //NO ADAPTATION
 NoAdaptationManager::NoAdaptationManager()
- : DEAdaptationManager(), F(0.5), Cr(0.9){}
+ : DEAdaptationManager(), F(0.1), Cr(0.2){}
 
 void NoAdaptationManager::succesfulValues(double F, double Cr){
 	//ignore

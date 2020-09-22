@@ -54,7 +54,7 @@ void WrappingRepair::repair(Particle* const p) const{
 			p->setX(i, ub[i] - std::fmod(lb[i] - p->getX(i), std::fabs(ub[i]-lb[i])));
 			repairVelocityPost(p,i);
 		} else if (p->getX(i) > ub[i]) {
-			p->setX(i, lb[i] - std::fmod(p->getX(i) - ub[i], std::fabs(ub[i]-lb[i])));
+			p->setX(i, lb[i] + std::fmod(p->getX(i) - ub[i], std::fabs(ub[i]-lb[i])));
 			repairVelocityPost(p,i);
 		}
 	}
@@ -126,7 +126,7 @@ void ProjectionMidpointRepair::repair(Particle* const p, Particle const* const b
 	}
 
 	double alpha=*std::min_element(alphas.begin(), alphas.end());
-	if (alpha != 1){
+	if (alpha != 1.0){
 		std::vector<double> midpoint(D);
 		add(lb, ub, midpoint);
 		scale(midpoint, 0.5*(1-alpha));
@@ -153,7 +153,7 @@ void ProjectionBaseRepair::repair(Particle* const p, Particle const* const base,
 	}
 
 	double alpha=*std::min_element(alphas.begin(), alphas.end());
-	if (alpha != 1){
+	if (alpha != 1.0){
 		std::vector<double> b = base->getX();
 		scale(b, (1-alpha));
 		scale(x, alpha);

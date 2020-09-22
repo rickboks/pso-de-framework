@@ -1,5 +1,6 @@
 #include "util.h"
 #include "rng.h"
+#include <filesystem>
 
 void scale(std::vector<double> & vec, double x){
 	std::transform(vec.begin(), vec.end(), vec.begin(),
@@ -35,7 +36,6 @@ Particle* getBest(std::vector<Particle*>const& genomes){
 			best = i;
 		}
 	}
-
 	return genomes[best];
 }
 
@@ -85,4 +85,23 @@ Particle* getPBest(std::vector<Particle*> genomes, double const p){
 		return genomes[0];
 	else
 		return bestP[rng.randInt(0, bestP.size()-1)];
+}
+
+std::string generateConfig(std::string const templateFile, std::string const name){
+	std::string const folder = "configurations";
+	std::string const cfgFile = folder + "/" + name + ".ini";
+
+	if (!std::filesystem::exists(folder)){
+		std::cerr << "Creating directory \"" << folder << "\"."<< std::endl;
+		std::filesystem::create_directory(folder);
+	}
+
+	std::ifstream src(templateFile, std::ios::binary);
+    std::ofstream dst(cfgFile, std::ios::binary);
+
+	dst << src.rdbuf() 
+		<< "result_folder = " + name << std::endl 
+		<< "algorithm_name = " + name << std::endl;
+
+	return cfgFile;
 }

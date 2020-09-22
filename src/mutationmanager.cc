@@ -23,8 +23,9 @@ std::vector<Particle*> MutationManager::mutate(std::vector<Particle*>const& geno
 	this->genomes = genomes;
 	this->Fs = Fs;
 
-	best = new Particle(*getBest(genomes));
-	pBest = new Particle(*getPBest(genomes, 0.1));
+	best = getBest(genomes);
+	pBest = getPBest(genomes, 0.1);
+
 	std::vector<Particle*> mutants(genomes.size());
 
 	for (unsigned int i = 0; i < genomes.size(); i++){
@@ -41,9 +42,6 @@ std::vector<Particle*> MutationManager::mutate(std::vector<Particle*>const& geno
 		}
 	}
 
-	delete best;
-	delete pBest;
-	
 	return mutants;
 }
 
@@ -127,9 +125,9 @@ Particle* Best1MutationManager::mutate(int const i) const{
 	std::vector<double> subtraction(this->D);
 	
 	std::vector<Particle*> xr = pickRandom(possibilities, 2);
-
 	subtract(xr[0]->getX(), xr[1]->getX(), subtraction);
-	scale(subtraction,Fs[i]);
+
+	scale(subtraction, Fs[i]);
 	add(mutant, subtraction, mutant);
 
 	Particle* m = new Particle(mutant);

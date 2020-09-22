@@ -6,6 +6,8 @@
 #include "hybridsuite.h"
 #include "psode2.h"
 #include "psode.h"
+#include "util.h"
+
 HybridAlgorithm* ha;
 ParticleSwarm* pso;
 DifferentialEvolution* de;
@@ -26,14 +28,15 @@ void _run_experiment(bool const log) {
     //psode2 = new PSODE2(HybridConfig("I", "N", "HY", "A", "T1", "B", "J", "RI"));
     //psode = new PSODE(HybridConfig("I", "N", "HY", "A", "T1", "B", "P3", "J", "RI"));    
     //pso = new ParticleSwarm(PSOConfig("I", "N", "PR", "A"));
-    de = new DifferentialEvolution(DEConfig("R1", "B", "N", "RI"));
+    de = new DifferentialEvolution(DEConfig("B1", "B", "J", "CO"));
 
     if (log)
 		pso->enableLogging();
 
-    std::string configName = "./configuration.ini";
-    IOHprofiler_experimenter<double> experimenter(configName,algorithm); 
-    experimenter._set_independent_runs(5);
+	std::string templateFile = "./configuration.ini";
+    std::string configFile = generateConfig(templateFile, de->getIdString());
+    IOHprofiler_experimenter<double> experimenter(configFile,algorithm); 
+    experimenter._set_independent_runs(1);
     experimenter._run();
     //delete pso;
 	//delete de;

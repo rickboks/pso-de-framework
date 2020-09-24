@@ -2,7 +2,7 @@ EXE  = experiment
 MPI_EXE = mpi_experiment
 SRC_DIR = src
 OBJ_DIR = obj
-RESULT_DIR=results
+RESULT_DIR= results
 INC_DIR = include
 LDFLAGS += -L ~/.local/lib -lboost_system -lboost_filesystem -lm -lIOH -lstdc++fs
 

@@ -16,6 +16,7 @@ void ConstraintHandler::repair(Particle* const p) const{}
 bool ConstraintHandler::resample(Particle const * const p, int const resamples) const{
 	return false;
 }
+
 void ConstraintHandler::repairVelocityPre(Particle* const p) const{}
 
 void ConstraintHandler::repairVelocityPost(Particle* const p, int const i) const{
@@ -71,7 +72,6 @@ std::map<std::string, std::function<ConstraintHandler* (std::vector<double>, std
 
 //PSOConstraintHandler::PSOConstraintHandler(std::vector<double> lb,std::vector<double> ub)
 //: ConstraintHandler(lb,ub){}
-
 
 //DEConstraintHandler::~DEConstraintHandler(){}
 

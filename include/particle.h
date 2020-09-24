@@ -2,7 +2,7 @@
 #include <vector>
 #include <map>
 #include "particleupdatesettings.h"
-#include <IOHprofiler_experimenter.h>
+#include "IOHprofiler_experimenter.h"
 
 class ParticleUpdateManager;
 

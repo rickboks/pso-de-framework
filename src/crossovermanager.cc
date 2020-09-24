@@ -18,8 +18,8 @@ std::vector<Particle*> BinomialCrossoverManager::crossover(std::vector<Particle*
 	std::vector<double> x(this->D);
 
 	for (unsigned int i = 0; i < genomes.size(); i++){
-		std::vector<double> mutantX = mutants[i]->getX();
-		std::vector<double> parentX = genomes[i]->getX();
+		std::vector<double> const mutantX = mutants[i]->getX();
+		std::vector<double> const parentX = genomes[i]->getX();
 		trials.push_back(new Particle(singleCrossover(genomes[i]->getX(), mutants[i]->getX(), Crs[i])));
 	}
 
@@ -51,26 +51,20 @@ std::vector<Particle*> ExponentialCrossoverManager::crossover(std::vector<Partic
 
 std::vector<double> ExponentialCrossoverManager::singleCrossover(std::vector<double>const& target, std::vector<double>const& donor, double const Cr){
 	std::vector<double> x(this->D);
-	std::unordered_set<int> mutantIndices;
-	int const n = rng.randInt(0,this->D-1);
+	int const start = rng.randInt(0,this->D-1);
 
 	int L = 0;
 	do {
 		L++;
-	} while (rng.randDouble(0,1) < Cr && L < this->D);
+	} while (rng.randDouble(0,1) <= Cr && L < this->D);
 
-	int steps = 0;
-	for (int i = n; steps < L; i++){
-		mutantIndices.insert(i%this->D);
-		steps++;
-	}
+	int const end = (start+L) % D;
 
-	for (int i = 0; i < this->D; i++) {
-		if (mutantIndices.find(i) != mutantIndices.end()){
+	for (int i = 0; i < D; i++){
+		if ((end >= start && (i >= start && i <= end)) || (start > end && (i < end || i > start)))
 			x[i] = donor[i];
-		} else {
+		else 
 			x[i] = target[i];
-		}
 	}
 
 	return x;

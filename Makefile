@@ -4,7 +4,7 @@ SRC_DIR = src
 OBJ_DIR = obj
 RESULT_DIR=results
 INC_DIR = include
-LDFLAGS += -L ~/.local/lib -lboost_system -lboost_filesystem -lm -lIOH
+LDFLAGS += -L ~/.local/lib -lboost_system -lboost_filesystem -lm -lIOH -lstdc++fs
 
 SRC:= $(shell find src/ ! -name "experiment.cc" ! -name "mpi_experiment.cc" -name "*.cc")
 OBJ = $(SRC:$(SRC_DIR)/%.cc=$(OBJ_DIR)/%.o)
@@ -18,6 +18,13 @@ all: $(OBJ_DIR) $(RESULT_DIR) $(EXE)
 
 .PHONY: mpi
 mpi: $(OBJ_DIR) $(RESULT_DIR) $(MPI_EXE)
+
+.PHONY:  clean
+clean:
+	rm -f $(OBJ_DIR)/*.o $(EXE) $(MPI_EXE)
+.PHONY: cleanall
+cleanall:
+	rm -rf $(OBJ_DIR) $(EXE) $(MPI_EXE) results
 
 $(EXE): $(OBJ) $(OBJ_DIR)/experiment.o
 	${CC} ${CFLAGS} -o $(EXE) $(OBJ) $(OBJ_DIR)/experiment.o ${LDFLAGS}
@@ -36,10 +43,3 @@ $(OBJ_DIR):
 $(RESULT_DIR):
 	mkdir $(RESULT_DIR)
 
-.PHONY:  clean
-clean:
-	rm -f $(OBJ_DIR)/*.o $(EXE) $(MPI_EXE)
-
-.PHONY: cleanall
-cleanall:
-	rm -rf $(OBJ_DIR) $(EXE) $(MPI_EXE) results

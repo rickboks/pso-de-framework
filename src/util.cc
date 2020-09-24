@@ -1,6 +1,6 @@
 #include "util.h"
 #include "rng.h"
-#include <filesystem>
+#include <experimental/filesystem>
 
 void scale(std::vector<double> & vec, double x){
 	std::transform(vec.begin(), vec.end(), vec.begin(),
@@ -91,9 +91,9 @@ std::string generateConfig(std::string const templateFile, std::string const nam
 	std::string const folder = "configurations";
 	std::string const cfgFile = folder + "/" + name + ".ini";
 
-	if (!std::filesystem::exists(folder)){
+	if (!std::experimental::filesystem::exists(folder)){
 		std::cerr << "Creating directory \"" << folder << "\"."<< std::endl;
-		std::filesystem::create_directory(folder);
+		std::experimental::filesystem::create_directory(folder);
 	}
 
 	std::ifstream src(templateFile, std::ios::binary);

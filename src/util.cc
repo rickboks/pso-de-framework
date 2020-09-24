@@ -105,3 +105,10 @@ std::string generateConfig(std::string const templateFile, std::string const nam
 
 	return cfgFile;
 }
+
+void printVec(std::vector<double> v){
+	for (double d : v)
+		std::cout << d << " ";
+	std::cout << std::endl;
+}
+

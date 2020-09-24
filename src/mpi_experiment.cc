@@ -47,7 +47,6 @@ int main(int argc, char **argv) {
 
 	if (id < suite.size()){
 		std::string configFile = generateConfig(templateFile, suite.getDE(id).getIdString());
-		std::cout << configFile << std::endl;
 		IOHprofiler_experimenter<double> experimenter(configFile, experiment);
 		experimenter._set_independent_runs(10);
 		experimenter._run();

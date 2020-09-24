@@ -134,7 +134,6 @@ void ProjectionMidpointRepair::repair(Particle* const p, Particle const* const b
 		add(x, midpoint, x);
 		p->setX(x);
 	}
-
 }
 
 ProjectionBaseRepair::ProjectionBaseRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}

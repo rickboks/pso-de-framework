@@ -55,15 +55,15 @@ Particle* Rand1MutationManager::mutate(int const i) const{
 	possibilities.erase(possibilities.begin() + i);
 
 	std::vector<Particle*> xr = pickRandom(possibilities, 3);
-	std::vector<double> x = xr[0]->getX();
+	std::vector<double> mutant = xr[0]->getX();
 	std::vector<double> subtraction(this->D);
 	subtract(xr[1]->getX(), xr[2]->getX(), subtraction);
 	scale(subtraction, Fs[i]);
-	add(x,subtraction, x);
+	add(mutant,subtraction, mutant);
 
-	Particle* mutant = new Particle(x);
-	deCH->repair(mutant, xr[0], genomes[i]);
-	return mutant;
+	Particle* m = new Particle(mutant);
+	deCH->repair(m, xr[0], genomes[i]);
+	return m;
 }
 
 // Target-to-best/1
@@ -289,13 +289,13 @@ Particle* TrigonometricMutationManager::rand1Mutation(int const i) const{
 	
 	std::vector<Particle*> xr = pickRandom(possibilities, 3);
 
-	std::vector<double> x = xr[0]->getX();
+	std::vector<double> mutant = xr[0]->getX();
 	std::vector<double> subtraction(this->D);
 	subtract(xr[1]->getX(), xr[2]->getX(), subtraction);
 	scale(subtraction, Fs[i]);
-	add(x,subtraction, x);
+	add(mutant,subtraction, mutant);
 
-	Particle* m = new Particle(x);
+	Particle* m = new Particle(mutant);
 	deCH->repair(m, xr[0], genomes[i]);
 	return m;
 }
@@ -312,13 +312,13 @@ Particle* TwoOpt1MutationManager::mutate(int const i) const{
 	if (xr[1]->getFitness() < xr[0]->getFitness())
 		std::swap(xr[0], xr[1]);
 
-	std::vector<double> x = xr[0]->getX();
+	std::vector<double> mutant = xr[0]->getX();
 	std::vector<double> subtraction(this->D);
 	subtract(xr[1]->getX(), xr[2]->getX(), subtraction);
 	scale(subtraction, Fs[i]);
-	add(x,subtraction, x);
+	add(mutant,subtraction, mutant);
 
-	Particle* m = new Particle(x);
+	Particle* m = new Particle(mutant);
 	deCH->repair(m, xr[0], genomes[i]);
 	return m;
 }

@@ -18,3 +18,4 @@ bool comparePtrs(Particle*a, Particle*b);
 void sortOnFitness(std::vector<Particle*>& genomes);
 Particle* getPBest(std::vector<Particle*> genomes, double const p);
 std::string generateConfig(std::string templateFile, std::string name);
+void printVec(std::vector<double> v);

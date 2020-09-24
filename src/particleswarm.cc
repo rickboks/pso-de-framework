@@ -86,14 +86,14 @@ void ParticleSwarm::runAsynchronous(int const evalBudget, int const popSize, std
 
 			particles[i]->updatePbest();
 			particles[i]->updateGbest();
-			particles[i]->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));			
+			particles[i]->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/evalBudget);			
 		}
 		logPositions();
 
 		improved ? notImproved=0 : notImproved++;
 
 		iterations++;	
-		topologyManager->update(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));	
+		topologyManager->update(double(problem->IOHprofiler_get_evaluations())/evalBudget);	
 	}
 
 	reset();
@@ -145,12 +145,12 @@ void ParticleSwarm::runSynchronous(int const evalBudget, int const popSize, std:
 		for (int i = 0; i < popSize; i++)
 			particles[i]->updateGbest();
 		for (int i = 0; i < popSize; i++)
-			particles[i]->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));
+			particles[i]->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/evalBudget);
 	
 		logPositions();
 	
 		iterations++;	
-		topologyManager->update(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));	
+		topologyManager->update(double(problem->IOHprofiler_get_evaluations())/evalBudget);	
 	}
 
 	reset();

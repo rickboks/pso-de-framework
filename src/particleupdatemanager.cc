@@ -90,7 +90,7 @@ ConstrictionCoefficientManager::ConstrictionCoefficientManager(std::vector<doubl
 	: ParticleUpdateManager(x,v,p,g),
 	phi1 (parameters.find(Setting::S_CC_PHI1) != parameters.end() ? parameters[Setting::S_CC_PHI1] : CC_PHI1_DEFAULT),
 	phi2 (parameters.find(Setting::S_CC_PHI2) != parameters.end() ? parameters[Setting::S_CC_PHI2] : CC_PHI2_DEFAULT),
-	chi (2 / ((phi1+phi2) - 2 + sqrt(pow(phi1+phi2, 2) - 4 * (phi1+phi2)))){}
+	chi (2.0 / ((phi1+phi2) - 2 + sqrt(pow(phi1+phi2, 2) - 4 * (phi1+phi2)))){}
 
 void ConstrictionCoefficientManager::updateVelocity(double const progress){
 	std::vector<double> pMinx(D);
@@ -110,7 +110,7 @@ FIPSManager::FIPSManager(std::vector<double> & x, std::vector<double> & v,
 	, std::vector<Particle*>& neighborhood)
 	: ParticleUpdateManager(x,v,p,g),
 	phi (parameters.find(Setting::S_FIPS_PHI) != parameters.end() ? parameters[Setting::S_FIPS_PHI] : FIPS_PHI_DEFAULT),
-	chi (2 / ((phi) -2 + sqrt( pow(phi, 2) - 4 * (phi)))),
+	chi (2.0 / ((phi) -2 + sqrt( pow(phi, 2) - 4 * (phi)))),
 	neighborhood(neighborhood){}
 
 

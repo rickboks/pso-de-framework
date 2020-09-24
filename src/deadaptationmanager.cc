@@ -43,21 +43,19 @@ void JADEManager::nextF(std::vector<double>& Fs){
 	rng.shuffle(indices.begin(), indices.end());
 
 	for (unsigned int i = 0; i < third; i++)
-		Fs[indices[i]] = std::max(rng.randDouble(0.0,1.2),0.0);
+		Fs[indices[i]] = rng.randDouble(0.0,1.2);
 
 	for (unsigned int i = third; i < Fs.size(); i++)
 		Fs[indices[i]] = std::max(rng.normalDistribution(MuF, 0.1),0.0);	
 
-        previousFs = Fs;
+	previousFs = Fs;
 }
 
-
 void JADEManager::nextCr(std::vector<double>& Crs){
-;
 	for (unsigned int i = 0; i < Crs.size(); i++){
-		Crs[i] = std::max(rng.normalDistribution(MuCr, 0.1),0.0);
-		
+		Crs[i] = std::min(std::max(rng.normalDistribution(MuCr, 0.1),0.0),1.0);
 	}
+
 	previousCrs = Crs;
 }
 

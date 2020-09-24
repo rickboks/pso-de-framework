@@ -59,13 +59,11 @@ std::vector<double> ExponentialCrossoverManager::singleCrossover(std::vector<dou
 	} while (rng.randDouble(0,1) <= Cr && L <= D);
 
 	int const end = (start+L-1) % D;
-
 	for (int i = 0; i < D; i++){
 		if ((end >= start && (i >= start && i <= end)) || (start > end && (i <= end || i >= start)))
 			x[i] = donor[i];
 		else 
 			x[i] = target[i];
 	}
-
 	return x;
 }

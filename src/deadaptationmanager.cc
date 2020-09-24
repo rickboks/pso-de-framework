@@ -49,7 +49,6 @@ void JADEManager::nextF(std::vector<double>& Fs){
 	for (unsigned int i = third; i < Fs.size(); i++)
 		Fs[indices[i]] = std::max(rng.normalDistribution(MuF, 0.1),0.0);	
 
-	printVec(Fs);
 	previousFs = Fs;
 }
 
@@ -58,7 +57,6 @@ void JADEManager::nextCr(std::vector<double>& Crs){
 		Crs[i] = std::min(std::max(rng.normalDistribution(MuCr, 0.1),0.0),1.0);
 	}
 
-	printVec(Crs);
 	previousCrs = Crs;
 }
 

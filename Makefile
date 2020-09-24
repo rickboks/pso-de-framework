@@ -4,11 +4,11 @@ SRC_DIR = src
 OBJ_DIR = obj
 RESULT_DIR=results
 INC_DIR = include
-LDFLAGS += -lboost_system -lboost_filesystem -lm -lIOH
+LDFLAGS += -L ~/.local/lib -lboost_system -lboost_filesystem -lm -lIOH
 
 SRC:= $(shell find src/ ! -name "experiment.cc" ! -name "mpi_experiment.cc" -name "*.cc")
 OBJ = $(SRC:$(SRC_DIR)/%.cc=$(OBJ_DIR)/%.o)
-INC = -I $(INC_DIR)
+INC = -I $(INC_DIR) -isystem ~/.local/include
 
 CC      = g++
 CFLAGS  = -Wall -std=c++17 -g -O2

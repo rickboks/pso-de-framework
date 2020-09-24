@@ -42,7 +42,6 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 	std::vector<double> Crs(popSize);
 
 	while (problem->IOHprofiler_get_evaluations() < evalBudget && !problem->IOHprofiler_hit_optimal()){
-
 		adaptationManager->nextF(Fs);
 		adaptationManager->nextCr(Crs);
 		adaptationManager->reset();

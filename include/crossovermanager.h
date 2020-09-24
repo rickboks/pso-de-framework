@@ -6,12 +6,6 @@
 #include "rng.h"
 #include "particle.h"
 
-enum CrossoverType {
-	BINOMIAL,
-	EXPONENTIAL,
-	CROSS_END
-};
-
 class CrossoverManager {
 	protected:
 		int const D;

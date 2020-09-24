@@ -25,7 +25,6 @@ std::vector<Particle*> MutationManager::mutate(std::vector<Particle*>const& geno
 
 	best = getBest(genomes);
 	pBest = getPBest(genomes, 0.1);
-
 	std::vector<Particle*> mutants(genomes.size());
 
 	for (unsigned int i = 0; i < genomes.size(); i++){

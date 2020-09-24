@@ -15,7 +15,7 @@ BinomialCrossoverManager::BinomialCrossoverManager(int const D) : CrossoverManag
 std::vector<Particle*> BinomialCrossoverManager::crossover(std::vector<Particle*>const& genomes, std::vector<Particle*>const& mutants, std::vector<double>const& Crs){
 	std::vector<Particle*> trials;
 	trials.reserve(genomes.size());
-	std::vector<double> x(this->D);
+	std::vector<double> x(D);
 
 	for (unsigned int i = 0; i < genomes.size(); i++){
 		std::vector<double> const mutantX = mutants[i]->getX();
@@ -27,9 +27,9 @@ std::vector<Particle*> BinomialCrossoverManager::crossover(std::vector<Particle*
 }
 
 std::vector<double> BinomialCrossoverManager::singleCrossover(std::vector<double>const& target, std::vector<double>const& donor, double const Cr){
-	std::vector<double> x(this->D);
-	int const jrand = rng.randInt(0,this->D-1);
-	for (int j = 0; j < this->D; j++){
+	std::vector<double> x(D);
+	int const jrand = rng.randInt(0,D-1);
+	for (int j = 0; j < D; j++){
 		if (j == jrand || rng.randDouble(0,1) < Cr){
 			x[j] = donor[j];
 		} else {
@@ -50,18 +50,18 @@ std::vector<Particle*> ExponentialCrossoverManager::crossover(std::vector<Partic
 }
 
 std::vector<double> ExponentialCrossoverManager::singleCrossover(std::vector<double>const& target, std::vector<double>const& donor, double const Cr){
-	std::vector<double> x(this->D);
-	int const start = rng.randInt(0,this->D-1);
+	std::vector<double> x(D);
+	int const start = rng.randInt(0,D-1);
 
 	int L = 0;
 	do {
 		L++;
-	} while (rng.randDouble(0,1) <= Cr && L < this->D);
+	} while (rng.randDouble(0,1) <= Cr && L <= D);
 
-	int const end = (start+L) % D;
+	int const end = (start+L-1) % D;
 
 	for (int i = 0; i < D; i++){
-		if ((end >= start && (i >= start && i <= end)) || (start > end && (i < end || i > start)))
+		if ((end >= start && (i >= start && i <= end)) || (start > end && (i <= end || i >= start)))
 			x[i] = donor[i];
 		else 
 			x[i] = target[i];

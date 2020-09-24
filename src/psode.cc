@@ -34,36 +34,20 @@ std::vector<Particle*> PSODE::copyPopulation(std::vector<Particle*>const& partic
 	return copy;
 }
 
-void PSODE::reset(){
-	delete topologyManager;
-	delete mutationManager;
-	delete crossoverManager;
-	delete adaptationManager;
-	delete deCH;
-	delete psoCH;
-	
-	for (Particle* const particle : particles)
-		delete particle;
-
-	particles.clear();
-}
-
 PSODE::~PSODE(){}
 
 void PSODE::run(std::shared_ptr<IOHprofiler_problem<double>> const problem, 
     		std::shared_ptr<IOHprofiler_csv_logger> const logger,
     		int const evalBudget, int const popSize, std::map<int,double> const particleUpdateParams){
-	this->problem=problem;
-	this->logger=logger;
-
 	if (config.synchronicity == "S")
-		runSynchronous(evalBudget, popSize, particleUpdateParams);
+		runSynchronous(problem, logger, evalBudget, popSize, particleUpdateParams);
 	else
-		runAsynchronous(evalBudget, popSize, particleUpdateParams);
+		runAsynchronous(problem, logger, evalBudget, popSize, particleUpdateParams);
 }
 
-void PSODE::runSynchronous(int const evalBudget, int const popSize, 
-	std::map<int,double> const particleUpdateParams){
+void PSODE::runSynchronous(std::shared_ptr<IOHprofiler_problem<double> > const problem, 
+    		std::shared_ptr<IOHprofiler_csv_logger> const logger, int const evalBudget, 
+    		int const popSize, std::map<int,double> const particleUpdateParams){
 
 	std::vector<Particle*> p0;
 	std::vector<Particle*> p1;
@@ -73,27 +57,21 @@ void PSODE::runSynchronous(int const evalBudget, int const popSize,
 	std::vector<double> const lowerBound = problem->IOHprofiler_get_lowerbound();
 	std::vector<double> const upperBound = problem->IOHprofiler_get_upperbound();
 
-	deCH = deCHs.at(config.deCH)(lowerBound, upperBound);
-	psoCH = psoCHs.at(config.psoCH)(lowerBound, upperBound);
+	ConstraintHandler const*const deCH = deCHs.at(config.deCH)(lowerBound, upperBound);
+	ConstraintHandler const*const psoCH = psoCHs.at(config.psoCH)(lowerBound, upperBound);
 
-	ParticleUpdateSettings settings(config.update, particleUpdateParams, psoCH);
+	ParticleUpdateSettings const settings(config.update, particleUpdateParams, psoCH);
 
-	for (int i = 0; i < popSize; i++)
+	for (int i = 0; i < popSize; i++){
 		particles.push_back(new Particle(D, &settings));
+		particles[i]->randomize(lowerBound, upperBound);
+	}
 
-	for (Particle* const p : particles)
-		p->randomize(lowerBound, upperBound);
-
-	topologyManager = topologies.at(config.topology)(particles);
-	mutationManager = mutations.at(config.mutation)(D, deCH);
-	crossoverManager = crossovers.at(config.crossover)(D);
-	adaptationManager = deAdaptations.at(config.adaptation)();
-	selectionManager = selections.at(config.selection)(D, adaptationManager);
-
-	int iterations = 0;
-	double bestFitness = std::numeric_limits<double>::max();
-	int notImproved = 0;
-	bool improved;
+	TopologyManager *const topologyManager = topologies.at(config.topology)(particles);
+	MutationManager *const mutationManager = mutations.at(config.mutation)(D, deCH);
+	CrossoverManager const*const crossoverManager = crossovers.at(config.crossover)(D);
+	DEAdaptationManager *const adaptationManager = deAdaptations.at(config.adaptation)();
+	SelectionManager const*const selectionManager = selections.at(config.selection)(D, adaptationManager);
 
 	std::vector<double> Fs(popSize);
 	std::vector<double> Crs(popSize);	
@@ -101,22 +79,12 @@ void PSODE::runSynchronous(int const evalBudget, int const popSize,
 	while (problem->IOHprofiler_get_evaluations() < evalBudget &&
 			!problem->IOHprofiler_hit_optimal()){
 		
-		improved = false;
-
 		adaptationManager->nextF(Fs);
 		adaptationManager->nextCr(Crs);
 		adaptationManager->reset();
 
-		for (int i = 0; i < popSize; i++){
-			double y = particles[i]->evaluate(problem,logger);
-
-			if (y < bestFitness){
-				improved = true;
-				bestFitness = y;
-			}
-		}
-
-		improved ? notImproved = 0 : notImproved++;
+		for (int i = 0; i < popSize; i++)
+			particles[i]->evaluate(problem,logger);
 
 		p0 = copyPopulation(particles);
 		
@@ -130,22 +98,13 @@ void PSODE::runSynchronous(int const evalBudget, int const popSize,
 		p1 = mutationManager->mutate(particles, Fs);
 		p2 = crossoverManager->crossover(particles,p1, Crs);
 			
-		improved = false;
 		for (unsigned int i = 0; i < p2.size(); i++){
 			p0[i]->evaluate(problem,logger);
 			p2[i]->evaluate(problem,logger);
-			
-			double minF = std::min(p0[i]->getFitness(), p2[i]->getFitness());	
-			if (minF < bestFitness){
-				improved = true;
-				bestFitness = minF;
-			}
 		}
 
 		selectionManager->selection(particles, p0, p2);
 		adaptationManager->update();
-
-		improved ? notImproved = 0 : notImproved++;
 
 		for (int i = 0; i < popSize; i++) {
 			delete p0[i]; 
@@ -153,15 +112,25 @@ void PSODE::runSynchronous(int const evalBudget, int const popSize,
 			delete p2[i];
 		}
 
-		iterations++;	
 		topologyManager->update(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));	
 	}
 
-	reset();
+	delete topologyManager;
+	delete mutationManager;
+	delete crossoverManager;
+	delete adaptationManager;
+	delete deCH;
+	delete psoCH;
+	
+	for (Particle* const particle : particles)
+		delete particle;
+
+	particles.clear();
 }
 
-void PSODE::runAsynchronous(int const evalBudget, 
-	int const popSize, std::map<int,double> const particleUpdateParams){
+void PSODE::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > const problem, 
+    		std::shared_ptr<IOHprofiler_csv_logger> const logger, int const evalBudget, 
+    		int const popSize, std::map<int,double> const particleUpdateParams){
 
 	std::vector<Particle*> p0;
 	std::vector<Particle*> p1;
@@ -171,9 +140,9 @@ void PSODE::runAsynchronous(int const evalBudget,
 	std::vector<double> const lowerBound = problem->IOHprofiler_get_lowerbound();
 	std::vector<double> const upperBound = problem->IOHprofiler_get_upperbound();
 
-	deCH = deCHs.at(config.deCH)(lowerBound, upperBound);
-	psoCH = psoCHs.at(config.deCH)(lowerBound, upperBound);
-	ParticleUpdateSettings settings(config.update, particleUpdateParams, psoCH);
+	ConstraintHandler const*const deCH = deCHs.at(config.deCH)(lowerBound, upperBound);
+	ConstraintHandler const*const psoCH = psoCHs.at(config.deCH)(lowerBound, upperBound);
+	ParticleUpdateSettings const settings(config.update, particleUpdateParams, psoCH);
 
 	for (int i = 0; i < popSize; i++)
 		particles.push_back(new Particle(D, &settings));
@@ -181,13 +150,11 @@ void PSODE::runAsynchronous(int const evalBudget,
 	for (Particle* const p : particles)
 		p->randomize(lowerBound, upperBound);
 
-	topologyManager = topologies.at(config.topology)(particles);
-	mutationManager = mutations.at(config.mutation)(D, deCH);
-	crossoverManager = crossovers.at(config.crossover)(D);
-	adaptationManager = deAdaptations.at(config.adaptation)();
-	selectionManager = selections.at(config.selection)(D, adaptationManager);
-
-	int iterations = 0;
+	TopologyManager *const topologyManager = topologies.at(config.topology)(particles);
+	MutationManager *const mutationManager = mutations.at(config.mutation)(D, deCH);
+	CrossoverManager const *const crossoverManager = crossovers.at(config.crossover)(D);
+	DEAdaptationManager *const adaptationManager = deAdaptations.at(config.adaptation)();
+	SelectionManager const*const selectionManager = selections.at(config.selection)(D, adaptationManager);
 
 	std::vector<double> Fs(popSize);
 	std::vector<double> Crs(popSize);
@@ -226,11 +193,20 @@ void PSODE::runAsynchronous(int const evalBudget,
 			delete p2[i];
 		}
 
-		iterations++;	
 		topologyManager->update(double(problem->IOHprofiler_get_evaluations())/double(evalBudget));	
 	}
 
-	reset();
+	delete topologyManager;
+	delete mutationManager;
+	delete crossoverManager;
+	delete adaptationManager;
+	delete deCH;
+	delete psoCH;
+	
+	for (Particle* const particle : particles)
+		delete particle;
+
+	particles.clear();
 }
 
 std::string PSODE::getIdString() const{

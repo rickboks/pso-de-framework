@@ -14,8 +14,7 @@ protected:
 	std::vector<double> previousCrs;
 public:
 	virtual ~DEAdaptationManager(){};
-	virtual void successfulIndex(int i)=0;
-	virtual void succesfulValues(double F, double Cr)=0;
+	virtual void successfulIndex(int const i)=0;
 	virtual void nextF(std::vector<double>& Fs)=0;
 	virtual void nextCr(std::vector<double>& Crs)=0;
 	virtual void reset()=0;
@@ -28,12 +27,11 @@ class JADEManager : public DEAdaptationManager{
 private:
 	double MuCr;
 	double MuF;
-	double c;
-	double lehmerMean();
+	double const c;
+	double lehmerMean() const;
 public:
 	JADEManager();
-	void successfulIndex(int i);
-	void succesfulValues(double F, double Cr);
+	void successfulIndex(int const i);
 	void nextF(std::vector<double>& Fs);
 	void nextCr(std::vector<double>& Crs);
 	void reset();
@@ -42,12 +40,11 @@ public:
 
 class NoAdaptationManager : public DEAdaptationManager {
 private:
-	double F;
-	double Cr;
+	double const F;
+	double const Cr;
 public:
 	NoAdaptationManager();
-	void successfulIndex(int i);
-	void succesfulValues(double F, double Cr);
+	void successfulIndex(int const i);
 	void nextF(std::vector<double>& Fs);
 	void nextCr(std::vector<double>& Crs);
 	void reset();

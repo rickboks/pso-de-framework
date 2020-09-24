@@ -16,7 +16,7 @@ std::map<std::string, std::function<SelectionManager* (int const, DEAdaptationMa
 });
 
 void SelectionManager::selection(std::vector<Particle*>& particles, 
-		std::vector<Particle*>const& p0, std::vector<Particle*>const& p2){
+		std::vector<Particle*>const& p0, std::vector<Particle*>const& p2) const{
 	//check sucessful indices
 	for (unsigned int i = 0; i < particles.size(); i++){
 		if (p2[i]->getFitness() < particles[i]->getFitness()){
@@ -28,11 +28,11 @@ void SelectionManager::selection(std::vector<Particle*>& particles,
 }
 
 //Pairwise 2
-Pairwise2SelectionManager::Pairwise2SelectionManager(int const D, DEAdaptationManager* dam)
+Pairwise2SelectionManager::Pairwise2SelectionManager(int const D, DEAdaptationManager* dam) 
 : SelectionManager(D, dam){}
 
 void Pairwise2SelectionManager::select(std::vector<Particle*>& particles, 
-		std::vector<Particle*>const& p0, std::vector<Particle*>const& p2){
+		std::vector<Particle*>const& p0, std::vector<Particle*>const& p2) const{
 	for (unsigned int i = 0 ; i < particles.size(); i++){
 		//PSO wins
 		if (p0[i]->getFitness() < p2[i]->getFitness()){
@@ -51,7 +51,7 @@ Pairwise3SelectionManager::Pairwise3SelectionManager(int const D, DEAdaptationMa
 : SelectionManager(D, dam){}
 
 void Pairwise3SelectionManager::select(std::vector<Particle*>& particles, 
-		std::vector<Particle*>const& p0, std::vector<Particle*>const& p2){
+		std::vector<Particle*>const& p0, std::vector<Particle*>const& p2) const{
 
 	for (unsigned int i = 0 ; i < particles.size(); i++){
 		double Fparticle = particles[i]->getFitness();
@@ -79,7 +79,7 @@ bool sortbyFirstElement(const std::tuple<Particle*, int, int>& a,
 } 
   
 void Union2SelectionManager::select(std::vector<Particle*>& particles, 
-		std::vector<Particle*>const& p0, std::vector<Particle*>const& p2){
+		std::vector<Particle*>const& p0, std::vector<Particle*>const& p2) const{
 
 	int popSize = particles.size();
 
@@ -110,7 +110,7 @@ Union3SelectionManager::Union3SelectionManager(int const D, DEAdaptationManager*
 : SelectionManager(D, dam){}
 
 void Union3SelectionManager::select(std::vector<Particle*>& particles, 
-		std::vector<Particle*>const& p0, std::vector<Particle*>const& p2){
+		std::vector<Particle*>const& p0, std::vector<Particle*>const& p2) const{
 	int popSize = particles.size();
 
 	std::vector< std::tuple<Particle*, int, int > >  allSolutions;

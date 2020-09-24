@@ -12,7 +12,8 @@ std::map<std::string, std::function<CrossoverManager* (int const)>> const crosso
 
 BinomialCrossoverManager::BinomialCrossoverManager(int const D) : CrossoverManager(D){}
 
-std::vector<Particle*> BinomialCrossoverManager::crossover(std::vector<Particle*>const& genomes, std::vector<Particle*>const& mutants, std::vector<double>const& Crs){
+std::vector<Particle*> BinomialCrossoverManager::crossover(std::vector<Particle*>const& genomes, 
+		std::vector<Particle*>const& mutants, std::vector<double>const& Crs) const{
 	std::vector<Particle*> trials;
 	trials.reserve(genomes.size());
 	std::vector<double> x(D);
@@ -26,7 +27,8 @@ std::vector<Particle*> BinomialCrossoverManager::crossover(std::vector<Particle*
 	return trials;
 }
 
-std::vector<double> BinomialCrossoverManager::singleCrossover(std::vector<double>const& target, std::vector<double>const& donor, double const Cr){
+std::vector<double> BinomialCrossoverManager::singleCrossover(std::vector<double>const& target, 
+		std::vector<double>const& donor, double const Cr) const{
 	std::vector<double> x(D);
 	int const jrand = rng.randInt(0,D-1);
 	for (int j = 0; j < D; j++){
@@ -41,7 +43,8 @@ std::vector<double> BinomialCrossoverManager::singleCrossover(std::vector<double
 
 ExponentialCrossoverManager::ExponentialCrossoverManager(int const D): CrossoverManager(D){}
 
-std::vector<Particle*> ExponentialCrossoverManager::crossover(std::vector<Particle*>const& genomes, std::vector<Particle*>const& mutants, std::vector<double>const& Crs){
+std::vector<Particle*> ExponentialCrossoverManager::crossover(std::vector<Particle*>const& genomes, 
+		std::vector<Particle*>const& mutants, std::vector<double>const& Crs) const {
 	std::vector<Particle*> trials;
 	for (unsigned int i = 0; i < genomes.size(); i++){
 		trials.push_back(new Particle(singleCrossover(genomes[i]->getX(), mutants[i]->getX(), Crs[i])));
@@ -49,7 +52,8 @@ std::vector<Particle*> ExponentialCrossoverManager::crossover(std::vector<Partic
 	return trials;
 }
 
-std::vector<double> ExponentialCrossoverManager::singleCrossover(std::vector<double>const& target, std::vector<double>const& donor, double const Cr){
+std::vector<double> ExponentialCrossoverManager::singleCrossover(std::vector<double>const& target, 
+		std::vector<double>const& donor, double const Cr) const{
 	std::vector<double> x(D);
 	int const start = rng.randInt(0,D-1);
 

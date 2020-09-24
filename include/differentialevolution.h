@@ -13,18 +13,12 @@ class IOHprofiler_csv_logger;
 struct DEConfig {
 	DEConfig(std::string const mutation, std::string const crossover, std::string const adaptation, std::string const constraintHandler)
 	: mutation(mutation), crossover(crossover), adaptation(adaptation), constraintHandler(constraintHandler){}
-
 	std::string const mutation, crossover, adaptation, constraintHandler;
 };
 
 class DifferentialEvolution {
 	private:
 		DEConfig const config;
-		std::vector<Particle*> genomes;
-		MutationManager* mutationManager;
-		CrossoverManager* crossoverManager;
-		DEAdaptationManager* adaptationManager;
-		ConstraintHandler* deCH;
 	public:
 		DifferentialEvolution(DEConfig const config);
 		void run(std::shared_ptr<IOHprofiler_problem<double> > const problem, 

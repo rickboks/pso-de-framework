@@ -9,51 +9,34 @@
 #include <iostream>
 #include <fstream>
 
-ParticleSwarm::ParticleSwarm(PSOConfig const config) : config(config), topologyManager(NULL){
+ParticleSwarm::ParticleSwarm(PSOConfig const config) : config(config){
 	logging = false;
 }
 
-void ParticleSwarm::reset(){
-	delete topologyManager;
-	topologyManager = NULL;
-	
-	for (Particle* const particle : particles)
-		delete particle;
+void ParticleSwarm::reset(){}
 
-	particles.clear();
-
-	delete psoCH;
-}
-
-ParticleSwarm::~ParticleSwarm(){
-	if (topologyManager != NULL)
-		delete topologyManager;
-
-	if (!particles.empty())
-		for (Particle* const particle : particles)
-			delete particle;
-}
+ParticleSwarm::~ParticleSwarm(){}
 
 void ParticleSwarm::run(std::shared_ptr<IOHprofiler_problem<double> > const problem, 
     		std::shared_ptr<IOHprofiler_csv_logger> const logger,
     		int const evalBudget, int const popSize, std::map<int,double> const particleUpdateParams){
 
-	this->problem=problem;
-	this->logger=logger;
-
 	if (config.synchronicity == "A")
-		runSynchronous(evalBudget, popSize, particleUpdateParams);
+		runSynchronous(problem, logger, evalBudget, popSize, particleUpdateParams);
 	else 
-		runAsynchronous(evalBudget, popSize, particleUpdateParams);
+		runAsynchronous(problem, logger, evalBudget, popSize, particleUpdateParams);
 }
 
-void ParticleSwarm::runAsynchronous(int const evalBudget, int const popSize, std::map<int,double> const particleUpdateParams){
+void ParticleSwarm::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > const problem, 
+    		std::shared_ptr<IOHprofiler_csv_logger> const logger,
+    		int const evalBudget, int const popSize, std::map<int,double> const particleUpdateParams){
+
 	int const D = problem->IOHprofiler_get_number_of_variables(); 
 	std::vector<double> lowerBound = problem->IOHprofiler_get_lowerbound(); 
 	std::vector<double> upperBound = problem->IOHprofiler_get_upperbound();
 
-	psoCH = psoCHs.at(config.constraintHandler)(lowerBound, upperBound); 
-	ParticleUpdateSettings settings(config.update, particleUpdateParams, psoCH);
+	ConstraintHandler const* const psoCH = psoCHs.at(config.constraintHandler)(lowerBound, upperBound); 
+	ParticleUpdateSettings const settings(config.update, particleUpdateParams, psoCH);
 
 	for (int i = 0; i < popSize; i++){
 		Particle* p = new Particle(D, &settings);
@@ -64,49 +47,41 @@ void ParticleSwarm::runAsynchronous(int const evalBudget, int const popSize, std
 	logStart();
 	logPositions();
 
-	topologyManager = topologies.at(config.topology)(particles);
+	TopologyManager* const topologyManager = topologies.at(config.topology)(particles);
 	
-	int iterations = 0;
-	double bestFitness = std::numeric_limits<double>::max();
-	int notImproved = 0;
-	bool improved;
-
 	while (	problem->IOHprofiler_get_evaluations() < evalBudget &&
 			!problem->IOHprofiler_hit_optimal()){
 		
-		improved = false;
-
 		for (int i = 0; i < popSize; i++){
-			double const y = particles[i]->evaluate(problem,logger);
-
-			if (y < bestFitness){
-				improved = true;
-				bestFitness = y;
-			}
-
+			particles[i]->evaluate(problem,logger);
 			particles[i]->updatePbest();
 			particles[i]->updateGbest();
 			particles[i]->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/evalBudget);			
 		}
+
 		logPositions();
-
-		improved ? notImproved=0 : notImproved++;
-
-		iterations++;	
 		topologyManager->update(double(problem->IOHprofiler_get_evaluations())/evalBudget);	
 	}
 
-	reset();
+	delete topologyManager;
+	for (Particle* const particle : particles)
+		delete particle;
+	particles.clear();
+	delete psoCH;
+
 	logEnd();
 }
 
-void ParticleSwarm::runSynchronous(int const evalBudget, int const popSize, std::map<int,double> const particleUpdateParams){
-	int const D = problem->IOHprofiler_get_number_of_variables(); 
-	std::vector<double> lowerBound = problem->IOHprofiler_get_lowerbound(); 
-	std::vector<double> upperBound = problem->IOHprofiler_get_upperbound(); 
+void ParticleSwarm::runSynchronous(std::shared_ptr<IOHprofiler_problem<double> > const problem, 
+    		std::shared_ptr<IOHprofiler_csv_logger> const logger,
+    		int const evalBudget, int const popSize, std::map<int,double> const particleUpdateParams){
 
-	ConstraintHandler* psoCH = psoCHs.at(config.constraintHandler)(lowerBound, upperBound); 
-	ParticleUpdateSettings settings(config.update, particleUpdateParams, psoCH);
+	int const D = problem->IOHprofiler_get_number_of_variables(); 
+	std::vector<double> const lowerBound = problem->IOHprofiler_get_lowerbound(); 
+	std::vector<double> const upperBound = problem->IOHprofiler_get_upperbound(); 
+
+	ConstraintHandler* const psoCH = psoCHs.at(config.constraintHandler)(lowerBound, upperBound); 
+	ParticleUpdateSettings const settings(config.update, particleUpdateParams, psoCH);
 
 	for (int i = 0; i < popSize; i++){
 		Particle* p = new Particle(D, &settings);
@@ -114,46 +89,34 @@ void ParticleSwarm::runSynchronous(int const evalBudget, int const popSize, std:
 		particles.push_back(p);
 	}
 
-	topologyManager = topologies.at(config.topology)(particles);
+	TopologyManager* const topologyManager = topologies.at(config.topology)(particles);
 
 	logStart();
 	logPositions();
 
-	int iterations = 0;
-	double bestFitness = std::numeric_limits<double>::max();
-	int notImproved = 0;
-	bool improved;
-
 	while (	problem->IOHprofiler_get_evaluations() < evalBudget &&
 			!problem->IOHprofiler_hit_optimal()){
 		
-		improved = false;
-
-		for (int i = 0; i < popSize; i++){		
-			double const y = particles[i]->evaluate(problem,logger);
-
-			if (y < bestFitness){
-				improved = true;
-				bestFitness = y;
-			}	
-		}		
-
-		improved ? notImproved=0 : notImproved++;
-		
-		for (int i = 0; i < popSize; i++)
+		for (int i = 0; i < popSize; i++){
+			particles[i]->evaluate(problem,logger);
 			particles[i]->updatePbest();
-		for (int i = 0; i < popSize; i++)
+		}
+
+		for (int i = 0; i < popSize; i++){
 			particles[i]->updateGbest();
-		for (int i = 0; i < popSize; i++)
 			particles[i]->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/evalBudget);
+		}
 	
 		logPositions();
-	
-		iterations++;	
 		topologyManager->update(double(problem->IOHprofiler_get_evaluations())/evalBudget);	
 	}
 
-	reset();
+	delete topologyManager;
+	for (Particle* const particle : particles)
+		delete particle;
+	particles.clear();
+	delete psoCH;
+
 	logEnd();
 }
 

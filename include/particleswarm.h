@@ -22,17 +22,15 @@ class ParticleSwarm {
 	private:
 		PSOConfig const config;
 		std::vector<Particle*> particles;
-		TopologyManager* topologyManager;
-		ConstraintHandler* psoCH;
-
-		std::shared_ptr<IOHprofiler_problem<double> > problem;
-    	std::shared_ptr<IOHprofiler_csv_logger> logger;
 		bool logging;
 
-		void runSynchronous(int const evalBudget, int const popSize, 
-    		std::map<int,double> const particleUpdateParams);
-		void runAsynchronous(int const evalBudget, int const popSize, 
-    		std::map<int,double> const particleUpdateParams);
+		void runSynchronous(std::shared_ptr<IOHprofiler_problem<double> > const problem, 
+    		std::shared_ptr<IOHprofiler_csv_logger> const logger,
+    		int const evalBudget, int const popSize, std::map<int,double> const particleUpdateParams);
+
+		void runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > const problem, 
+    		std::shared_ptr<IOHprofiler_csv_logger> const logger,
+    		int const evalBudget, int const popSize, std::map<int,double> const particleUpdateParams);
 	public:
 		ParticleSwarm(PSOConfig const config);
 		~ParticleSwarm();

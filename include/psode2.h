@@ -12,28 +12,25 @@ class PSODE2 : public HybridAlgorithm {
 	private:
 		bool logging;
 		std::vector<Particle*> particles;		
-		std::vector<Particle*> psoPop;		
-		std::vector<Particle*> dePop;		
-		//void runSynchronous(int const evalBudget, int const popSize, 
-			//std::map<int,double> particleUpdateParams);
+		std::vector<Particle*> psoPop;
+		std::vector<Particle*> dePop;
 
-		void runAsynchronous(int const evalBudget, int const popSize, 
-			std::map<int,double> particleUpdateParams);
-
-		std::vector<Particle*> copyPopulation(std::vector<Particle*>const& particles);
+		void runAsynchronous(std::shared_ptr<IOHprofiler_problem<double>> const problem, 
+    		std::shared_ptr<IOHprofiler_csv_logger> const logger, int const evalBudget, 
+    		int const popSize, std::map<int,double> const particleUpdateParams);
 
 		void logPositions();
 		void logStart();
 		void logEnd();
 		void share();
 
-		public:
+	public:
 		PSODE2(HybridConfig const config);
 		~PSODE2();
 
-		void run(std::shared_ptr<IOHprofiler_problem<double> > problem, 
-    		std::shared_ptr<IOHprofiler_csv_logger> logger, int const evalBudget, 
-    		int const popSize, std::map<int,double> particleUpdateParams);
+		void run(std::shared_ptr<IOHprofiler_problem<double> > const problem, 
+    		std::shared_ptr<IOHprofiler_csv_logger> const logger, int const evalBudget, 
+    		int const popSize, std::map<int,double> const particleUpdateParams);
 
 		void reset();
 

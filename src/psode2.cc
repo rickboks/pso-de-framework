@@ -17,65 +17,47 @@
 PSODE2::PSODE2(HybridConfig const config)
 		: HybridAlgorithm(config){}
 
-void PSODE2::reset(){
-	delete topologyManager;
-	delete mutationManager;
-	delete crossoverManager;
-	delete adaptationManager;
-	delete deCH;
-	delete psoCH;
-
-	for (Particle* const particle : particles)
-		delete particle;
-
-	particles.clear();
-	dePop.clear();
-	psoPop.clear();
-}
-
 PSODE2::~PSODE2(){}
 
 void PSODE2::run(std::shared_ptr<IOHprofiler_problem<double> > problem, 
     		std::shared_ptr<IOHprofiler_csv_logger> logger,
     		int const evalBudget, int const popSize, std::map<int,double> particleUpdateParams){
 
-	this->problem=problem;
-	this->logger=logger;
 	//if (config.synchronicity == SYNCHRONOUS)
 		//runSynchronous(evalBudget, popSize, particleUpdateParams);
 	//if (config.synchronicity == ASYNCHRONOUS)
-		runAsynchronous(evalBudget, popSize, particleUpdateParams);
+		runAsynchronous(problem, logger, evalBudget, popSize, particleUpdateParams);
 }
 
-void PSODE2::runAsynchronous(int const evalBudget, int const popSize, std::map<int,double> particleUpdateParams){
+void PSODE2::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > problem, 
+    		std::shared_ptr<IOHprofiler_csv_logger> logger, int const evalBudget, int const popSize, 
+			std::map<int,double> particleUpdateParams){
+
 	int const D = problem->IOHprofiler_get_number_of_variables(); /// dimension
 	logging=false;
 
 	std::vector<double> lowerBound = problem->IOHprofiler_get_lowerbound();
 	std::vector<double> upperBound = problem->IOHprofiler_get_upperbound();
 
-	deCH = deCHs.at(config.deCH)(lowerBound,upperBound);
-	psoCH = psoCHs.at(config.psoCH)(lowerBound,upperBound);
-	ParticleUpdateSettings settings(config.update, particleUpdateParams, psoCH);
+	ConstraintHandler const*const deCH = deCHs.at(config.deCH)(lowerBound,upperBound);
+	ConstraintHandler *const psoCH = psoCHs.at(config.psoCH)(lowerBound,upperBound);
+	ParticleUpdateSettings const settings(config.update, particleUpdateParams, psoCH);
 
 	int const split = popSize / 2;
 	for (int i = 0; i < split; i++) psoPop.push_back(new Particle(D, &settings));
 	for (int i = split; i < popSize; i++) dePop.push_back(new Particle(D));
-	
-	// append the two populations
 	particles = psoPop; 
 	particles.insert(particles.end(), dePop.begin(), dePop.end());
 
-	for (Particle* const p : particles)
+	for (Particle* const p : particles){
 		p->randomize(lowerBound, upperBound);
-
-	for (Particle* const p : particles)
 		p->evaluate(problem, logger);
+	}
 
-	topologyManager = topologies.at(config.topology)(psoPop);
-	mutationManager = mutations.at(config.mutation)(D, deCH);
-	crossoverManager = crossovers.at(config.crossover)(D);
-	adaptationManager = deAdaptations.at(config.adaptation)();
+	TopologyManager* const topologyManager = topologies.at(config.topology)(psoPop);
+	MutationManager* const mutationManager = mutations.at(config.mutation)(D, deCH);
+	CrossoverManager const*const crossoverManager = crossovers.at(config.crossover)(D);
+	DEAdaptationManager *const adaptationManager = deAdaptations.at(config.adaptation)();
 
 	std::vector<double> Fs(dePop.size());
 	std::vector<double> Crs(dePop.size());
@@ -101,11 +83,9 @@ void PSODE2::runAsynchronous(int const evalBudget, int const popSize, std::map<i
 		}
 
 		// Perform mutation 
-		//
-		std::vector<Particle*> donors = mutationManager->mutate(dePop, Fs);
-
+		std::vector<Particle*> const donors = mutationManager->mutate(dePop, Fs);
 		// Perform crossover
-		std::vector<Particle*> trials = crossoverManager->crossover(dePop, donors, Crs);
+		std::vector<Particle*> const trials = crossoverManager->crossover(dePop, donors, Crs);
 
 		for (Particle* const d : donors) delete d;
 
@@ -135,7 +115,20 @@ void PSODE2::runAsynchronous(int const evalBudget, int const popSize, std::map<i
 		logPositions();
 	}
 
-	reset();
+	delete topologyManager;
+	delete mutationManager;
+	delete crossoverManager;
+	delete adaptationManager;
+	delete deCH;
+	delete psoCH;
+
+	for (Particle* const particle : particles)
+		delete particle;
+
+	particles.clear();
+	dePop.clear();
+	psoPop.clear();
+
 	logEnd();
 }
 
@@ -156,8 +149,8 @@ void PSODE2::logEnd(){
 }
 
 void PSODE2::share(){
-	Particle* best_de = getPBest(dePop, 0.1);
-	Particle* best_pso = getPBest(psoPop, 0.1);
+	Particle* const best_de = getPBest(dePop, 0.1);
+	Particle* const best_pso = getPBest(psoPop, 0.1);
 
 	std::vector<double> x = best_pso->getX();
 	double y = best_pso->getFitness();

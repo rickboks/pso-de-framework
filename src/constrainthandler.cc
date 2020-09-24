@@ -20,7 +20,8 @@ bool ConstraintHandler::resample(Particle const * const p, int const resamples) 
 void ConstraintHandler::repairVelocityPre(Particle* const p) const{}
 
 void ConstraintHandler::repairVelocityPost(Particle* const p, int const i) const{
-	if (p->isPSO) p->setV(i, -0.5 * p->getV(i));
+	if (p->isPSO) 
+		p->setV(i, -0.5 * p->getV(i));
 }
 
 bool ConstraintHandler::isFeasible(Particle const * const p) const{

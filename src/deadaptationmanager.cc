@@ -15,13 +15,9 @@ std::map<std::string, std::function<DEAdaptationManager*()>> const deAdaptations
 JADEManager::JADEManager()
  : DEAdaptationManager(), MuCr(0.5), MuF(0.6), c(0.1){}
 
-void JADEManager::successfulIndex(int i){
-	succesfulValues(previousFs[i], previousCrs[i]);
+void JADEManager::successfulIndex(int const i){
+	SF.insert(previousFs[i]); SCr.insert(previousCrs[i]);
 }
-
-void JADEManager::succesfulValues(double F, double Cr){
-	SF.insert(F); SCr.insert(Cr);
-};
 
 void JADEManager::update(){
 	if (!SCr.empty()){
@@ -60,7 +56,7 @@ void JADEManager::nextCr(std::vector<double>& Crs){
 	previousCrs = Crs;
 }
 
-double JADEManager::lehmerMean(){
+double JADEManager::lehmerMean() const {
 	double sumOfSquares = std::inner_product(SF.begin(), SF.end(), SF.begin(), 0.0);
 	double sum = std::accumulate(SF.begin(), SF.end(), 0.0);
 	return sumOfSquares/sum;
@@ -74,10 +70,6 @@ void JADEManager::reset(){
 //NO ADAPTATION
 NoAdaptationManager::NoAdaptationManager()
  : DEAdaptationManager(), F(0.1), Cr(0.2){}
-
-void NoAdaptationManager::succesfulValues(double F, double Cr){
-	//ignore
-}
 
 void NoAdaptationManager::update(){
 	//ignore
@@ -95,6 +87,6 @@ void NoAdaptationManager::reset(){
 	//ignore
 }
 
-void NoAdaptationManager::successfulIndex(int i){
+void NoAdaptationManager::successfulIndex(int const i){
 	//ignore
 }

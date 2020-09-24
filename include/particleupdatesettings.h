@@ -38,7 +38,7 @@ enum Setting {
 };
 
 struct ParticleUpdateSettings {
-	ParticleUpdateSettings(std::string const managerType, std::map<int, double> const parameters, ConstraintHandler* psoCH)
+	ParticleUpdateSettings(std::string const managerType, std::map<int, double> const parameters, ConstraintHandler const*const psoCH)
 		:managerType(managerType), parameters(parameters), psoCH(psoCH){
 	};
 
@@ -46,5 +46,5 @@ struct ParticleUpdateSettings {
 
 	std::string managerType;
 	std::map<int, double> parameters;
-	ConstraintHandler* psoCH;
+	ConstraintHandler const* psoCH;
 };

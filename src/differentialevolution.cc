@@ -24,6 +24,8 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 	std::vector<double> const lowerBound = problem->IOHprofiler_get_lowerbound();
 	std::vector<double> const upperBound = problem->IOHprofiler_get_upperbound();
 
+	std::vector<Particle*> genomes;
+	genomes.reserve(popSize);
 	for (int i = 0; i < popSize; i++)
 		genomes.push_back(new Particle(D));
 
@@ -33,10 +35,10 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 	std::vector<Particle*> donors;
 	std::vector<Particle*> trials;
 
-	deCH = deCHs.at(config.constraintHandler)(lowerBound, upperBound);
-	crossoverManager = crossovers.at(config.crossover)(D);
-	mutationManager = mutations.at(config.mutation)(D, deCH);
-	adaptationManager = deAdaptations.at(config.adaptation)();
+	ConstraintHandler const* const deCH = deCHs.at(config.constraintHandler)(lowerBound, upperBound);
+	CrossoverManager const* const crossoverManager = crossovers.at(config.crossover)(D);
+	MutationManager* const mutationManager = mutations.at(config.mutation)(D, deCH);
+	DEAdaptationManager* const adaptationManager = deAdaptations.at(config.adaptation)();
 
 	std::vector<double> Fs(popSize);
 	std::vector<double> Crs(popSize);

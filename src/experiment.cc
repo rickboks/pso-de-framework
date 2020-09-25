@@ -28,8 +28,7 @@ void _run_experiment(bool const log) {
     //psode2 = new PSODE2(HybridConfig("I", "N", "HY", "A", "T1", "B", "J", "RI"));
     //psode = new PSODE(HybridConfig("I", "N", "HY", "A", "T1", "B", "P3", "J", "RI"));    
     //pso = new ParticleSwarm(PSOConfig("I", "N", "PR", "A"));
-    //
-    de = new DifferentialEvolution(DEConfig("B1", "B", "J", "PB"));
+    de = new DifferentialEvolution(DEConfig("B1", "B", "J", "TR"));
 
     if (log)
 		pso->enableLogging();

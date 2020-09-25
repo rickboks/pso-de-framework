@@ -35,11 +35,11 @@ void ReflectionRepair::repair(Particle* const p) const{
 	for (int i = 0; i < D; i++){
 		bool is_repaired = false;
 		while (p->getX(i) < lb[i]){
-			p->setX(i, 2 * lb[i] - p->getX(i));
+			p->setX(i, 2. * lb[i] - p->getX(i));
 			is_repaired = true;
 		}
 		while (p->getX(i) > ub[i]){
-			p->setX(i, 2 * ub[i] - p->getX(i));
+			p->setX(i, 2. * ub[i] - p->getX(i));
 			is_repaired = true;
 		}
 		if (is_repaired)
@@ -51,10 +51,10 @@ WrappingRepair::WrappingRepair(std::vector<double>const lb, std::vector<double>c
 void WrappingRepair::repair(Particle* const p) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i]){
-			p->setX(i, ub[i] - std::fmod(lb[i] - p->getX(i), std::fabs(ub[i]-lb[i])));
+			p->setX(i, ub[i] - std::fmod(lb[i] - p->getX(i), std::abs(ub[i]-lb[i])));
 			repairVelocityPost(p,i);
 		} else if (p->getX(i) > ub[i]) {
-			p->setX(i, lb[i] + std::fmod(p->getX(i) - ub[i], std::fabs(ub[i]-lb[i])));
+			p->setX(i, lb[i] + std::fmod(p->getX(i) - ub[i], std::abs(ub[i]-lb[i])));
 			repairVelocityPost(p,i);
 		}
 	}
@@ -65,6 +65,41 @@ bool ResamplingRepair::resample(Particle const* const p, int const resamples) co
 	if (resamples >= 100 || isFeasible(p))
 		return false;
 	return true;
+}
+
+//Adapted from https://github.com/psbiomech/c-cmaes
+TransformationRepair::TransformationRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub), 
+	al(D), au(D), xlo(D), xhi(D), r(D){
+	for (int i = 0; i < D; i++){
+		al[i] = std::min( (ub[i]-lb[i])/2., (1.+std::abs(lb[i]))/20. );
+		au[i] = std::min( (ub[i]-lb[i])/2., (1.+std::abs(ub[i]))/20. );
+		xlo[i] = lb[i] - 2. * al[i] - (ub[i] - lb[i]) / 2.;
+		xhi[i] = ub[i] + 2. * au[i] + (ub[i] - lb[i]) / 2.;
+		r[i] = 2.*(ub[i] - lb[i] + al[i] + au[i]);
+	}
+}
+void TransformationRepair::repair(Particle* const p) const{
+	shift(p);
+	for (int i = 0; i < D; i++){
+		double const x_i = p->getX(i);
+		if (x_i < lb[i] + al[i])
+			p->setX(i, lb[i] + pow(x_i - (lb[i] - al[i]),2.)/(4.*al[i]));
+		else if (x_i > ub[i]-au[i])
+			p->setX(i, ub[i] - pow(x_i - (ub[i] + au[i]),2.)/(4.*au[i]));
+	}
+}
+void TransformationRepair::shift(Particle* const p) const {
+	for (int i = 0; i < D; i++){
+		if (p->getX(i) < xlo[i]) // Shift up
+			p->setX(i, p->getX(i) + r[i] * (1 + (int)((xlo[i] - p->getX(i))/r[i])) );
+		if (p->getX(i) > xhi[i]) // Shift down
+			p->setX(i, p->getX(i) - r[i] * (1 + (int)((p->getX(i)-xhi[i])/r[i])) );
+
+		if (p->getX(i) < lb[i] - al[i]) // mirror
+			p->setX(i, p->getX(i) + 2. * (lb[i] - al[i] - p->getX(i)));
+		if (p->getX(i) > ub[i] + au[i])
+			p->setX(i, p->getX(i) - 2. * (p->getX(i) - ub[i] - au[i]));
+	}
 }
 
 // Differential Evolution
@@ -118,18 +153,18 @@ void ProjectionMidpointRepair::repair(Particle* const p, Particle const* const b
 
 	for (int i = 0; i < D; i++){
 		if (x[i] > ub[i]){
-			alphas[i] = (lb[i] - ub[i])/(lb[i] - 2 * x[i] + ub[i]);
+			alphas[i] = (lb[i] - ub[i])/(lb[i] - 2. * x[i] + ub[i]);
 		} else if (x[i] < lb[i]){
-			alphas[i] = (ub[i] - lb[i])/(lb[i] - 2 * x[i] + ub[i]);
+			alphas[i] = (ub[i] - lb[i])/(lb[i] - 2. * x[i] + ub[i]);
 		} else
 			alphas[i] = std::numeric_limits<double>::max(); //Can't divide by zero
 	}
 
 	double alpha=*std::min_element(alphas.begin(), alphas.end());
-	if (alpha != 1.0){
+	if (alpha != 1.){
 		std::vector<double> midpoint(D);
 		add(lb, ub, midpoint);
-		scale(midpoint, 0.5*(1-alpha));
+		scale(midpoint, 0.5*(1.-alpha));
 		scale(x, alpha);
 		add(x, midpoint, x);
 		p->setX(x);
@@ -152,9 +187,9 @@ void ProjectionBaseRepair::repair(Particle* const p, Particle const* const base,
 	}
 
 	double alpha=*std::min_element(alphas.begin(), alphas.end());
-	if (alpha != 1.0){
+	if (alpha != 1.){
 		std::vector<double> b = base->getX();
-		scale(b, (1-alpha));
+		scale(b, (1.-alpha));
 		scale(x, alpha);
 		add(x, b, x);
 		p->setX(x);
@@ -165,12 +200,12 @@ void ProjectionBaseRepair::repair(Particle* const p, Particle const* const base,
 HyperbolicRepair::HyperbolicRepair(std::vector<double>const lb, std::vector<double>const ub) : RepairHandler(lb, ub){}
 void HyperbolicRepair::repairVelocityPre(Particle * const p) const{
 	for (int i = 0; i < D; i++){
-		double const center = (lb[i] + ub[i])/2;
+		double const center = (lb[i] + ub[i])/2.;
 		double const v = p->getV(i);
 		if (v > center){
-			p->setV(i, v / (1 + std::fabs(v / (ub[i] - p->getX(i)))));
+			p->setV(i, v / (1. + std::abs(v / (ub[i] - p->getX(i)))));
 		} else {
-			p->setV(i, v / (1 + std::fabs(v / (p->getX(i) - lb[i]))));
+			p->setV(i, v / (1. + std::abs(v / (p->getX(i) - lb[i]))));
 		}
 	}
 }
@@ -180,7 +215,7 @@ void PBestDimRepair::repair(Particle* const p) const {
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i] || p->getX(i) > ub[i]){
 			p->setX(i, p->getP(i));
-			p->setV(i,0.0);
+			p->setV(i,0.);
 		}
 	}	
 }

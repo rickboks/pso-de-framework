@@ -41,6 +41,16 @@ class ResamplingRepair : public RepairHandler {
 		ResamplingRepair(std::vector<double> const lb, std::vector<double> const ub);
 		bool resample(Particle const* const p, int const resamples) const;
 };
+
+class TransformationRepair : public RepairHandler { //Adapted from https://github.com/psbiomech/c-cmaes
+	private:
+		std::vector<double> al, au, xlo, xhi, r;
+		void shift(Particle* const p) const;
+	public:
+		TransformationRepair(std::vector<double> const lb, std::vector<double> const ub);
+		void repair(Particle* const p) const;
+};
+
 // Differential Evolution
 class RandBaseRepair : public RepairHandler {
 	public:

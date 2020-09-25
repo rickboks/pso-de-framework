@@ -18,7 +18,7 @@ DifferentialEvolution::DifferentialEvolution(DEConfig const config)
 
 void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > const problem, 
     		std::shared_ptr<IOHprofiler_csv_logger> const logger, 
-    		int const evalBudget, int const popSize){
+    		int const evalBudget, int const popSize) const{
 
 	int const D = problem->IOHprofiler_get_number_of_variables();
 	std::vector<double> const lowerBound = problem->IOHprofiler_get_lowerbound();

@@ -41,6 +41,7 @@ std::map<std::string, std::function<ConstraintHandler* (std::vector<double>, std
 	{"WR", LC(WrappingRepair)},
 	{"DP", LC(DeathPenalty)},
 	{"RS", LC(ResamplingRepair)},
+	{"TR", LC(TransformationRepair)},
 
 	// PSO
 	{"HY", LC(HyperbolicRepair)},
@@ -55,6 +56,7 @@ std::map<std::string, std::function<ConstraintHandler* (std::vector<double>, std
 	{"WR", LC(WrappingRepair)},
 	{"DP", LC(DeathPenalty)},
 	{"RS", LC(ResamplingRepair)},
+	{"TR", LC(TransformationRepair)},
 
 	// DE
 	{"RB", LC(RandBaseRepair)},

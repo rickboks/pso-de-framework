@@ -249,8 +249,8 @@ Particle* TrigonometricMutationManager::trigonometricMutation(int const i) const
 	
 	std::vector<Particle*> xr = pickRandom(possibilities, 3);
 
-	double pPrime = fabs(xr[0]->getFitness()) + fabs(xr[1]->getFitness()) 
-					+ fabs(xr[2]->getFitness());
+	double pPrime = std::abs(xr[0]->getFitness()) + std::abs(xr[1]->getFitness()) 
+					+ std::abs(xr[2]->getFitness());
 
 	double p0 = xr[0]->getFitness() / pPrime;
 	double p1 = xr[1]->getFitness() / pPrime;

@@ -23,6 +23,6 @@ class DifferentialEvolution {
 		DifferentialEvolution(DEConfig const config);
 		void run(std::shared_ptr<IOHprofiler_problem<double> > const problem, 
     		std::shared_ptr<IOHprofiler_csv_logger> const logger,
-    		int const evalBudget, int const popSize);
+    		int const evalBudget, int const popSize) const;
 		std::string getIdString() const;
 };

@@ -35,10 +35,10 @@ class Particle {
 		void setV(std::vector<double> const v);
 		void setV(int const dim, double val);
 		void setX(std::vector<double> const x, double const fitness, bool const updateVelocity);
+		void setX(int const dim, double const val);
 		void setX(std::vector<double> x);
-		void addNeighbor(Particle* const neighbor);
-		void removeNeighbor(Particle* const neighbor);
-		void removeAllNeighbors();
+		std::vector<double> getX() const;
+		double getX(int const dim) const;
 		double getGbest() const;
 		double getPbest() const;
 		std::vector<double> getG() const;
@@ -47,18 +47,16 @@ class Particle {
 		void updatePbest();
 		void updateGbest();
 		void updateVelocityAndPosition(double const progress);
+		void addNeighbor(Particle* const neighbor);
+		void removeNeighbor(Particle* const neighbor);
+		void removeAllNeighbors();
 		bool isNeighbor(Particle* particle) const;
 		void replaceNeighbors(std::map<Particle*, Particle*> const mapping);
-		int getAmountOfNeighbors();
-
-		std::vector<double> getX() const;
+		int getNumberOfNeighbors() const;
 		double evaluate (std::shared_ptr<IOHprofiler_problem<double> > problem, std::shared_ptr<IOHprofiler_csv_logger> logger);
 		double getFitness() const;
 		void setFitness(double const d);
 		std::string positionString() const;
 		void randomize(std::vector<double> const lowerBounds, std::vector<double> const upperBounds);
 		bool operator < (const Particle& s) const;
-		void setX(int const dim, double const val);
-		double getX(int const dim) const;
-
 };

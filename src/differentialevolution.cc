@@ -28,6 +28,7 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 	for (int i = 0; i < popSize; i++){
 		genomes[i] = new Particle(D);
 		genomes[i]->randomize(lowerBound, upperBound);
+		genomes[i]->evaluate(problem, logger);
 	}
 
 	std::vector<Particle*> donors;
@@ -53,11 +54,11 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 			delete m;
 		
 		for (int i = 0; i < popSize; i++){
-			double const parentF = genomes[i]->evaluate(problem,logger);
+			double const parentF = genomes[i]->getFitness();
 			double const trialF = trials[i]->evaluate(problem,logger);
 			if (trialF < parentF){
-				genomes[i]->setX(trials[i]->getX(), trials[i]->getFitness(), false);
-				adaptationManager->successfulIndex(i);				
+				genomes[i]->setX(trials[i]->getX(), trialF, false);
+				adaptationManager->successfulIndex(i);
 			}
 		}
 		

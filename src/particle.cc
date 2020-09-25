@@ -151,7 +151,7 @@ void Particle::replaceNeighbors(std::map<Particle*, Particle*> mapping){
 	}
 }
 
-int Particle::getAmountOfNeighbors(){
+int Particle::getNumberOfNeighbors() const{
 	return neighborhood.size();
 }
 

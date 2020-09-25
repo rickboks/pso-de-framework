@@ -4,27 +4,11 @@
 #include "penaltyhandler.h"
 #define LC(X) [](std::vector<double>lb, std::vector<double>ub){return new X(lb,ub);}
 
-ConstraintHandler::ConstraintHandler(std::vector<double>const lb,std::vector<double>const ub)
-: lb(lb), ub(ub), D(lb.size()){}
-
-ConstraintHandler::~ConstraintHandler(){}
-
-void ConstraintHandler::repair(Particle* const p, Particle const* const base, Particle const* const target) const{}
-
-void ConstraintHandler::repair(Particle* const p) const{}
-
-bool ConstraintHandler::resample(Particle const * const p, int const resamples) const{
-	return false;
+ConstraintHandler::ConstraintHandler(std::vector<double>const lb,std::vector<double>const ub): lb(lb), ub(ub), D(lb.size()){
 }
+ConstraintHandler::~ConstraintHandler(){};
 
-void ConstraintHandler::repairVelocityPre(Particle* const p) const{}
-
-void ConstraintHandler::repairVelocityPost(Particle* const p, int const i) const{
-	if (p->isPSO) 
-		p->setV(i, -0.5 * p->getV(i));
-}
-
-bool ConstraintHandler::isFeasible(Particle const * const p) const{
+bool ConstraintHandler::isFeasible(Solution const * const p) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i] || p->getX(i) > ub[i]){
 			return false;
@@ -33,7 +17,41 @@ bool ConstraintHandler::isFeasible(Particle const * const p) const{
 	return true;
 }
 
-std::map<std::string, std::function<ConstraintHandler* (std::vector<double>, std::vector<double>)>> const psoCHs ({
+bool ConstraintHandler::resample(Solution const * const p, int const resamples) const{
+	return false;
+}
+
+DEConstraintHandler::DEConstraintHandler(std::vector<double>const lb,std::vector<double>const ub)
+: ConstraintHandler(lb, ub){}
+
+DEConstraintHandler::~DEConstraintHandler(){}
+
+
+PSOConstraintHandler::PSOConstraintHandler(std::vector<double>const lb,std::vector<double>const ub)
+: ConstraintHandler(lb, ub){}
+PSOConstraintHandler::~PSOConstraintHandler(){};
+//void DEConstraintHandler::repairVelocityPre(Solution* const p) const{}
+//void DEConstraintHandler::repairVelocityPost(Solution* const p, int const i) const{
+	////if (p->isPSO) 
+		////p->setV(i, -0.5 * p->getV(i));
+//}
+
+//std::map<std::string, std::function<ConstraintHandler* (std::vector<double>, std::vector<double>)>> const psoCHs ({
+	//// Generic
+	//{"RI", LC(ReinitializationRepair)},
+	//{"PR", LC(ProjectionRepair)},
+	//{"RF", LC(ReflectionRepair)},
+	//{"WR", LC(WrappingRepair)},
+	//{"DP", LC(DeathPenalty)},
+	//{"RS", LC(ResamplingRepair)},
+	//{"TR", LC(TransformationRepair)},
+
+	//// PSO
+	//{"HY", LC(HyperbolicRepair)},
+	//{"PD", LC(PBestDimRepair)},
+//});
+
+std::map<std::string, std::function<ConstraintHandler*(std::vector<double>, std::vector<double>)>> const deCHs ({
 	// Generic
 	{"RI", LC(ReinitializationRepair)},
 	{"PR", LC(ProjectionRepair)},
@@ -43,22 +61,7 @@ std::map<std::string, std::function<ConstraintHandler* (std::vector<double>, std
 	{"RS", LC(ResamplingRepair)},
 	{"TR", LC(TransformationRepair)},
 
-	// PSO
-	{"HY", LC(HyperbolicRepair)},
-	{"PD", LC(PBestDimRepair)},
-});
-
-std::map<std::string, std::function<ConstraintHandler* (std::vector<double>, std::vector<double>)>> const deCHs ({
-	// Generic
-	{"RI", LC(ReinitializationRepair)},
-	{"PR", LC(ProjectionRepair)},
-	{"RF", LC(ReflectionRepair)},
-	{"WR", LC(WrappingRepair)},
-	{"DP", LC(DeathPenalty)},
-	{"RS", LC(ResamplingRepair)},
-	{"TR", LC(TransformationRepair)},
-
-	// DE
+	//// DE
 	{"RB", LC(RandBaseRepair)},
 	{"MB", LC(MidpointBaseRepair)},
 	{"MT", LC(MidpointTargetRepair)},
@@ -66,6 +69,21 @@ std::map<std::string, std::function<ConstraintHandler* (std::vector<double>, std
 	{"PM", LC(ProjectionMidpointRepair)},
 	{"PB", LC(ProjectionBaseRepair)},
 });
+
+std::map<std::string, std::function<ConstraintHandler*(std::vector<double>, std::vector<double>)>> const psoCHs {
+	// Generic
+	{"RI", LC(ReinitializationRepair)},
+	{"PR", LC(ProjectionRepair)},
+	{"RF", LC(ReflectionRepair)},
+	{"WR", LC(WrappingRepair)},
+	{"DP", LC(DeathPenalty)},
+	{"RS", LC(ResamplingRepair)},
+	{"TR", LC(TransformationRepair)},
+
+	//// PSO
+	{"HY", LC(HyperbolicRepair)},
+	{"PD", LC(PBestDimRepair)},
+};
 
 //GenericConstraintHandler::GenericConstraintHandler(std::vector<double> lb,std::vector<double> ub)
 //: ConstraintHandler(lb,ub){}

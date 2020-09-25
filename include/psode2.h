@@ -4,16 +4,16 @@
 #include "particleswarm.h"
 #include "mutationmanager.h"
 #include "crossovermanager.h"
-#include "selectionmanager.h"
+//#include "selectionmanager.h"
 #include "hybridalgorithm.h"
 #include <memory>
 
 class PSODE2 : public HybridAlgorithm {
 	private:
 		bool logging;
-		std::vector<Particle*> particles;		
+		std::vector<Solution*> particles;		
 		std::vector<Particle*> psoPop;
-		std::vector<Particle*> dePop;
+		std::vector<Solution*> dePop;
 
 		void runAsynchronous(std::shared_ptr<IOHprofiler_problem<double>> const problem, 
     		std::shared_ptr<IOHprofiler_csv_logger> const logger, int const evalBudget, 

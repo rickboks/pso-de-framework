@@ -1,6 +1,5 @@
 #pragma once
 #include "mutationmanager.h"
-#include "particle.h"
 #include "mutationmanager.h"
 #include "crossovermanager.h"
 #include "deadaptationmanager.h"

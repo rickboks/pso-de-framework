@@ -2,15 +2,10 @@
 #include <vector>
 #include "constrainthandler.h"
 
-class Particle;
+class Solution;
 
-class PenaltyHandler : public ConstraintHandler {
-	public:
-		PenaltyHandler(std::vector<double>const lb,std::vector<double>const ub);
-};
-
-class DeathPenalty : public PenaltyHandler {
+class DeathPenalty : public ConstraintHandler{
 	public:
 		DeathPenalty(std::vector<double>const lb,std::vector<double>const ub);
-		void penalize(Particle* const p) const;
+		void penalize(Solution* const p) const;
 };

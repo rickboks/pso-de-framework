@@ -5,13 +5,13 @@
 #include "differentialevolution.h"
 #include "hybridsuite.h"
 #include "psode2.h"
-#include "psode.h"
+//#include "psode.h"
 #include "util.h"
 
 HybridAlgorithm* ha;
 ParticleSwarm* pso;
 DifferentialEvolution* de;
-PSODE* psode;
+//PSODE* psode;
 PSODE2* psode2;
 
 void algorithm

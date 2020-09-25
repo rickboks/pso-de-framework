@@ -1,5 +1,6 @@
 #include <IOHprofiler_problem.h>
 #include <IOHprofiler_csv_logger.h>
+#include "util.h"
 #include "constrainthandler.h"
 #include "hybridalgorithm.h"
 #include "repairhandler.h"
@@ -10,6 +11,7 @@
 #include "mutationmanager.h"
 #include "penaltyhandler.h"
 #include "psode2.h"
+#include "deadaptationmanager.h"
 #include <limits>
 #include <iostream>
 #include <algorithm> 
@@ -45,11 +47,11 @@ void PSODE2::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > probl
 
 	int const split = popSize / 2;
 	for (int i = 0; i < split; i++) psoPop.push_back(new Particle(D, &settings));
-	for (int i = split; i < popSize; i++) dePop.push_back(new Particle(D));
-	particles = psoPop; 
+	for (int i = split; i < popSize; i++) dePop.push_back(new Solution(D));
+	particles.insert(particles.end(), psoPop.begin(), psoPop.end());
 	particles.insert(particles.end(), dePop.begin(), dePop.end());
 
-	for (Particle* const p : particles){
+	for (Solution* const p : particles){
 		p->randomize(lowerBound, upperBound);
 		p->evaluate(problem, logger);
 	}
@@ -83,11 +85,11 @@ void PSODE2::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > probl
 		}
 
 		// Perform mutation 
-		std::vector<Particle*> const donors = mutationManager->mutate(dePop, Fs);
+		std::vector<Solution*> const donors = mutationManager->mutate(dePop, Fs);
 		// Perform crossover
-		std::vector<Particle*> const trials = crossoverManager->crossover(dePop, donors, Crs);
+		std::vector<Solution*> const trials = crossoverManager->crossover(dePop, donors, Crs);
 
-		for (Particle* const d : donors) delete d;
+		for (Solution* const d : donors) delete d;
 
 		for (unsigned int i = 0; i < dePop.size(); i++){
 			//Evaluate the parent vector
@@ -98,12 +100,12 @@ void PSODE2::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > probl
 
 			// Perform selection
 			if (trials[i]->getFitness() < dePop[i]->getFitness()){
-				dePop[i]->setX(trials[i]->getX(), trials[i]->getFitness(), false);
+				dePop[i]->setX(trials[i]->getX(), trials[i]->getFitness());
 				adaptationManager->successfulIndex(i);
 			}
 		}
 
-		for (Particle* const p : trials)
+		for (Solution* const p : trials)
 			delete p;
 
 		if (iterations % 10 == 0)
@@ -122,7 +124,7 @@ void PSODE2::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > probl
 	delete deCH;
 	delete psoCH;
 
-	for (Particle* const particle : particles)
+	for (Solution* const particle : particles)
 		delete particle;
 
 	particles.clear();
@@ -149,14 +151,14 @@ void PSODE2::logEnd(){
 }
 
 void PSODE2::share(){
-	Particle* const best_de = getPBest(dePop, 0.1);
+	Solution* const best_de = getPBest(dePop, 0.1);
 	Particle* const best_pso = getPBest(psoPop, 0.1);
 
 	std::vector<double> x = best_pso->getX();
 	double y = best_pso->getFitness();
 
-	best_pso->setX(best_de->getX(), best_de->getFitness(), true); //Updates the velocity as well
-	best_de->setX(x, y, false); //Not here
+	best_pso->setX(best_de->getX(), best_de->getFitness()); //Updates the velocity as well
+	best_de->setX(x, y); //Not here
 }
 
 void PSODE2::logPositions(){

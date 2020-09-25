@@ -4,6 +4,19 @@
 CrossoverManager::CrossoverManager(int const D): D(D){}
 CrossoverManager::~CrossoverManager(){}
 
+std::vector<Solution*> CrossoverManager::crossover(std::vector<Solution*>const& genomes, std::vector<Solution*>const& mutants, std::vector<double>const& Crs) const{
+	std::vector<Solution*> trials;
+	trials.reserve(genomes.size());
+	std::vector<double> x(D);
+
+	for (unsigned int i = 0; i < genomes.size(); i++){
+		std::vector<double> const mutantX = mutants[i]->getX();
+		std::vector<double> const parentX = genomes[i]->getX();
+		trials.push_back(new Solution(singleCrossover(genomes[i]->getX(), mutants[i]->getX(), Crs[i])));
+	}
+	return trials;
+}
+
 #define LC(X) [](int const D){return new X(D);}
 std::map<std::string, std::function<CrossoverManager* (int const)>> const crossovers({
 		{"B", LC(BinomialCrossoverManager)},
@@ -11,22 +24,6 @@ std::map<std::string, std::function<CrossoverManager* (int const)>> const crosso
 });
 
 BinomialCrossoverManager::BinomialCrossoverManager(int const D) : CrossoverManager(D){}
-
-std::vector<Particle*> BinomialCrossoverManager::crossover(std::vector<Particle*>const& genomes, 
-		std::vector<Particle*>const& mutants, std::vector<double>const& Crs) const{
-	std::vector<Particle*> trials;
-	trials.reserve(genomes.size());
-	std::vector<double> x(D);
-
-	for (unsigned int i = 0; i < genomes.size(); i++){
-		std::vector<double> const mutantX = mutants[i]->getX();
-		std::vector<double> const parentX = genomes[i]->getX();
-		trials.push_back(new Particle(singleCrossover(genomes[i]->getX(), mutants[i]->getX(), Crs[i])));
-	}
-
-	return trials;
-}
-
 std::vector<double> BinomialCrossoverManager::singleCrossover(std::vector<double>const& target, 
 		std::vector<double>const& donor, double const Cr) const{
 	std::vector<double> x(D);
@@ -42,15 +39,6 @@ std::vector<double> BinomialCrossoverManager::singleCrossover(std::vector<double
 }
 
 ExponentialCrossoverManager::ExponentialCrossoverManager(int const D): CrossoverManager(D){}
-
-std::vector<Particle*> ExponentialCrossoverManager::crossover(std::vector<Particle*>const& genomes, 
-		std::vector<Particle*>const& mutants, std::vector<double>const& Crs) const {
-	std::vector<Particle*> trials;
-	for (unsigned int i = 0; i < genomes.size(); i++){
-		trials.push_back(new Particle(singleCrossover(genomes[i]->getX(), mutants[i]->getX(), Crs[i])));
-	}
-	return trials;
-}
 
 std::vector<double> ExponentialCrossoverManager::singleCrossover(std::vector<double>const& target, 
 		std::vector<double>const& donor, double const Cr) const{

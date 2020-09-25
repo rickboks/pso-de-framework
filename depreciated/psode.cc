@@ -133,8 +133,8 @@ void PSODE::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > const 
     		int const popSize, std::map<int,double> const particleUpdateParams){
 
 	std::vector<Particle*> p0;
-	std::vector<Particle*> p1;
-	std::vector<Particle*> p2;
+	std::vector<Solution*> p1;
+	std::vector<Solution*> p2;
 
 	int const D = problem->IOHprofiler_get_number_of_variables(); /// dimension
 	std::vector<double> const lowerBound = problem->IOHprofiler_get_lowerbound();

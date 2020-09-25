@@ -24,15 +24,15 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 	std::vector<double> const lowerBound = problem->IOHprofiler_get_lowerbound();
 	std::vector<double> const upperBound = problem->IOHprofiler_get_upperbound();
 
-	std::vector<Particle*> genomes(popSize);
+	std::vector<Solution*> genomes(popSize);
 	for (int i = 0; i < popSize; i++){
-		genomes[i] = new Particle(D);
+		genomes[i] = new Solution(D);
 		genomes[i]->randomize(lowerBound, upperBound);
 		genomes[i]->evaluate(problem, logger);
 	}
 
-	std::vector<Particle*> donors;
-	std::vector<Particle*> trials;
+	std::vector<Solution*> donors;
+	std::vector<Solution*> trials;
 
 	ConstraintHandler const* const deCH = deCHs.at(config.constraintHandler)(lowerBound, upperBound);
 	CrossoverManager const* const crossoverManager = crossovers.at(config.crossover)(D);
@@ -50,25 +50,25 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 		donors = mutationManager->mutate(genomes,Fs);
 		trials = crossoverManager->crossover(genomes, donors, Crs);
 
-		for (Particle* m : donors)
+		for (Solution* m : donors)
 			delete m;
 		
 		for (int i = 0; i < popSize; i++){
 			double const parentF = genomes[i]->getFitness();
 			double const trialF = trials[i]->evaluate(problem,logger);
 			if (trialF < parentF){
-				genomes[i]->setX(trials[i]->getX(), trialF, false);
+				genomes[i]->setX(trials[i]->getX(), trialF);
 				adaptationManager->successfulIndex(i);
 			}
 		}
 		
-		for (Particle* g : trials)
-				delete g;
+		for (Solution* g : trials)
+			delete g;
 
 		adaptationManager->update();
 	}
 
-	for (Particle* d : genomes)
+	for (Solution* d : genomes)
 		delete d;
 	
 	delete mutationManager;

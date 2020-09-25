@@ -5,7 +5,6 @@
 #include "mutationmanager.h"
 #include "crossovermanager.h"
 #include "particleupdatemanager.h"
-#include "selectionmanager.h"
 #include "topologymanager.h"
 #include "particleswarm.h"
 #include "hybridalgorithm.h"
@@ -45,8 +44,8 @@ class HybridSuite {
 				mutationManagers.push_back(i.first);
 			for (auto&i : ::crossovers)
 				crossoverManagers.push_back(i.first);
-			for (auto&i : ::selections)
-				selectionManagers.push_back(i.first);
+			//for (auto&i : ::selections)
+				//selectionManagers.push_back(i.first);
 			for (auto&i : ::deAdaptations)
 				adaptationManagers.push_back(i.first);
 

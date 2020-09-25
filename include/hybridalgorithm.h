@@ -4,7 +4,7 @@
 #include "particleswarm.h"
 #include "mutationmanager.h"
 #include "crossovermanager.h"
-#include "selectionmanager.h"
+//#include "selectionmanager.h"
 #include "constrainthandler.h"
 #include <memory>
 

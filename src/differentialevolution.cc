@@ -24,13 +24,11 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 	std::vector<double> const lowerBound = problem->IOHprofiler_get_lowerbound();
 	std::vector<double> const upperBound = problem->IOHprofiler_get_upperbound();
 
-	std::vector<Particle*> genomes;
-	genomes.reserve(popSize);
-	for (int i = 0; i < popSize; i++)
-		genomes.push_back(new Particle(D));
-
-	for (Particle* const p : genomes)
-		p->randomize(lowerBound, upperBound);
+	std::vector<Particle*> genomes(popSize);
+	for (int i = 0; i < popSize; i++){
+		genomes[i] = new Particle(D);
+		genomes[i]->randomize(lowerBound, upperBound);
+	}
 
 	std::vector<Particle*> donors;
 	std::vector<Particle*> trials;

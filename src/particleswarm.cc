@@ -83,16 +83,15 @@ void ParticleSwarm::runSynchronous(std::shared_ptr<IOHprofiler_problem<double> >
 	ConstraintHandler* const psoCH = psoCHs.at(config.constraintHandler)(lowerBound, upperBound); 
 	ParticleUpdateSettings const settings(config.update, particleUpdateParams, psoCH);
 
+	particles.resize(D);
 	for (int i = 0; i < popSize; i++){
-		Particle* p = new Particle(D, &settings);
-		p->randomize(lowerBound, upperBound);
-		particles.push_back(p);
+		particles[i] = new Particle(D, &settings);
+		particles[i]->randomize(lowerBound, upperBound);
 	}
 
 	TopologyManager* const topologyManager = topologies.at(config.topology)(particles);
 
-	logStart();
-	logPositions();
+	logStart(); logPositions();
 
 	while (	problem->IOHprofiler_get_evaluations() < evalBudget &&
 			!problem->IOHprofiler_hit_optimal()){

@@ -23,12 +23,12 @@ extern std::map<std::string, std::function<CrossoverManager* (int const)>> const
 
 class BinomialCrossoverManager : public CrossoverManager {
 	public:
-		BinomialCrossoverManager(int const D);
+		BinomialCrossoverManager(int const D): CrossoverManager(D){};
 		std::vector<double> singleCrossover(std::vector<double>const& target, std::vector<double>const& donor, double const Cr) const;
 };
 
 class ExponentialCrossoverManager : public CrossoverManager {
 	public:
-		ExponentialCrossoverManager(int const D);
+		ExponentialCrossoverManager(int const D): CrossoverManager(D){};
 		std::vector<double> singleCrossover(std::vector<double>const& target, std::vector<double>const& donor, double const Cr) const;
 };

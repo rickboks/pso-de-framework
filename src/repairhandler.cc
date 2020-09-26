@@ -9,7 +9,6 @@ void PSOConstraintHandler::repairVelocityPost(Particle* const p, int const i) co
 	p->setV(i, 0.);
 }
 
-HyperbolicRepair::HyperbolicRepair(std::vector<double>const lb, std::vector<double>const ub) :ConstraintHandler(lb,ub), PSOConstraintHandler(lb, ub){}
 void HyperbolicRepair::repairVelocityPre(Particle * const p) const{
 	for (int i = 0; i < D; i++){
 		double const center = (lb[i] + ub[i])/2.;
@@ -22,7 +21,6 @@ void HyperbolicRepair::repairVelocityPre(Particle * const p) const{
 	}
 }
 
-PBestDimRepair::PBestDimRepair(std::vector<double>const lb, std::vector<double>const ub) :ConstraintHandler(lb,ub), PSOConstraintHandler(lb, ub){}
 void PBestDimRepair::repairPSO(Particle* const p) const {
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i] || p->getX(i) > ub[i]){
@@ -32,7 +30,6 @@ void PBestDimRepair::repairPSO(Particle* const p) const {
 	}	
 }
 
-PSOReinitializationRepair::PSOReinitializationRepair(std::vector<double>const lb, std::vector<double>const ub) :ConstraintHandler(lb,ub), PSOConstraintHandler(lb,ub){}
 void PSOReinitializationRepair::repair(Particle* const p) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i] || p->getX(i) > ub[i]){
@@ -42,7 +39,6 @@ void PSOReinitializationRepair::repair(Particle* const p) const{
 	}
 }
 
-PSOProjectionRepair::PSOProjectionRepair(std::vector<double>const lb, std::vector<double>const ub) :ConstraintHandler(lb,ub), PSOConstraintHandler(lb,ub){}
 void PSOProjectionRepair::repair(Particle* const p) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i]){
@@ -55,7 +51,6 @@ void PSOProjectionRepair::repair(Particle* const p) const{
 	}
 }
 
-PSOReflectionRepair::PSOReflectionRepair(std::vector<double>const lb, std::vector<double>const ub) :ConstraintHandler(lb,ub), PSOConstraintHandler(lb,ub){}
 void PSOReflectionRepair::repair(Particle* const p) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i]){
@@ -72,7 +67,6 @@ void PSOReflectionRepair::repair(Particle* const p) const{
 	}
 }
 
-PSOWrappingRepair::PSOWrappingRepair(std::vector<double>const lb, std::vector<double>const ub) :ConstraintHandler(lb,ub), PSOConstraintHandler(lb,ub){}
 void PSOWrappingRepair::repair(Particle* const p) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i]){
@@ -85,7 +79,6 @@ void PSOWrappingRepair::repair(Particle* const p) const{
 	}
 }
 
-PSOResamplingRepair::PSOResamplingRepair(std::vector<double>const lb, std::vector<double>const ub) :ConstraintHandler(lb,ub), PSOConstraintHandler(lb,ub){}
 bool PSOResamplingRepair::resample(Solution const* const p, int const resamples) const{
 	if (resamples >= 100 || isFeasible(p))
 		return false;
@@ -134,7 +127,6 @@ void PSOTransformationRepair::shift(Particle* const p) const {
 }
 
 // Differential Evolution
-RandBaseRepair::RandBaseRepair(std::vector<double>const lb, std::vector<double>const ub):ConstraintHandler(lb,ub), DEConstraintHandler(lb, ub){}
 void RandBaseRepair::repairDE(Solution* const p, Solution const* const base, Solution const* const target) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) > ub[i]){
@@ -145,7 +137,6 @@ void RandBaseRepair::repairDE(Solution* const p, Solution const* const base, Sol
 	}
 }
 
-MidpointBaseRepair::MidpointBaseRepair(std::vector<double>const lb, std::vector<double>const ub):ConstraintHandler(lb,ub), DEConstraintHandler(lb, ub){}
 void MidpointBaseRepair::repairDE(Solution* const p, Solution const* const base, Solution const* const target) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) > ub[i]){
@@ -156,7 +147,6 @@ void MidpointBaseRepair::repairDE(Solution* const p, Solution const* const base,
 	}
 }
 
-MidpointTargetRepair::MidpointTargetRepair(std::vector<double>const lb, std::vector<double>const ub):ConstraintHandler(lb,ub), DEConstraintHandler(lb, ub){}
 void MidpointTargetRepair::repairDE(Solution* const p, Solution const* const base, Solution const* const target) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) > ub[i]){
@@ -167,7 +157,6 @@ void MidpointTargetRepair::repairDE(Solution* const p, Solution const* const bas
 	}
 }
 
-ConservatismRepair::ConservatismRepair(std::vector<double>const lb, std::vector<double>const ub):ConstraintHandler(lb,ub), DEConstraintHandler(lb, ub){}
 void ConservatismRepair::repairDE(Solution* const p, Solution const* const base, Solution const* const target) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) > ub[i] || p->getX(i) < lb[i]){
@@ -176,7 +165,6 @@ void ConservatismRepair::repairDE(Solution* const p, Solution const* const base,
 	}
 }
 
-ProjectionMidpointRepair::ProjectionMidpointRepair(std::vector<double>const lb, std::vector<double>const ub) :ConstraintHandler(lb,ub), DEConstraintHandler(lb, ub){}
 void ProjectionMidpointRepair::repairDE(Solution* const p, Solution const* const base, Solution const* const target) const{
 	std::vector<double> x = p->getX();
 	std::vector<double>alphas(D+1);
@@ -202,7 +190,6 @@ void ProjectionMidpointRepair::repairDE(Solution* const p, Solution const* const
 	}
 }
 
-ProjectionBaseRepair::ProjectionBaseRepair(std::vector<double>const lb, std::vector<double>const ub) :ConstraintHandler(lb,ub), DEConstraintHandler(lb, ub){}
 void ProjectionBaseRepair::repairDE(Solution* const p, Solution const* const base, Solution const* const target) const{
 	std::vector<double> x = p->getX();
 	std::vector<double> alphas(D+1);
@@ -228,7 +215,6 @@ void ProjectionBaseRepair::repairDE(Solution* const p, Solution const* const bas
 }
 
 
-DEReinitializationRepair::DEReinitializationRepair(std::vector<double>const lb, std::vector<double>const ub) :ConstraintHandler(lb,ub), DEConstraintHandler(lb,ub){}
 void DEReinitializationRepair::repair(Solution* const p) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i] || p->getX(i) > ub[i]){
@@ -238,7 +224,6 @@ void DEReinitializationRepair::repair(Solution* const p) const{
 	}
 }
 
-DEProjectionRepair::DEProjectionRepair(std::vector<double>const lb, std::vector<double>const ub) :ConstraintHandler(lb,ub), DEConstraintHandler(lb,ub){}
 void DEProjectionRepair::repair(Solution* const p) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i])			
@@ -248,7 +233,6 @@ void DEProjectionRepair::repair(Solution* const p) const{
 	}
 }
 
-DEReflectionRepair::DEReflectionRepair(std::vector<double>const lb, std::vector<double>const ub) :ConstraintHandler(lb,ub), DEConstraintHandler(lb,ub){}
 void DEReflectionRepair::repair(Solution* const p) const{
 	for (int i = 0; i < D; i++){
 		while (p->getX(i) < lb[i]){
@@ -260,7 +244,6 @@ void DEReflectionRepair::repair(Solution* const p) const{
 	}
 }
 
-DEWrappingRepair::DEWrappingRepair(std::vector<double>const lb, std::vector<double>const ub) :ConstraintHandler(lb,ub), DEConstraintHandler(lb,ub){}
 void DEWrappingRepair::repair(Solution* const p) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i]){
@@ -271,7 +254,6 @@ void DEWrappingRepair::repair(Solution* const p) const{
 	}
 }
 
-DEResamplingRepair::DEResamplingRepair(std::vector<double>const lb, std::vector<double>const ub) :ConstraintHandler(lb,ub), DEConstraintHandler(lb,ub){}
 bool DEResamplingRepair::resample(Solution const* const p, int const resamples) const{
 	if (resamples >= 100 || isFeasible(p))
 		return false;

@@ -23,7 +23,6 @@ std::map<std::string, std::function<CrossoverManager* (int const)>> const crosso
 		{"E", LC(ExponentialCrossoverManager)},
 });
 
-BinomialCrossoverManager::BinomialCrossoverManager(int const D) : CrossoverManager(D){}
 std::vector<double> BinomialCrossoverManager::singleCrossover(std::vector<double>const& target, 
 		std::vector<double>const& donor, double const Cr) const{
 	std::vector<double> x(D);
@@ -37,8 +36,6 @@ std::vector<double> BinomialCrossoverManager::singleCrossover(std::vector<double
 	}
 	return x;
 }
-
-ExponentialCrossoverManager::ExponentialCrossoverManager(int const D): CrossoverManager(D){}
 
 std::vector<double> ExponentialCrossoverManager::singleCrossover(std::vector<double>const& target, 
 		std::vector<double>const& donor, double const Cr) const{

@@ -12,6 +12,7 @@ class IOHprofiler_csv_logger;
 struct DEConfig {
 	DEConfig(std::string const mutation, std::string const crossover, std::string const adaptation, std::string const constraintHandler)
 	: mutation(mutation), crossover(crossover), adaptation(adaptation), constraintHandler(constraintHandler){}
+
 	std::string const mutation, crossover, adaptation, constraintHandler;
 };
 

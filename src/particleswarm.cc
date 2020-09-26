@@ -31,8 +31,8 @@ void ParticleSwarm::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> 
     		int const evalBudget, int const popSize, std::map<int,double> const particleUpdateParams){
 
 	int const D = problem->IOHprofiler_get_number_of_variables(); 
-	std::vector<double> lowerBound = problem->IOHprofiler_get_lowerbound(); 
-	std::vector<double> upperBound = problem->IOHprofiler_get_upperbound();
+	std::vector<double> const lowerBound = problem->IOHprofiler_get_lowerbound(); 
+	std::vector<double> const upperBound = problem->IOHprofiler_get_upperbound();
 
 	PSOConstraintHandler const* const psoCH = psoCHs.at(config.constraintHandler)(lowerBound, upperBound); 
 	ParticleUpdateSettings const settings(config.update, particleUpdateParams, psoCH);
@@ -48,17 +48,17 @@ void ParticleSwarm::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> 
 	while (	problem->IOHprofiler_get_evaluations() < evalBudget &&
 			!problem->IOHprofiler_hit_optimal()){
 		
-		for (int i = 0; i < popSize; i++){
-			particles[i]->evaluate(problem,logger);
-			particles[i]->updatePbest();
-			particles[i]->updateGbest();
-			particles[i]->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/evalBudget);			
+		for (Particle* p : particles){
+			p->evaluate(problem,logger);
+			p->updatePbest();
+			p->updateGbest();
+			p->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/evalBudget);			
 		}
 		topologyManager->update(double(problem->IOHprofiler_get_evaluations())/evalBudget);	
 	}
 
 	delete topologyManager;
-	for (Particle* const particle : particles)
+	for (Particle* particle : particles)
 		delete particle;
 	particles.clear();
 	delete psoCH;
@@ -86,21 +86,21 @@ void ParticleSwarm::runSynchronous(std::shared_ptr<IOHprofiler_problem<double> >
 	while (	problem->IOHprofiler_get_evaluations() < evalBudget &&
 			!problem->IOHprofiler_hit_optimal()){
 		
-		for (int i = 0; i < popSize; i++){
-			particles[i]->evaluate(problem,logger);
-			particles[i]->updatePbest();
+		for (Particle* p : particles){
+			p->evaluate(problem,logger);
+			p->updatePbest();
 		}
 
-		for (int i = 0; i < popSize; i++){
-			particles[i]->updateGbest();
-			particles[i]->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/evalBudget);
+		for (Particle* p : particles){
+			p->updateGbest();
+			p->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/evalBudget);
 		}
 	
 		topologyManager->update(double(problem->IOHprofiler_get_evaluations())/evalBudget);	
 	}
 
 	delete topologyManager;
-	for (Particle* const particle : particles)
+	for (Particle* particle : particles)
 		delete particle;
 	particles.clear();
 	delete psoCH;

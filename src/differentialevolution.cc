@@ -31,9 +31,6 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 		genomes[i]->evaluate(problem, logger);
 	}
 
-	std::vector<Solution*> donors;
-	std::vector<Solution*> trials;
-
 	DEConstraintHandler const* const deCH = deCHs.at(config.constraintHandler)(lowerBound, upperBound);
 	CrossoverManager const* const crossoverManager = crossovers.at(config.crossover)(D);
 	MutationManager* const mutationManager = mutations.at(config.mutation)(D, deCH);
@@ -47,8 +44,8 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 		adaptationManager->nextCr(Crs);
 		adaptationManager->reset();
 		
-		donors = mutationManager->mutate(genomes,Fs);
-		trials = crossoverManager->crossover(genomes, donors, Crs);
+		std::vector<Solution*> const donors = mutationManager->mutate(genomes,Fs);
+		std::vector<Solution*> const trials = crossoverManager->crossover(genomes, donors, Crs);
 
 		for (Solution* m : donors)
 			delete m;

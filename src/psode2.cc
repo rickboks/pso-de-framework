@@ -83,7 +83,8 @@ void PSODE2::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > probl
 		// Perform crossover
 		std::vector<Solution*> const trials = crossoverManager->crossover(dePop, donors, Crs);
 
-		for (Solution* const d : donors) delete d;
+		for (Solution* d : donors) 
+			delete d;
 
 		for (unsigned int i = 0; i < dePop.size(); i++){
 			//Evaluate the parent vector
@@ -99,7 +100,7 @@ void PSODE2::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > probl
 			}
 		}
 
-		for (Solution* const p : trials)
+		for (Solution* p : trials)
 			delete p;
 
 		if (iterations % 10 == 0)
@@ -117,7 +118,7 @@ void PSODE2::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > probl
 	delete deCH;
 	delete psoCH;
 
-	for (Solution* const particle : particles)
+	for (Solution* particle : particles)
 		delete particle;
 
 	particles.clear();
@@ -134,9 +135,9 @@ void PSODE2::share(){
 	Solution* const best_de = getPBest(dePop, 0.1);
 	Particle* const best_pso = getPBest(psoPop, 0.1);
 
-	std::vector<double> x = best_pso->getX();
-	double y = best_pso->getFitness();
+	std::vector<double> const x = best_pso->getX();
+	double const y = best_pso->getFitness();
 
-	best_pso->setXandUpdateV(best_de->getX(), best_de->getFitness()); //Updates the velocity as well
-	best_de->setX(x, y); //Not here
+	best_pso->setXandUpdateV(best_de->getX(), best_de->getFitness());
+	best_de->setX(x, y);
 }

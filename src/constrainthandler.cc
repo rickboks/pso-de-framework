@@ -4,10 +4,6 @@
 #include "penaltyhandler.h"
 #define LC(X) [](std::vector<double>lb, std::vector<double>ub){return new X(lb,ub);}
 
-ConstraintHandler::ConstraintHandler(std::vector<double>const lb,std::vector<double>const ub): lb(lb), ub(ub), D(lb.size()){
-}
-ConstraintHandler::~ConstraintHandler(){};
-
 bool ConstraintHandler::isFeasible(Solution const * const p) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i] || p->getX(i) > ub[i]){
@@ -20,22 +16,6 @@ bool ConstraintHandler::isFeasible(Solution const * const p) const{
 bool ConstraintHandler::resample(Solution const * const p, int const resamples) const{
 	return false;
 }
-
-DEConstraintHandler::DEConstraintHandler(std::vector<double>const lb,std::vector<double>const ub)
-: ConstraintHandler(lb, ub){}
-
-DEConstraintHandler::~DEConstraintHandler(){}
-
-
-PSOConstraintHandler::PSOConstraintHandler(std::vector<double>const lb,std::vector<double>const ub)
-: ConstraintHandler(lb, ub){}
-PSOConstraintHandler::~PSOConstraintHandler(){};
-
-//void DEConstraintHandler::repairVelocityPre(Solution* const p) const{}
-//void DEConstraintHandler::repairVelocityPost(Solution* const p, int const i) const{
-	////if (p->isPSO) 
-		////p->setV(i, -0.5 * p->getV(i));
-//}
 
 std::map<std::string, std::function<DEConstraintHandler*(std::vector<double>, std::vector<double>)>> const deCHs ({
 	// Generic

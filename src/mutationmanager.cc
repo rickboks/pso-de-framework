@@ -1,31 +1,27 @@
 #include "mutationmanager.h"
-
 #define LC(X) [](int const D, DEConstraintHandler const * const ch){return new X(D,ch);}
+std::vector<Solution*> MutationManager::mutate(std::vector<Solution*>const& genomes, std::vector<double>const& Fs){
+	this->genomes = genomes;
+	this->Fs = Fs;
+	best = getBest(this->genomes);
+	pBest = getPBest(this->genomes, 0.1);
+	std::vector<Solution*> mutants(this->genomes.size());
 
-std::vector<Solution*> MutationManager::mutate(std::vector<Solution*>const& gnms, std::vector<double>const& _Fs){
-		this->genomes = gnms;
-
-		this->Fs = _Fs;
-		this->best = getBest(this->genomes);
-		this->pBest = getPBest(this->genomes, 0.1);
-
-		std::vector<Solution*> mutants(genomes.size());
-
-		for (unsigned int i = 0; i < this->genomes.size(); i++){
-			int resamples = 0;
-			while (true){
-				Solution* m = this->mutate(i);
-				if (!deCH->resample(m, resamples)){
-					this->deCH->repair(m); //generic repair
-					mutants[i] = m; 
-					break;
-				}
-				resamples++;
-				delete m;
+	for (unsigned int i = 0; i < this->genomes.size(); i++){
+		int resamples = 0;
+		while (true){
+			Solution* m = mutate(i);
+			if (!deCH->resample(m, resamples)){
+				deCH->repair(m); //generic repair
+				mutants[i] = m; 
+				break;
 			}
+			resamples++;
+			delete m;
 		}
-		return mutants;
 	}
+	return mutants;
+}
 std::map<std::string, std::function<MutationManager* (int const, DEConstraintHandler const*const)>> const mutations ({
 		{"R1", LC(Rand1MutationManager)},
 		{"T1", LC(TTB1MutationManager)},
@@ -40,16 +36,7 @@ std::map<std::string, std::function<MutationManager* (int const, DEConstraintHan
 		{"O2", LC(TwoOpt2MutationManager)},
 });
 
-MutationManager::MutationManager(int const D, DEConstraintHandler const* const deCH)
-	:D(D), deCH(deCH){}
-
-
-MutationManager::~MutationManager(){}
-
 // Rand/1
-Rand1MutationManager::Rand1MutationManager(int const D, DEConstraintHandler const* const deCH)
-	: MutationManager(D, deCH){}
-
 Solution* Rand1MutationManager::mutate(int const i) const{
 	std::vector<Solution*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);
@@ -67,9 +54,6 @@ Solution* Rand1MutationManager::mutate(int const i) const{
 }
 
 // Target-to-best/1
-TTB1MutationManager::TTB1MutationManager(int const D, DEConstraintHandler const* const deCH)
-	: MutationManager(D, deCH){}
-
 Solution* TTB1MutationManager::mutate(int const i) const{
 	std::vector<Solution*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);
@@ -88,10 +72,6 @@ Solution* TTB1MutationManager::mutate(int const i) const{
 	deCH->repairDE(m, genomes[i], genomes[i]);
 	return m;
 }
-
-// Target-to-pbest/1
-TTPB1MutationManager::TTPB1MutationManager(int const D, DEConstraintHandler const* const deCH)
-	:MutationManager(D, deCH){}
 
 Solution* TTPB1MutationManager::mutate(int const i) const{
 	std::vector<Solution*> possibilities = genomes;
@@ -114,8 +94,6 @@ Solution* TTPB1MutationManager::mutate(int const i) const{
 }
 
 // Best/1
-Best1MutationManager::Best1MutationManager(int const D, DEConstraintHandler const* const deCH):MutationManager(D, deCH){}
-
 Solution* Best1MutationManager::mutate(int const i) const{
 	std::vector<Solution*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);
@@ -135,8 +113,6 @@ Solution* Best1MutationManager::mutate(int const i) const{
 }
 
 // Best/2
-Best2MutationManager::Best2MutationManager(int const D, DEConstraintHandler const* const deCH):MutationManager(D, deCH){}
-
 Solution* Best2MutationManager::mutate(int const i) const{
 	std::vector<Solution*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);
@@ -158,8 +134,6 @@ Solution* Best2MutationManager::mutate(int const i) const{
 }
 
 // Rand/2
-Rand2MutationManager::Rand2MutationManager(int const D, DEConstraintHandler const* const deCH):MutationManager(D, deCH){}
-
 Solution* Rand2MutationManager::mutate(int const i) const{
 	std::vector<Solution*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);
@@ -180,8 +154,6 @@ Solution* Rand2MutationManager::mutate(int const i) const{
 }
 
 // Rand/2/dir
-Rand2DirMutationManager::Rand2DirMutationManager(int const D, DEConstraintHandler const* const deCH):MutationManager(D, deCH){}
-
 Solution* Rand2DirMutationManager::mutate(int const i) const{
 	std::vector<Solution*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);
@@ -210,7 +182,6 @@ Solution* Rand2DirMutationManager::mutate(int const i) const{
 }
 
 // NSDE
-NSDEMutationManager::NSDEMutationManager(int const D, DEConstraintHandler const* const deCH):MutationManager(D, deCH){}
 Solution* NSDEMutationManager::mutate(int const i) const {
 	std::vector<Solution*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);
@@ -237,8 +208,6 @@ Solution* NSDEMutationManager::mutate(int const i) const {
 }
 
 // Trigonometric
-TrigonometricMutationManager::TrigonometricMutationManager(int const D, DEConstraintHandler const* const deCH): MutationManager(D, deCH), gamma(0.05){}
-
 Solution* TrigonometricMutationManager::mutate(int const i) const{
 	return rng.randDouble(0,1) <= gamma ? trigonometricMutation(i) : rand1Mutation(i);
 }
@@ -301,8 +270,6 @@ Solution* TrigonometricMutationManager::rand1Mutation(int const i) const{
 }
 
 // Two-opt/1
-TwoOpt1MutationManager::TwoOpt1MutationManager(int const D, DEConstraintHandler const* const deCH): MutationManager(D, deCH) {}
-
 Solution* TwoOpt1MutationManager::mutate(int const i) const{
 	std::vector<Solution*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);
@@ -324,7 +291,6 @@ Solution* TwoOpt1MutationManager::mutate(int const i) const{
 }
 
 // Two-opt/2
-TwoOpt2MutationManager::TwoOpt2MutationManager(int const D, DEConstraintHandler const* const deCH): MutationManager(D, deCH){}
 Solution* TwoOpt2MutationManager::mutate(int const i) const{
 	std::vector<Solution*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);

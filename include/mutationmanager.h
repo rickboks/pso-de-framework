@@ -18,59 +18,58 @@ class MutationManager {
 		Solution const* pBest;
 		virtual Solution* mutate(int const i) const=0;
 	public:
-		MutationManager(int const D, DEConstraintHandler const* const deCH);
-		virtual ~MutationManager();
-		std::vector<Solution*> mutate(std::vector<Solution*>const& gnms, std::vector<double>const& _Fs);
+		MutationManager(int const D, DEConstraintHandler const* const deCH):D(D), deCH(deCH){};
+		virtual ~MutationManager(){};
+		std::vector<Solution*> mutate(std::vector<Solution*>const& genomes, std::vector<double>const& Fs);
 };
 
 extern std::map<std::string, std::function<MutationManager* (int const, DEConstraintHandler const*const)>> const mutations;
 
 class Rand1MutationManager : public MutationManager {
 	public:
-		Rand1MutationManager(int const D, DEConstraintHandler const* const deCH);
+		Rand1MutationManager(int const D, DEConstraintHandler const* const deCH): MutationManager(D, deCH){};
 		Solution* mutate(int const i) const;
 };
 
 class TTB1MutationManager : public MutationManager {
 	public:
-		TTB1MutationManager(int const D, DEConstraintHandler const* const deCH);
+		TTB1MutationManager(int const D, DEConstraintHandler const* const deCH): MutationManager(D, deCH){};
 		Solution* mutate(int const i) const;
 };
 
 class TTPB1MutationManager : public MutationManager {
 	public:
-		TTPB1MutationManager(int const D, DEConstraintHandler const* const deCH);
+		TTPB1MutationManager(int const D, DEConstraintHandler const* const deCH): MutationManager(D, deCH){};
 		Solution* mutate(int const i) const;
 };
 
-
 class Best1MutationManager: public MutationManager {
 	public:
-		Best1MutationManager(int const D, DEConstraintHandler const* const deCH);
+		Best1MutationManager(int const D, DEConstraintHandler const* const deCH):MutationManager(D, deCH){};
 		Solution* mutate(int const i) const;
 };
 
 class Best2MutationManager: public MutationManager {
 	public:
-		Best2MutationManager(int const D, DEConstraintHandler const* const deCH);
+		Best2MutationManager(int const D, DEConstraintHandler const* const deCH):MutationManager(D, deCH){};
 		Solution* mutate(int const i) const;
 };
 
 class Rand2MutationManager: public MutationManager {
 	public:
-		Rand2MutationManager(int const D, DEConstraintHandler const* const deCH);
+		Rand2MutationManager(int const D, DEConstraintHandler const* const deCH):MutationManager(D, deCH){};
 		Solution* mutate(int const i) const;
 };
 
 class Rand2DirMutationManager : public MutationManager {
 	public:
-		Rand2DirMutationManager(int const D, DEConstraintHandler const* const deCH);
+		Rand2DirMutationManager(int const D, DEConstraintHandler const* const deCH):MutationManager(D, deCH){};
 		Solution* mutate(int const i) const;
 };
 
 class NSDEMutationManager : public MutationManager {
 	public:
-		NSDEMutationManager(int const D, DEConstraintHandler const* const deCH);
+		NSDEMutationManager(int const D, DEConstraintHandler const* const deCH):MutationManager(D, deCH){};
 		Solution* mutate(int const i) const;
 };
 
@@ -81,18 +80,18 @@ class TrigonometricMutationManager : public MutationManager {
 		Solution* rand1Mutation(int const i) const;
 
 	public:
-		TrigonometricMutationManager(int const D, DEConstraintHandler const* const deCH);
+		TrigonometricMutationManager(int const D, DEConstraintHandler const* const deCH): MutationManager(D, deCH), gamma(0.05){};
 		Solution* mutate(int const i) const;
 };
 
 class TwoOpt1MutationManager : public MutationManager {
 	public:
-		TwoOpt1MutationManager(int const D, DEConstraintHandler const* const deCH);
+		TwoOpt1MutationManager(int const D, DEConstraintHandler const* const deCH): MutationManager(D, deCH) {};
 		Solution* mutate(int const i) const;
 };
 
 class TwoOpt2MutationManager : public MutationManager {
 	public:
-		TwoOpt2MutationManager(int const D, DEConstraintHandler const* const deCH);
+		TwoOpt2MutationManager(int const D, DEConstraintHandler const* const deCH): MutationManager(D, deCH){};
 		Solution* mutate(int const i) const;
 };

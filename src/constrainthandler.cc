@@ -30,36 +30,22 @@ DEConstraintHandler::~DEConstraintHandler(){}
 PSOConstraintHandler::PSOConstraintHandler(std::vector<double>const lb,std::vector<double>const ub)
 : ConstraintHandler(lb, ub){}
 PSOConstraintHandler::~PSOConstraintHandler(){};
+
 //void DEConstraintHandler::repairVelocityPre(Solution* const p) const{}
 //void DEConstraintHandler::repairVelocityPost(Solution* const p, int const i) const{
 	////if (p->isPSO) 
 		////p->setV(i, -0.5 * p->getV(i));
 //}
 
-//std::map<std::string, std::function<ConstraintHandler* (std::vector<double>, std::vector<double>)>> const psoCHs ({
-	//// Generic
-	//{"RI", LC(ReinitializationRepair)},
-	//{"PR", LC(ProjectionRepair)},
-	//{"RF", LC(ReflectionRepair)},
-	//{"WR", LC(WrappingRepair)},
-	//{"DP", LC(DeathPenalty)},
-	//{"RS", LC(ResamplingRepair)},
-	//{"TR", LC(TransformationRepair)},
-
-	//// PSO
-	//{"HY", LC(HyperbolicRepair)},
-	//{"PD", LC(PBestDimRepair)},
-//});
-
-std::map<std::string, std::function<ConstraintHandler*(std::vector<double>, std::vector<double>)>> const deCHs ({
+std::map<std::string, std::function<DEConstraintHandler*(std::vector<double>, std::vector<double>)>> const deCHs ({
 	// Generic
-	{"RI", LC(ReinitializationRepair)},
-	{"PR", LC(ProjectionRepair)},
-	{"RF", LC(ReflectionRepair)},
-	{"WR", LC(WrappingRepair)},
+	{"RI", LC(DEReinitializationRepair)},
+	{"PR", LC(DEProjectionRepair)},
+	{"RF", LC(DEReflectionRepair)},
+	{"WR", LC(DEWrappingRepair)},
 	{"DP", LC(DeathPenalty)},
-	{"RS", LC(ResamplingRepair)},
-	{"TR", LC(TransformationRepair)},
+	{"RS", LC(DEResamplingRepair)},
+	{"TR", LC(DETransformationRepair)},
 
 	//// DE
 	{"RB", LC(RandBaseRepair)},
@@ -70,30 +56,17 @@ std::map<std::string, std::function<ConstraintHandler*(std::vector<double>, std:
 	{"PB", LC(ProjectionBaseRepair)},
 });
 
-std::map<std::string, std::function<ConstraintHandler*(std::vector<double>, std::vector<double>)>> const psoCHs {
+std::map<std::string, std::function<PSOConstraintHandler*(std::vector<double>, std::vector<double>)>> const psoCHs {
 	// Generic
-	{"RI", LC(ReinitializationRepair)},
-	{"PR", LC(ProjectionRepair)},
-	{"RF", LC(ReflectionRepair)},
-	{"WR", LC(WrappingRepair)},
+	{"RI", LC(PSOReinitializationRepair)},
+	{"PR", LC(PSOProjectionRepair)},
+	{"RF", LC(PSOReflectionRepair)},
+	{"WR", LC(PSOWrappingRepair)},
 	{"DP", LC(DeathPenalty)},
-	{"RS", LC(ResamplingRepair)},
-	{"TR", LC(TransformationRepair)},
+	{"RS", LC(PSOResamplingRepair)},
+	{"TR", LC(PSOTransformationRepair)},
 
 	//// PSO
 	{"HY", LC(HyperbolicRepair)},
 	{"PD", LC(PBestDimRepair)},
 };
-
-//GenericConstraintHandler::GenericConstraintHandler(std::vector<double> lb,std::vector<double> ub)
-//: ConstraintHandler(lb,ub){}
-
-//DEConstraintHandler::DEConstraintHandler(std::vector<double> lb,std::vector<double> ub)
-//: ConstraintHandler(lb,ub){}
-
-//PSOConstraintHandler::PSOConstraintHandler(std::vector<double> lb,std::vector<double> ub)
-//: ConstraintHandler(lb,ub){}
-
-//DEConstraintHandler::~DEConstraintHandler(){}
-
-//PSOConstraintHandler::~PSOConstraintHandler(){}

@@ -41,8 +41,8 @@ void PSODE2::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > probl
 	std::vector<double> lowerBound = problem->IOHprofiler_get_lowerbound();
 	std::vector<double> upperBound = problem->IOHprofiler_get_upperbound();
 
-	ConstraintHandler const*const deCH = deCHs.at(config.deCH)(lowerBound,upperBound);
-	ConstraintHandler *const psoCH = psoCHs.at(config.psoCH)(lowerBound,upperBound);
+	DEConstraintHandler const*const deCH = deCHs.at(config.deCH)(lowerBound,upperBound);
+	PSOConstraintHandler *const psoCH = psoCHs.at(config.psoCH)(lowerBound,upperBound);
 	ParticleUpdateSettings const settings(config.update, particleUpdateParams, psoCH);
 
 	int const split = popSize / 2;

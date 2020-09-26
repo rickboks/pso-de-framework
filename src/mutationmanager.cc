@@ -1,6 +1,6 @@
 #include "mutationmanager.h"
 
-#define LC(X) [](int const D, ConstraintHandler const * const ch){return new X(D,ch);}
+#define LC(X) [](int const D, DEConstraintHandler const * const ch){return new X(D,ch);}
 
 std::vector<Solution*> MutationManager::mutate(std::vector<Solution*>const& gnms, std::vector<double>const& _Fs){
 		this->genomes = gnms;
@@ -26,7 +26,7 @@ std::vector<Solution*> MutationManager::mutate(std::vector<Solution*>const& gnms
 		}
 		return mutants;
 	}
-std::map<std::string, std::function<MutationManager* (int const, ConstraintHandler const*const)>> const mutations ({
+std::map<std::string, std::function<MutationManager* (int const, DEConstraintHandler const*const)>> const mutations ({
 		{"R1", LC(Rand1MutationManager)},
 		{"T1", LC(TTB1MutationManager)},
 		{"P1", LC(TTPB1MutationManager)},
@@ -40,14 +40,14 @@ std::map<std::string, std::function<MutationManager* (int const, ConstraintHandl
 		{"O2", LC(TwoOpt2MutationManager)},
 });
 
-MutationManager::MutationManager(int const D, ConstraintHandler const* const deCH)
+MutationManager::MutationManager(int const D, DEConstraintHandler const* const deCH)
 	:D(D), deCH(deCH){}
 
 
 MutationManager::~MutationManager(){}
 
 // Rand/1
-Rand1MutationManager::Rand1MutationManager(int const D, ConstraintHandler const* const deCH)
+Rand1MutationManager::Rand1MutationManager(int const D, DEConstraintHandler const* const deCH)
 	: MutationManager(D, deCH){}
 
 Solution* Rand1MutationManager::mutate(int const i) const{
@@ -67,7 +67,7 @@ Solution* Rand1MutationManager::mutate(int const i) const{
 }
 
 // Target-to-best/1
-TTB1MutationManager::TTB1MutationManager(int const D, ConstraintHandler const* const deCH)
+TTB1MutationManager::TTB1MutationManager(int const D, DEConstraintHandler const* const deCH)
 	: MutationManager(D, deCH){}
 
 Solution* TTB1MutationManager::mutate(int const i) const{
@@ -90,7 +90,7 @@ Solution* TTB1MutationManager::mutate(int const i) const{
 }
 
 // Target-to-pbest/1
-TTPB1MutationManager::TTPB1MutationManager(int const D, ConstraintHandler const* const deCH)
+TTPB1MutationManager::TTPB1MutationManager(int const D, DEConstraintHandler const* const deCH)
 	:MutationManager(D, deCH){}
 
 Solution* TTPB1MutationManager::mutate(int const i) const{
@@ -114,7 +114,7 @@ Solution* TTPB1MutationManager::mutate(int const i) const{
 }
 
 // Best/1
-Best1MutationManager::Best1MutationManager(int const D, ConstraintHandler const* const deCH):MutationManager(D, deCH){}
+Best1MutationManager::Best1MutationManager(int const D, DEConstraintHandler const* const deCH):MutationManager(D, deCH){}
 
 Solution* Best1MutationManager::mutate(int const i) const{
 	std::vector<Solution*> possibilities = genomes;
@@ -135,7 +135,7 @@ Solution* Best1MutationManager::mutate(int const i) const{
 }
 
 // Best/2
-Best2MutationManager::Best2MutationManager(int const D, ConstraintHandler const* const deCH):MutationManager(D, deCH){}
+Best2MutationManager::Best2MutationManager(int const D, DEConstraintHandler const* const deCH):MutationManager(D, deCH){}
 
 Solution* Best2MutationManager::mutate(int const i) const{
 	std::vector<Solution*> possibilities = genomes;
@@ -158,7 +158,7 @@ Solution* Best2MutationManager::mutate(int const i) const{
 }
 
 // Rand/2
-Rand2MutationManager::Rand2MutationManager(int const D, ConstraintHandler const* const deCH):MutationManager(D, deCH){}
+Rand2MutationManager::Rand2MutationManager(int const D, DEConstraintHandler const* const deCH):MutationManager(D, deCH){}
 
 Solution* Rand2MutationManager::mutate(int const i) const{
 	std::vector<Solution*> possibilities = genomes;
@@ -180,7 +180,7 @@ Solution* Rand2MutationManager::mutate(int const i) const{
 }
 
 // Rand/2/dir
-Rand2DirMutationManager::Rand2DirMutationManager(int const D, ConstraintHandler const* const deCH):MutationManager(D, deCH){}
+Rand2DirMutationManager::Rand2DirMutationManager(int const D, DEConstraintHandler const* const deCH):MutationManager(D, deCH){}
 
 Solution* Rand2DirMutationManager::mutate(int const i) const{
 	std::vector<Solution*> possibilities = genomes;
@@ -210,7 +210,7 @@ Solution* Rand2DirMutationManager::mutate(int const i) const{
 }
 
 // NSDE
-NSDEMutationManager::NSDEMutationManager(int const D, ConstraintHandler const* const deCH):MutationManager(D, deCH){}
+NSDEMutationManager::NSDEMutationManager(int const D, DEConstraintHandler const* const deCH):MutationManager(D, deCH){}
 Solution* NSDEMutationManager::mutate(int const i) const {
 	std::vector<Solution*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);
@@ -237,7 +237,7 @@ Solution* NSDEMutationManager::mutate(int const i) const {
 }
 
 // Trigonometric
-TrigonometricMutationManager::TrigonometricMutationManager(int const D, ConstraintHandler const* const deCH): MutationManager(D, deCH), gamma(0.05){}
+TrigonometricMutationManager::TrigonometricMutationManager(int const D, DEConstraintHandler const* const deCH): MutationManager(D, deCH), gamma(0.05){}
 
 Solution* TrigonometricMutationManager::mutate(int const i) const{
 	return rng.randDouble(0,1) <= gamma ? trigonometricMutation(i) : rand1Mutation(i);
@@ -301,7 +301,7 @@ Solution* TrigonometricMutationManager::rand1Mutation(int const i) const{
 }
 
 // Two-opt/1
-TwoOpt1MutationManager::TwoOpt1MutationManager(int const D, ConstraintHandler const* const deCH): MutationManager(D, deCH) {}
+TwoOpt1MutationManager::TwoOpt1MutationManager(int const D, DEConstraintHandler const* const deCH): MutationManager(D, deCH) {}
 
 Solution* TwoOpt1MutationManager::mutate(int const i) const{
 	std::vector<Solution*> possibilities = genomes;
@@ -324,7 +324,7 @@ Solution* TwoOpt1MutationManager::mutate(int const i) const{
 }
 
 // Two-opt/2
-TwoOpt2MutationManager::TwoOpt2MutationManager(int const D, ConstraintHandler const* const deCH): MutationManager(D, deCH){}
+TwoOpt2MutationManager::TwoOpt2MutationManager(int const D, DEConstraintHandler const* const deCH): MutationManager(D, deCH){}
 Solution* TwoOpt2MutationManager::mutate(int const i) const{
 	std::vector<Solution*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);

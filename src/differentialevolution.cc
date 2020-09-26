@@ -34,7 +34,7 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 	std::vector<Solution*> donors;
 	std::vector<Solution*> trials;
 
-	ConstraintHandler const* const deCH = deCHs.at(config.constraintHandler)(lowerBound, upperBound);
+	DEConstraintHandler const* const deCH = deCHs.at(config.constraintHandler)(lowerBound, upperBound);
 	CrossoverManager const* const crossoverManager = crossovers.at(config.crossover)(D);
 	MutationManager* const mutationManager = mutations.at(config.mutation)(D, deCH);
 	DEAdaptationManager* const adaptationManager = deAdaptations.at(config.adaptation)();

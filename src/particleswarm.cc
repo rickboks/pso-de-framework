@@ -35,7 +35,7 @@ void ParticleSwarm::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> 
 	std::vector<double> lowerBound = problem->IOHprofiler_get_lowerbound(); 
 	std::vector<double> upperBound = problem->IOHprofiler_get_upperbound();
 
-	ConstraintHandler const* const psoCH = psoCHs.at(config.constraintHandler)(lowerBound, upperBound); 
+	PSOConstraintHandler const* const psoCH = psoCHs.at(config.constraintHandler)(lowerBound, upperBound); 
 	ParticleUpdateSettings const settings(config.update, particleUpdateParams, psoCH);
 
 	for (int i = 0; i < popSize; i++){
@@ -80,7 +80,7 @@ void ParticleSwarm::runSynchronous(std::shared_ptr<IOHprofiler_problem<double> >
 	std::vector<double> const lowerBound = problem->IOHprofiler_get_lowerbound(); 
 	std::vector<double> const upperBound = problem->IOHprofiler_get_upperbound(); 
 
-	ConstraintHandler* const psoCH = psoCHs.at(config.constraintHandler)(lowerBound, upperBound); 
+	PSOConstraintHandler* const psoCH = psoCHs.at(config.constraintHandler)(lowerBound, upperBound); 
 	ParticleUpdateSettings const settings(config.update, particleUpdateParams, psoCH);
 
 	particles.resize(D);

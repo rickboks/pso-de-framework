@@ -19,7 +19,7 @@ class Particle : public Solution {
 		std::vector<Particle*> neighborhood;
 		ParticleUpdateManager* particleUpdateManager;
 		ParticleUpdateSettings const * const settings;
-		ConstraintHandler const * const psoCH;
+		PSOConstraintHandler const * const psoCH;
 	public:
 		Particle(int const D, ParticleUpdateSettings const*const particleUpdateSettings);
 		Particle(Particle const & other);

@@ -25,10 +25,7 @@ void PSODE2::run(std::shared_ptr<IOHprofiler_problem<double> > problem,
     		std::shared_ptr<IOHprofiler_csv_logger> logger,
     		int const evalBudget, int const popSize, std::map<int,double> particleUpdateParams){
 
-	//if (config.synchronicity == SYNCHRONOUS)
-		//runSynchronous(evalBudget, popSize, particleUpdateParams);
-	//if (config.synchronicity == ASYNCHRONOUS)
-		runAsynchronous(problem, logger, evalBudget, popSize, particleUpdateParams);
+	runAsynchronous(problem, logger, evalBudget, popSize, particleUpdateParams);
 }
 
 void PSODE2::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > problem, 
@@ -135,7 +132,7 @@ void PSODE2::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > probl
 }
 
 std::string PSODE2::getIdString() const{
-	return "H2_" + config.update + "_" + config.topology + "_" + config.psoCH + "_" + config.synchronicity 
+	return "H2_" + config.update + "_" + config.topology + "_" + config.psoCH /*+ "_" + config.synchronicity*/
 		+ "_" + config.mutation + "_" + config.crossover + "_" + config.adaptation + "_" + config.deCH;
 }
 
@@ -157,7 +154,7 @@ void PSODE2::share(){
 	std::vector<double> x = best_pso->getX();
 	double y = best_pso->getFitness();
 
-	best_pso->setX(best_de->getX(), best_de->getFitness()); //Updates the velocity as well
+	best_pso->setXandUpdateV(best_de->getX(), best_de->getFitness()); //Updates the velocity as well
 	best_de->setX(x, y); //Not here
 }
 

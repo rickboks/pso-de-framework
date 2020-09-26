@@ -106,7 +106,6 @@ std::vector<double> Particle::getP() const {
 
 void Particle::updateGbest(){
 	int bestNeighbor = -1;
-	int const size = neighborhood.size();
 
 	if (fitness < gbest){ // First check own fitness
 		gbest = fitness;
@@ -114,7 +113,7 @@ void Particle::updateGbest(){
 	}
 
 	double bestScore = gbest;
-	for (int i = 0; i < size; i++){ // Check neighbors fitness
+	for (unsigned int i = 0; i < neighborhood.size(); i++){ // Check neighbors fitness
 		double const currentScore = neighborhood[i]->getPbest();
 		if (currentScore < bestScore){
 			bestScore = currentScore;
@@ -139,26 +138,12 @@ bool Particle::isNeighbor(Particle* particle) const {
 	return std::find(neighborhood.begin(), neighborhood.end(), particle) != neighborhood.end();
 }
 
-void Particle::replaceNeighbors(std::map<Particle*, Particle*> mapping){
-	for (int i = 0; i < (int) neighborhood.size(); i++){
-		neighborhood[i] = mapping[neighborhood[i]];
-	}
-}
-
 int Particle::getNumberOfNeighbors() const{
 	return neighborhood.size();
 }
 
-void Particle::setX(std::vector<double> x, double fitness){
+void Particle::setXandUpdateV(std::vector<double> x, double fitness){
 	subtract(x, this->x, v); // Reverse engineer velocity
 	this->x = x;
 	this->fitness = fitness;
-}
-
-void Particle::setX(std::vector<double> x){
-	this->x = x;
-}
-
-void Particle::setX(int const dim, double const val){
-	x[dim] = val;
 }

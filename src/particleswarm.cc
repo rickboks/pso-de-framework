@@ -9,8 +9,7 @@
 #include <iostream>
 #include <fstream>
 
-ParticleSwarm::ParticleSwarm(PSOConfig const config) : config(config){
-	logging = false;
+ParticleSwarm::ParticleSwarm(PSOConfig const config) : config(config), logging(false){
 }
 
 void ParticleSwarm::reset(){}
@@ -22,9 +21,9 @@ void ParticleSwarm::run(std::shared_ptr<IOHprofiler_problem<double> > const prob
     		int const evalBudget, int const popSize, std::map<int,double> const particleUpdateParams){
 
 	if (config.synchronicity == "A")
-		runSynchronous(problem, logger, evalBudget, popSize, particleUpdateParams);
-	else 
 		runAsynchronous(problem, logger, evalBudget, popSize, particleUpdateParams);
+	else 
+		runSynchronous(problem, logger, evalBudget, popSize, particleUpdateParams);
 }
 
 void ParticleSwarm::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > const problem, 
@@ -38,17 +37,15 @@ void ParticleSwarm::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> 
 	PSOConstraintHandler const* const psoCH = psoCHs.at(config.constraintHandler)(lowerBound, upperBound); 
 	ParticleUpdateSettings const settings(config.update, particleUpdateParams, psoCH);
 
+	particles.resize(popSize);
 	for (int i = 0; i < popSize; i++){
-		Particle* p = new Particle(D, &settings);
-		p->randomize(lowerBound, upperBound);
-		particles.push_back(p);
+		particles[i] = new Particle(D, &settings);
+		particles[i]->randomize(lowerBound, upperBound);
 	}
 
-	logStart();
-	logPositions();
-
 	TopologyManager* const topologyManager = topologies.at(config.topology)(particles);
-	
+
+	logStart(); logPositions();
 	while (	problem->IOHprofiler_get_evaluations() < evalBudget &&
 			!problem->IOHprofiler_hit_optimal()){
 		
@@ -83,7 +80,7 @@ void ParticleSwarm::runSynchronous(std::shared_ptr<IOHprofiler_problem<double> >
 	PSOConstraintHandler* const psoCH = psoCHs.at(config.constraintHandler)(lowerBound, upperBound); 
 	ParticleUpdateSettings const settings(config.update, particleUpdateParams, psoCH);
 
-	particles.resize(D);
+	particles.resize(popSize);
 	for (int i = 0; i < popSize; i++){
 		particles[i] = new Particle(D, &settings);
 		particles[i]->randomize(lowerBound, upperBound);

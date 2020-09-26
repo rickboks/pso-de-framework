@@ -64,12 +64,6 @@ class DEWrappingRepair : public DEConstraintHandler {
 		void repair(Solution* const p) const;
 };
 
-class DEResamplingRepair : public DEConstraintHandler {
-	public:
-		DEResamplingRepair(std::vector<double> const lb, std::vector<double> const ub):ConstraintHandler(lb,ub), DEConstraintHandler(lb, ub){};
-		bool resample(Solution const* const p, int const resamples) const;
-};
-
 class DETransformationRepair : public DEConstraintHandler { //Adapted from https://github.com/psbiomech/c-cmaes
 	private:
 		std::vector<double> al, au, xlo, xhi, r;
@@ -116,12 +110,6 @@ class PSOWrappingRepair : public PSOConstraintHandler {
 		void repair(Particle* const p) const;
 };
 
-class PSOResamplingRepair : public PSOConstraintHandler {
-	public:
-		PSOResamplingRepair(std::vector<double> const lb, std::vector<double> const ub):ConstraintHandler(lb,ub), PSOConstraintHandler(lb, ub){};
-		bool resample(Solution const* const p, int const resamples) const;
-};
-
 class PSOTransformationRepair : public PSOConstraintHandler { //Adapted from https://github.com/psbiomech/c-cmaes
 	private:
 		std::vector<double> al, au, xlo, xhi, r;
@@ -130,3 +118,12 @@ class PSOTransformationRepair : public PSOConstraintHandler { //Adapted from htt
 		PSOTransformationRepair(std::vector<double> const lb, std::vector<double> const ub);
 		void repair(Particle* const p) const;
 };
+
+// Generic
+class ResamplingRepair : public DEConstraintHandler, public PSOConstraintHandler  {
+	public:
+		ResamplingRepair(std::vector<double> const lb, std::vector<double> const ub)
+			:ConstraintHandler(lb,ub), DEConstraintHandler(lb,ub), PSOConstraintHandler(lb, ub){};
+		bool resample(Solution const* const p, int const resamples) const;
+};
+

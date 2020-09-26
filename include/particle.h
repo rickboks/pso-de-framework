@@ -28,9 +28,7 @@ class Particle : public Solution {
 		double getV(int const dim) const;
 		void setV(std::vector<double> const v);
 		void setV(int const dim, double val);
-		void setX(std::vector<double> const x, double const fitness);
-		void setX(int const dim, double const val);
-		void setX(std::vector<double> x);
+		void setXandUpdateV(std::vector<double> const x, double const fitness); 
 		double getGbest() const;
 		double getPbest() const;
 		std::vector<double> getG() const;
@@ -43,6 +41,5 @@ class Particle : public Solution {
 		void removeNeighbor(Particle* const neighbor);
 		void removeAllNeighbors();
 		bool isNeighbor(Particle* particle) const;
-		void replaceNeighbors(std::map<Particle*, Particle*> const mapping);
 		int getNumberOfNeighbors() const;
 };

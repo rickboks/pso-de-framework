@@ -2,11 +2,8 @@
 #include "rng.h"
 #include <limits>
 
-Solution::Solution(int const D) : x(D),  evaluated(false), fitness(std::numeric_limits<double>::max()), D(D){
-}
-
+Solution::Solution(int const D) : x(D),  evaluated(false), fitness(std::numeric_limits<double>::max()), D(D){}
 Solution::Solution(std::vector<double> const x): x(x), evaluated(false), fitness(std::numeric_limits<double>::max()), D(x.size()){}
-
 Solution::~Solution(){};
 
 void Solution::setX(std::vector<double> x, double fitness){

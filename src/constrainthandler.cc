@@ -24,7 +24,7 @@ std::map<std::string, std::function<DEConstraintHandler*(std::vector<double>, st
 	{"RF", LC(DEReflectionRepair)},
 	{"WR", LC(DEWrappingRepair)},
 	{"DP", LC(DeathPenalty)},
-	{"RS", LC(DEResamplingRepair)},
+	{"RS", LC(ResamplingRepair)},
 	{"TR", LC(DETransformationRepair)},
 
 	//// DE
@@ -43,7 +43,7 @@ std::map<std::string, std::function<PSOConstraintHandler*(std::vector<double>, s
 	{"RF", LC(PSOReflectionRepair)},
 	{"WR", LC(PSOWrappingRepair)},
 	{"DP", LC(DeathPenalty)},
-	{"RS", LC(PSOResamplingRepair)},
+	{"RS", LC(ResamplingRepair)},
 	{"TR", LC(PSOTransformationRepair)},
 
 	//// PSO

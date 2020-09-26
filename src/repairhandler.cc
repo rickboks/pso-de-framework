@@ -78,13 +78,7 @@ void PSOWrappingRepair::repair(Particle* const p) const{
 		}
 	}
 }
-
-bool PSOResamplingRepair::resample(Solution const* const p, int const resamples) const{
-	if (resamples >= 100 || isFeasible(p))
-		return false;
-	return true;
-}
-
+//
 //Adapted from https://github.com/psbiomech/c-cmaes
 PSOTransformationRepair::PSOTransformationRepair(std::vector<double>const lb, std::vector<double>const ub) 
 	:ConstraintHandler(lb,ub), PSOConstraintHandler(lb,ub), al(D), au(D), xlo(D), xhi(D), r(D){
@@ -219,7 +213,6 @@ void DEReinitializationRepair::repair(Solution* const p) const{
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i] || p->getX(i) > ub[i]){
 			p->setX(i, rng.randDouble(lb[i], ub[i]));
-			//repairVelocityPost(p, i);
 		}
 	}
 }
@@ -252,12 +245,6 @@ void DEWrappingRepair::repair(Solution* const p) const{
 			p->setX(i, lb[i] + std::fmod(p->getX(i) - ub[i], std::abs(ub[i]-lb[i])));
 		}
 	}
-}
-
-bool DEResamplingRepair::resample(Solution const* const p, int const resamples) const{
-	if (resamples >= 100 || isFeasible(p))
-		return false;
-	return true;
 }
 
 //Adapted from https://github.com/psbiomech/c-cmaes
@@ -294,4 +281,11 @@ void DETransformationRepair::shift(Solution* const p) const {
 		if (p->getX(i) > ub[i] + au[i])
 			p->setX(i, p->getX(i) - 2. * (p->getX(i) - ub[i] - au[i]));
 	}
+}
+
+// Generic
+bool ResamplingRepair::resample(Solution const* const p, int const resamples) const{
+	if (resamples >= 100 || isFeasible(p))
+		return false;
+	return true;
 }

@@ -18,18 +18,15 @@ void algorithm
     int const D = problem->IOHprofiler_get_number_of_variables(); 
     //psode2->run(problem, logger, D*10000, D*5, std::map<int,double>()); 
     //psode->run(problem, logger, D*10000, D*5, std::map<int,double>()); 
-    pso->run(problem, logger, D*10000, D*5, std::map<int,double>()); 
-    //de->run(problem, logger, D*10000, D*5); 
+    //pso->run(problem, logger, D*10000, D*5, std::map<int,double>()); 
+    de->run(problem, logger, D*10000, D*5); 
 }
 
 void _run_experiment(bool const log) {
     //psode2 = new PSODE2(HybridConfig("I", "N", "HY", "A", "T1", "B", "J", "RI"));
     //psode = new PSODE(HybridConfig("I", "N", "HY", "A", "T1", "B", "P3", "J", "RI"));    
-    pso = new ParticleSwarm(PSOConfig("I", "N", "HY", "A"));
-    //de = new DifferentialEvolution(DEConfig("P1", "E", "J", "RS"));
-
-    if (log)
-		pso->enableLogging();
+    //pso = new ParticleSwarm(PSOConfig("I", "N", "HY", "A"));
+    de = new DifferentialEvolution(DEConfig("P1", "E", "J", "RS"));
 
 	std::string templateFile = "./configuration.ini";
     std::string configFile = generateConfig(templateFile, pso->getIdString());

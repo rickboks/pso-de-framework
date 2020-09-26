@@ -15,6 +15,7 @@ class IOHprofiler_csv_logger;
 struct PSOConfig {
 	PSOConfig(std::string const update, std::string const topology, std::string constraintHandler, std::string const synchronicity) 
 	: update(update), topology(topology), constraintHandler(constraintHandler), synchronicity(synchronicity){}
+
 	std::string const update, topology, constraintHandler, synchronicity;
 };
 
@@ -22,8 +23,6 @@ class ParticleSwarm {
 	private:
 		PSOConfig const config;
 		std::vector<Particle*> particles;
-		bool logging;
-
 		void runSynchronous(std::shared_ptr<IOHprofiler_problem<double> > const problem, 
     		std::shared_ptr<IOHprofiler_csv_logger> const logger,
     		int const evalBudget, int const popSize, std::map<int,double> const particleUpdateParams);
@@ -41,8 +40,4 @@ class ParticleSwarm {
 
 		void reset();
 		std::string getIdString() const;
-		void enableLogging();
-		void logStart();
-		void logEnd();
-		void logPositions();
 };

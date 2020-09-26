@@ -9,7 +9,7 @@
 #include <iostream>
 #include <fstream>
 
-ParticleSwarm::ParticleSwarm(PSOConfig const config) : config(config), logging(false){
+ParticleSwarm::ParticleSwarm(PSOConfig const config) : config(config){
 }
 
 void ParticleSwarm::reset(){}
@@ -45,7 +45,6 @@ void ParticleSwarm::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> 
 
 	TopologyManager* const topologyManager = topologies.at(config.topology)(particles);
 
-	logStart(); logPositions();
 	while (	problem->IOHprofiler_get_evaluations() < evalBudget &&
 			!problem->IOHprofiler_hit_optimal()){
 		
@@ -55,8 +54,6 @@ void ParticleSwarm::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> 
 			particles[i]->updateGbest();
 			particles[i]->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/evalBudget);			
 		}
-
-		logPositions();
 		topologyManager->update(double(problem->IOHprofiler_get_evaluations())/evalBudget);	
 	}
 
@@ -65,8 +62,6 @@ void ParticleSwarm::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> 
 		delete particle;
 	particles.clear();
 	delete psoCH;
-
-	logEnd();
 }
 
 void ParticleSwarm::runSynchronous(std::shared_ptr<IOHprofiler_problem<double> > const problem, 
@@ -88,8 +83,6 @@ void ParticleSwarm::runSynchronous(std::shared_ptr<IOHprofiler_problem<double> >
 
 	TopologyManager* const topologyManager = topologies.at(config.topology)(particles);
 
-	logStart(); logPositions();
-
 	while (	problem->IOHprofiler_get_evaluations() < evalBudget &&
 			!problem->IOHprofiler_hit_optimal()){
 		
@@ -103,7 +96,6 @@ void ParticleSwarm::runSynchronous(std::shared_ptr<IOHprofiler_problem<double> >
 			particles[i]->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/evalBudget);
 		}
 	
-		logPositions();
 		topologyManager->update(double(problem->IOHprofiler_get_evaluations())/evalBudget);	
 	}
 
@@ -112,38 +104,8 @@ void ParticleSwarm::runSynchronous(std::shared_ptr<IOHprofiler_problem<double> >
 		delete particle;
 	particles.clear();
 	delete psoCH;
-
-	logEnd();
 }
 
 std::string ParticleSwarm::getIdString() const {
 	return "P_" + config.update + "_" + config.topology + "_" + config.constraintHandler + "_" + config.synchronicity;
-}
-
-void ParticleSwarm::enableLogging(){
-	logging=true;
-}
-
-void ParticleSwarm::logStart(){
-	if (logging)
-		std::cout << "LOGGER: START" << std::endl;
-}
-
-void ParticleSwarm::logEnd(){
-	if (logging)
-		std::cout << "LOGGER: END" << std::endl;
-}
-
-void ParticleSwarm::logPositions(){
-	if (logging){
-		std::cout << "LOGGER: " << std::endl;
-		for (unsigned int i = 0; i < particles.size(); i++){
-			std::cout << "LOGGER: ";
-			std::vector<double> position = particles[i]->getX();
-			for (unsigned int j = 0; j < position.size()-1 ; j++){
-				std::cout << position[j] << " ";
-			}
-			std::cout << position[position.size()-1] << std::endl;
-		}
-	}
 }

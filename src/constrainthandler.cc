@@ -19,12 +19,14 @@ bool ConstraintHandler::resample(Solution const * const p, int const resamples) 
 
 std::map<std::string, std::function<DEConstraintHandler*(std::vector<double>, std::vector<double>)>> const deCHs ({
 	// Generic
+	{"DP", LC(DeathPenalty)},
+	{"RS", LC(ResamplingRepair)},
+
+	// Almost generic
 	{"RI", LC(DEReinitializationRepair)},
 	{"PR", LC(DEProjectionRepair)},
 	{"RF", LC(DEReflectionRepair)},
 	{"WR", LC(DEWrappingRepair)},
-	{"DP", LC(DeathPenalty)},
-	{"RS", LC(ResamplingRepair)},
 	{"TR", LC(DETransformationRepair)},
 
 	//// DE
@@ -38,12 +40,14 @@ std::map<std::string, std::function<DEConstraintHandler*(std::vector<double>, st
 
 std::map<std::string, std::function<PSOConstraintHandler*(std::vector<double>, std::vector<double>)>> const psoCHs {
 	// Generic
+	{"DP", LC(DeathPenalty)},
+	{"RS", LC(ResamplingRepair)},
+
+	// Almost generic
 	{"RI", LC(PSOReinitializationRepair)},
 	{"PR", LC(PSOProjectionRepair)},
 	{"RF", LC(PSOReflectionRepair)},
 	{"WR", LC(PSOWrappingRepair)},
-	{"DP", LC(DeathPenalty)},
-	{"RS", LC(ResamplingRepair)},
 	{"TR", LC(PSOTransformationRepair)},
 
 	//// PSO

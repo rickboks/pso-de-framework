@@ -54,7 +54,7 @@ void PSODE2::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > probl
 	TopologyManager* const topologyManager = topologies.at(config.topology)(psoPop);
 	MutationManager* const mutationManager = mutations.at(config.mutation)(D, deCH);
 	CrossoverManager const*const crossoverManager = crossovers.at(config.crossover)(D);
-	DEAdaptationManager *const adaptationManager = deAdaptations.at(config.adaptation)();
+	DEAdaptationManager *const adaptationManager = deAdaptations.at(config.adaptation)(popSize);
 
 	std::vector<double> Fs(dePop.size());
 	std::vector<double> Crs(dePop.size());
@@ -66,7 +66,6 @@ void PSODE2::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > probl
 		// Get new DE parameters from the adaptation manager (JADE or constant)
 		adaptationManager->nextF(Fs);
 		adaptationManager->nextCr(Crs);
-		adaptationManager->reset();
 
 		// Measure fitness of the PSO population
 		// Update pbest and gbest of PSO population
@@ -86,17 +85,17 @@ void PSODE2::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > probl
 		for (Solution* d : donors) 
 			delete d;
 
+		std::vector<double> parentF(popSize), trialF(popSize);
 		for (unsigned int i = 0; i < dePop.size(); i++){
 			//Evaluate the parent vector
-			dePop[i]->evaluate(problem,logger);
+			parentF[i] = dePop[i]->evaluate(problem,logger);
 
 			//Evaluate the trial vector
-			trials[i]->evaluate(problem,logger);
+			trialF[i] = trials[i]->evaluate(problem,logger);
 
 			// Perform selection
-			if (trials[i]->getFitness() < dePop[i]->getFitness()){
+			if ( trialF[i] < parentF[i] ){
 				dePop[i]->setX(trials[i]->getX(), trials[i]->getFitness());
-				adaptationManager->successfulIndex(i);
 			}
 		}
 
@@ -106,7 +105,7 @@ void PSODE2::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > probl
 		if (iterations % 10 == 0)
 			share();
 
-		adaptationManager->update();
+		adaptationManager->update(parentF, trialF);
 		iterations++;	
 		topologyManager->update(double(problem->IOHprofiler_get_evaluations())/evalBudget);	
 	}
@@ -132,8 +131,8 @@ std::string PSODE2::getIdString() const{
 }
 
 void PSODE2::share(){
-	Solution* const best_de = getPBest(dePop, 0.1);
-	Particle* const best_pso = getPBest(psoPop, 0.1);
+	Solution* const best_de = getPBest(dePop);
+	Particle* const best_pso = getPBest(psoPop);
 
 	std::vector<double> const x = best_pso->getX();
 	double const y = best_pso->getFitness();

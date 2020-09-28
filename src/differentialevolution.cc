@@ -34,7 +34,7 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 	DEConstraintHandler const* const deCH = deCHs.at(config.constraintHandler)(lowerBound, upperBound);
 	CrossoverManager const* const crossoverManager = crossovers.at(config.crossover)(D);
 	MutationManager* const mutationManager = mutations.at(config.mutation)(D, deCH);
-	DEAdaptationManager* const adaptationManager = deAdaptations.at(config.adaptation)();
+	DEAdaptationManager* const adaptationManager = deAdaptations.at(config.adaptation)(popSize);
 
 	std::vector<double> Fs(popSize);
 	std::vector<double> Crs(popSize);
@@ -42,7 +42,6 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 	while (problem->IOHprofiler_get_evaluations() < evalBudget && !problem->IOHprofiler_hit_optimal()){
 		adaptationManager->nextF(Fs);
 		adaptationManager->nextCr(Crs);
-		adaptationManager->reset();
 		
 		std::vector<Solution*> const donors = mutationManager->mutate(genomes,Fs);
 		std::vector<Solution*> const trials = crossoverManager->crossover(genomes, donors, Crs);
@@ -50,19 +49,18 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 		for (Solution* m : donors)
 			delete m;
 		
+		std::vector<double> parentF(popSize), trialF(popSize);
 		for (int i = 0; i < popSize; i++){
-			double const parentF = genomes[i]->getFitness();
-			double const trialF = trials[i]->evaluate(problem,logger);
-			if (trialF < parentF){
-				genomes[i]->setX(trials[i]->getX(), trialF);
-				adaptationManager->successfulIndex(i);
-			}
+			parentF[i] = genomes[i]->getFitness();
+			trialF[i] = trials[i]->evaluate(problem, logger);
+			if (trialF[i] < parentF[i])
+				genomes[i]->setX(trials[i]->getX(), trialF[i]);
 		}
 		
 		for (Solution* g : trials)
 			delete g;
 
-		adaptationManager->update();
+		adaptationManager->update(parentF, trialF);
 	}
 
 	for (Solution* d : genomes)

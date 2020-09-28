@@ -4,7 +4,6 @@ std::vector<Solution*> MutationManager::mutate(std::vector<Solution*>const& geno
 	this->genomes = genomes;
 	this->Fs = Fs;
 	best = getBest(this->genomes);
-	pBest = getPBest(this->genomes, 0.1);
 	std::vector<Solution*> mutants(this->genomes.size());
 
 	for (unsigned int i = 0; i < this->genomes.size(); i++){
@@ -74,6 +73,7 @@ Solution* TTB1MutationManager::mutate(int const i) const{
 }
 
 Solution* TTPB1MutationManager::mutate(int const i) const{
+	Solution* pBest = getPBest(this->genomes);
 	std::vector<Solution*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);
 

@@ -15,7 +15,6 @@ class MutationManager {
 		std::vector<Solution*> genomes;
 		std::vector<double> Fs;
 		Solution const* best;
-		Solution const* pBest;
 		virtual Solution* mutate(int const i) const=0;
 	public:
 		MutationManager(int const D, DEConstraintHandler const* const deCH):D(D), deCH(deCH){};

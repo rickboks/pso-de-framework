@@ -320,19 +320,23 @@ bool TransformationRepair::shift(Particle* const p) {
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < xlo[i]) {
 			p->setX(i, p->getX(i) + r[i] * (1 + (int)((xlo[i] - p->getX(i))/r[i])) );
+			repairVelocityPost(p,i);
 			repaired=true;
 		}
 		if (p->getX(i) > xhi[i]) {
 			p->setX(i, p->getX(i) - r[i] * (1 + (int)((p->getX(i)-xhi[i])/r[i])) );
+			repairVelocityPost(p,i);
 			repaired=true;
 		}
 
 		if (p->getX(i) < lb[i] - al[i]) {
 			p->setX(i, p->getX(i) + 2. * (lb[i] - al[i] - p->getX(i)));
+			repairVelocityPost(p,i);
 			repaired=true;
 		}
 		if (p->getX(i) > ub[i] + au[i]){
 			p->setX(i, p->getX(i) - 2. * (p->getX(i) - ub[i] - au[i]));
+			repairVelocityPost(p,i);
 			repaired=true;
 		}
 	}
@@ -359,11 +363,11 @@ bool TransformationRepair::shift(Solution* const p){
 	bool repaired = false;
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < xlo[i]) {
-			p->setX(i, p->getX(i) + r[i] * (1 + (int)((xlo[i] - p->getX(i))/r[i])) );
+			p->setX(i, p->getX(i) + r[i] * (1 + (int)((xlo[i] - p->getX(i))/r[i])));
 			repaired=true;
 		}
 		if (p->getX(i) > xhi[i]){
-			p->setX(i, p->getX(i) - r[i] * (1 + (int)((p->getX(i)-xhi[i])/r[i])) );
+			p->setX(i, p->getX(i) - r[i] * (1 + (int)((p->getX(i)-xhi[i])/r[i])));
 			repaired=true;
 		}
 

@@ -94,3 +94,9 @@ class TwoOpt2MutationManager : public MutationManager {
 		TwoOpt2MutationManager(int const D, DEConstraintHandler* const deCH): MutationManager(D, deCH){};
 		Solution* mutate(int const i) const;
 };
+
+class ProximityMutationManager : public MutationManager {
+	public:
+		ProximityMutationManager(int const D, DEConstraintHandler* const deCH): MutationManager(D, deCH){};
+		Solution* mutate(int const i) const;
+};

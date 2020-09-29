@@ -28,7 +28,6 @@ class DEConstraintHandler : virtual public ConstraintHandler {
 		virtual ~DEConstraintHandler(){};
 		virtual void repairDE(Solution* const p, Solution const * const base, Solution const* const target){}; // DE constraint handler
 		virtual void repair(Solution* const p){};// Generic constraint handler
-		virtual void penalize(Solution* const p){}; // Generic penalize
 };
 
 class PSOConstraintHandler : virtual public ConstraintHandler {
@@ -40,7 +39,6 @@ class PSOConstraintHandler : virtual public ConstraintHandler {
 		virtual void repairPSO(Particle* const p){};// PSO constraint handler
 		virtual void repairVelocityPre(Particle* const p){}; // For constraint handlers that fix the velocity
 		virtual void repair(Particle* const p){}; // Generic constraint handler
-		virtual void penalize(Solution* const p){}; // Generic penalize
 };
 
 extern std::map<std::string, std::function<DEConstraintHandler* (std::vector<double>, std::vector<double>)>> const deCHs;

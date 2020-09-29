@@ -1,7 +1,6 @@
 #include "constrainthandler.h"
 #include "particle.h"
 #include "repairhandler.h"
-#include "penaltyhandler.h"
 #define LC(X) [](std::vector<double>lb, std::vector<double>ub){return new X(lb,ub);}
 
 bool ConstraintHandler::isFeasible(Solution const * const p) const{

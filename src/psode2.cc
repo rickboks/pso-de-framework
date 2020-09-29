@@ -9,7 +9,6 @@
 #include "particleupdatesettings.h"
 #include "util.h"
 #include "mutationmanager.h"
-#include "penaltyhandler.h"
 #include "psode2.h"
 #include "deadaptationmanager.h"
 #include <limits>

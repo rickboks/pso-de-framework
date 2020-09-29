@@ -14,7 +14,7 @@ public:
 	virtual ~DEAdaptationManager(){};
 	virtual void nextF(std::vector<double>& Fs)=0;
 	virtual void nextCr(std::vector<double>& Crs)=0;
-	virtual void update(std::vector<double>const& orig, std::vector<double>const& trials)=0;
+	virtual void update(std::vector<double>const& targets, std::vector<double>const& trials)=0;
 };
 
 extern std::map<std::string, std::function<DEAdaptationManager*(int const)>> const deAdaptations;

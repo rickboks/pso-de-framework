@@ -5,6 +5,7 @@
 #include <iostream>
 #include <functional>
 #include <string>
+#include <fstream> 
 #include "differentialevolution.h"
 #include "rng.h"
 #include "utilities.h"
@@ -70,14 +71,12 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 	}
 
 	Solution const* const best = getBest(genomes);
-	std::cout << std::endl << getIdString() << "p" << popSize << "D" << D << "f" << problem->IOHprofiler_get_problem_id() 
-		/*<< "i" << problem->IOHprofiler_get_instance_id()*/ << " 0.1 0.2 ";
+	std::cout << std::endl << getIdString() << "p" << popSize << "D" << D << "f" << problem->IOHprofiler_get_problem_id();
 
 	for (double d : percCorrected)
 		std::cout << d << " ";
 	for (double d : best->getX())
 		std::cout << d << " ";
-
 	std::cout << best->getFitness() << " " << problem->IOHprofiler_get_optimal()[0] << std::endl;
 
 	for (Solution* d : genomes)

@@ -379,3 +379,13 @@ bool ResamplingRepair::resample(Solution const* const p, int const resamples) {
 
 	return true;
 }
+
+void DeathPenalty::repair(Particle* const p) {
+	repair((Solution*) p);
+}
+void DeathPenalty::repair(Solution* const p) {
+	if (!isFeasible(p)){
+		p->setFitness(std::numeric_limits<double>::max());
+		nCorrected++;
+	}
+}

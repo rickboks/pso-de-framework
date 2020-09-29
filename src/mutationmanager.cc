@@ -219,12 +219,12 @@ Solution* TrigonometricMutationManager::trigonometricMutation(int const i) const
 	
 	std::vector<Solution*> xr = pickRandom(possibilities, 3);
 
-	double pPrime = std::abs(xr[0]->getFitness()) + std::abs(xr[1]->getFitness()) 
+	double const pPrime = std::abs(xr[0]->getFitness()) + std::abs(xr[1]->getFitness()) 
 					+ std::abs(xr[2]->getFitness());
 
-	double p0 = xr[0]->getFitness() / pPrime;
-	double p1 = xr[1]->getFitness() / pPrime;
-	double p2 = xr[2]->getFitness() / pPrime;
+	double const p0 = xr[0]->getFitness() / pPrime;
+	double const p1 = xr[1]->getFitness() / pPrime;
+	double const p2 = xr[2]->getFitness() / pPrime;
 
 	std::vector<double> mutant;
 	std::vector<double> temp(this->D);
@@ -293,6 +293,30 @@ Solution* TwoOpt1MutationManager::mutate(int const i) const{
 
 // Two-opt/2
 Solution* TwoOpt2MutationManager::mutate(int const i) const{
+	std::vector<Solution*> possibilities = genomes;
+	possibilities.erase(possibilities.begin() + i);
+
+	std::vector<Solution*> xr = pickRandom(possibilities, 5);
+
+	if (xr[1]->getFitness() < xr[0]->getFitness())
+		std::swap(xr[0], xr[1]);
+
+	std::vector<double> mutant = xr[0]->getX();
+	std::vector<double> subtraction(this->D);
+	subtract(xr[1]->getX(), xr[2]->getX(), subtraction);
+	scale(subtraction, Fs[i]);
+	add(mutant, subtraction, mutant);
+	subtract(xr[3]->getX(), xr[4]->getX(), subtraction);
+	scale(subtraction, Fs[i]);
+	add(mutant, subtraction, mutant);
+
+	Solution* m = new Solution(mutant);
+	deCH->repairDE(m, xr[0], genomes[i]);
+	return m;
+}
+
+// Proximity-based
+Solution* ProximityMutationManager::mutate(int const i) const{
 	std::vector<Solution*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);
 

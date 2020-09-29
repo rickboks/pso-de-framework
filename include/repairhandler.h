@@ -1,7 +1,9 @@
 #pragma once
 #include <functional>
+#include <limits>
 #include <vector>
 #include "constrainthandler.h"
+#include <iostream>
 
 // Differential Evolution
 class RandBaseRepair : public DEConstraintHandler {
@@ -127,3 +129,10 @@ class ResamplingRepair : public DEConstraintHandler, public PSOConstraintHandler
 		bool resample(Solution const* const p, int const resamples);
 };
 
+class DeathPenalty : public DEConstraintHandler, public PSOConstraintHandler {
+	public:
+		DeathPenalty(std::vector<double>const lb,std::vector<double>const ub):ConstraintHandler(lb,ub), 
+			DEConstraintHandler(lb,ub), PSOConstraintHandler(lb,ub){};
+		void repair(Solution* const p);
+		void repair(Particle* const p);
+};

@@ -103,13 +103,13 @@ std::vector<double> SHADEManager::w(std::vector<double>const& delta) const {
 	return w;
 }
 
-void SHADEManager::update(std::vector<double>const& orig, std::vector<double>const& trials){
+void SHADEManager::update(std::vector<double>const& targets, std::vector<double>const& trials){
 	std::vector<double> SF, SCr, delta;
 	for (int i = 0; i < popSize; i++){
-		if (trials[i] < orig[i]){
+		if (trials[i] < targets[i]){
 			SF.push_back(previousFs[i]); 
 			SCr.push_back(previousCrs[i]);
-			delta.push_back(std::abs(trials[i] - orig[i]));
+			delta.push_back(std::abs(trials[i] - targets[i]));
 		}
 	}
 
@@ -142,7 +142,7 @@ void SHADEManager::nextCr(std::vector<double>& Crs){
 
 //NO ADAPTATION
 NoAdaptationManager::NoAdaptationManager(int const popSize)
- : DEAdaptationManager(popSize), F(0.1), Cr(0.2){}
+ : DEAdaptationManager(popSize), F(0.5), Cr(0.9){}
 
 void NoAdaptationManager::update(std::vector<double>const& orig, std::vector<double>const& trials){
 	//ignore

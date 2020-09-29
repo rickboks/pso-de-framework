@@ -5,78 +5,103 @@
 #include <limits>
 
 // Particle Swarm Optimization
-void PSOConstraintHandler::repairVelocityPost(Particle* const p, int const i) const{
+void PSOConstraintHandler::repairVelocityPost(Particle* const p, int const i){
 	p->setV(i, 0.);
 }
 
-void HyperbolicRepair::repairVelocityPre(Particle * const p) const{
+void HyperbolicRepair::repairVelocityPre(Particle * const p) {
+	bool repaired = false;
 	for (int i = 0; i < D; i++){
 		double const center = (lb[i] + ub[i])/2.;
 		double const v = p->getV(i);
 		if (v > center){
 			p->setV(i, v / (1. + std::abs(v / (ub[i] - p->getX(i)))));
+			repaired=true;
 		} else {
 			p->setV(i, v / (1. + std::abs(v / (p->getX(i) - lb[i]))));
+			repaired=true;
 		}
 	}
+
+	if (repaired) nCorrected++;
 }
 
-void PBestDimRepair::repairPSO(Particle* const p) const {
+void PBestDimRepair::repairPSO(Particle* const p) {
+	bool repaired = false;
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i] || p->getX(i) > ub[i]){
 			p->setX(i, p->getP(i));
 			repairVelocityPost(p, i);
+			repaired = true;
 		}
 	}	
+
+	if (repaired) nCorrected++;
 }
 
-void PSOReinitializationRepair::repair(Particle* const p) const{
+void PSOReinitializationRepair::repair(Particle* const p) {
+	bool repaired = false;
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i] || p->getX(i) > ub[i]){
 			p->setX(i, rng.randDouble(lb[i], ub[i]));
 			repairVelocityPost(p, i);
+			repaired = true;
 		}
 	}
+
+	if (repaired) nCorrected++;
 }
 
-void PSOProjectionRepair::repair(Particle* const p) const{
+void PSOProjectionRepair::repair(Particle* const p) {
+	bool repaired = false;
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i]){
 			p->setX(i, lb[i]);
 			repairVelocityPost(p, i);
+			repaired = true;
 		} else if (p->getX(i) > ub[i]){
 			p->setX(i, ub[i]);
 			repairVelocityPost(p, i);
+			repaired = true;
 		}
 	}
+	if (repaired) nCorrected++;
 }
 
-void PSOReflectionRepair::repair(Particle* const p) const{
+void PSOReflectionRepair::repair(Particle* const p) {
+	bool repaired = false;
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i]){
 			do {
 				p->setX(i, 2. * lb[i] - p->getX(i));
 			} while(p->getX(i) < lb[i]);
 			repairVelocityPost(p, i);
+			repaired=true;
 		} else if (p->getX(i) > ub[i]) {
 			do {
 				p->setX(i, 2. * ub[i] - p->getX(i));
 			} while(p->getX(i) > ub[i]);
 			repairVelocityPost(p, i);
+			repaired=true;
 		}
 	}
+	if (repaired) nCorrected++;
 }
 
-void PSOWrappingRepair::repair(Particle* const p) const{
+void PSOWrappingRepair::repair(Particle* const p) {
+	bool repaired = false;
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i]){
 			p->setX(i, ub[i] - std::fmod(lb[i] - p->getX(i), std::abs(ub[i]-lb[i])));
 			repairVelocityPost(p,i);
+			repaired=true;
 		} else if (p->getX(i) > ub[i]) {
 			p->setX(i, lb[i] + std::fmod(p->getX(i) - ub[i], std::abs(ub[i]-lb[i])));
 			repairVelocityPost(p,i);
+			repaired=true;
 		}
 	}
+	if (repaired) nCorrected++;
 }
 //
 //Adapted from https://github.com/psbiomech/c-cmaes
@@ -92,77 +117,106 @@ PSOTransformationRepair::PSOTransformationRepair(std::vector<double>const lb, st
 }
 
 // TODO maybe repair velocity in shift as well?
-void PSOTransformationRepair::repair(Particle* const p) const{
-	shift(p);
+void PSOTransformationRepair::repair(Particle* const p) {
+	bool repaired = shift(p);
 	for (int i = 0; i < D; i++){
 		double const x_i = p->getX(i);
 		if (x_i < lb[i] + al[i]){
 			p->setX(i, lb[i] + pow(x_i - (lb[i] - al[i]),2.)/(4.*al[i]));
 			repairVelocityPost(p,i);
+			repaired=true;
 		}
 		else if (x_i > ub[i]-au[i]){
 			p->setX(i, ub[i] - pow(x_i - (ub[i] + au[i]),2.)/(4.*au[i]));
 			repairVelocityPost(p,i);
+			repaired=true;
 		}
 	}
+	if (repaired) nCorrected++;
 }
-void PSOTransformationRepair::shift(Particle* const p) const {
-	for (int i = 0; i < D; i++){
-		if (p->getX(i) < xlo[i]) // Shift up
-			p->setX(i, p->getX(i) + r[i] * (1 + (int)((xlo[i] - p->getX(i))/r[i])) );
-		if (p->getX(i) > xhi[i]) // Shift down
-			p->setX(i, p->getX(i) - r[i] * (1 + (int)((p->getX(i)-xhi[i])/r[i])) );
 
-		if (p->getX(i) < lb[i] - al[i]) // mirror
+bool PSOTransformationRepair::shift(Particle* const p) {
+	bool repaired = false;
+	for (int i = 0; i < D; i++){
+		if (p->getX(i) < xlo[i]) {
+			p->setX(i, p->getX(i) + r[i] * (1 + (int)((xlo[i] - p->getX(i))/r[i])) );
+			repaired=true;
+		}
+		if (p->getX(i) > xhi[i]) {
+			p->setX(i, p->getX(i) - r[i] * (1 + (int)((p->getX(i)-xhi[i])/r[i])) );
+			repaired=true;
+		}
+
+		if (p->getX(i) < lb[i] - al[i]) {
 			p->setX(i, p->getX(i) + 2. * (lb[i] - al[i] - p->getX(i)));
-		if (p->getX(i) > ub[i] + au[i])
+			repaired=true;
+		}
+		if (p->getX(i) > ub[i] + au[i]){
 			p->setX(i, p->getX(i) - 2. * (p->getX(i) - ub[i] - au[i]));
+			repaired=true;
+		}
 	}
+	return repaired;
 }
 
 // Differential Evolution
-void RandBaseRepair::repairDE(Solution* const p, Solution const* const base, Solution const* const target) const{
+void RandBaseRepair::repairDE(Solution* const p, Solution const* const base, Solution const* const target) {
+	bool repaired = false;
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) > ub[i]){
 			p->setX(i, base->getX(i) + rng.randDouble(0,1) * (ub[i] - base->getX(i)));
+			repaired=true;
 		} else if (p->getX(i) < lb[i]){
 			p->setX(i, base->getX(i) + rng.randDouble(0,1) * (lb[i] - base->getX(i)));
+			repaired=true;
 		}
 	}
+	if (repaired) nCorrected++;
 }
 
-void MidpointBaseRepair::repairDE(Solution* const p, Solution const* const base, Solution const* const target) const{
+void MidpointBaseRepair::repairDE(Solution* const p, Solution const* const base, Solution const* const target) {
+	bool repaired = false;
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) > ub[i]){
 			p->setX(i, 0.5 * (base->getX(i) + ub[i]));
+			repaired=true;
 		} else if (p->getX(i) < lb[i]){
 			p->setX(i, 0.5 * (base->getX(i) + lb[i]));
+			repaired=true;
 		}
 	}
+	if (repaired) nCorrected++;
 }
 
-void MidpointTargetRepair::repairDE(Solution* const p, Solution const* const base, Solution const* const target) const{
+void MidpointTargetRepair::repairDE(Solution* const p, Solution const* const base, Solution const* const target) {
+	bool repaired = false;
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) > ub[i]){
 			p->setX(i, 0.5 * (target->getX(i) + ub[i]));
+			repaired=true;
 		} else if (p->getX(i) < lb[i]){
 			p->setX(i, 0.5 * (target->getX(i) + lb[i]));
+			repaired=true;
 		}
 	}
+	if (repaired) nCorrected++;
 }
 
-void ConservatismRepair::repairDE(Solution* const p, Solution const* const base, Solution const* const target) const{
+void ConservatismRepair::repairDE(Solution* const p, Solution const* const base, Solution const* const target) {
+	bool repaired = false;
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) > ub[i] || p->getX(i) < lb[i]){
 			p->setX(i, base->getX(i));
+			repaired=true;
 		}
 	}
+	if (repaired) nCorrected++;
 }
 
-void ProjectionMidpointRepair::repairDE(Solution* const p, Solution const* const base, Solution const* const target) const{
+void ProjectionMidpointRepair::repairDE(Solution* const p, Solution const* const base, Solution const* const target) {
 	std::vector<double> x = p->getX();
 	std::vector<double>alphas(D+1);
-	alphas[D] = 1;
+	alphas[D] = 1.;
 
 	for (int i = 0; i < D; i++){
 		if (x[i] > ub[i]){
@@ -173,21 +227,22 @@ void ProjectionMidpointRepair::repairDE(Solution* const p, Solution const* const
 			alphas[i] = std::numeric_limits<double>::max(); //Can't divide by zero
 	}
 
-	double alpha=*std::min_element(alphas.begin(), alphas.end());
-	if (alpha != 1.){
+	std::vector<double>::iterator alpha=std::min_element(alphas.begin(), alphas.end());
+	if (alpha != std::next(alphas.end(), -1)){
 		std::vector<double> midpoint(D);
 		add(lb, ub, midpoint);
-		scale(midpoint, 0.5*(1.-alpha));
-		scale(x, alpha);
+		scale(midpoint, 0.5*(1.- *alpha));
+		scale(x, *alpha);
 		add(x, midpoint, x);
 		p->setX(x);
+		nCorrected++;
 	}
 }
 
-void ProjectionBaseRepair::repairDE(Solution* const p, Solution const* const base, Solution const* const target) const{
+void ProjectionBaseRepair::repairDE(Solution* const p, Solution const* const base, Solution const* const target) {
 	std::vector<double> x = p->getX();
 	std::vector<double> alphas(D+1);
-	alphas[D] = 1;
+	alphas[D] = 1.;
 
 	for (int i = 0; i < D; i++){
 		if (x[i] > ub[i]){
@@ -198,53 +253,69 @@ void ProjectionBaseRepair::repairDE(Solution* const p, Solution const* const bas
 			alphas[i] = std::numeric_limits<double>::max(); //Can't divide by zero
 	}
 
-	double alpha=*std::min_element(alphas.begin(), alphas.end());
-	if (alpha != 1.){
+	std::vector<double>::iterator alpha=std::min_element(alphas.begin(), alphas.end());
+	if (alpha != std::next(alphas.end(), -1)){
 		std::vector<double> b = base->getX();
-		scale(b, (1.-alpha));
-		scale(x, alpha);
+		scale(b, (1.-*alpha));
+		scale(x, *alpha);
 		add(x, b, x);
 		p->setX(x);
+		nCorrected++;
 	}
 }
 
-
-void DEReinitializationRepair::repair(Solution* const p) const{
+void DEReinitializationRepair::repair(Solution* const p) {
+	bool repaired = false;
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i] || p->getX(i) > ub[i]){
 			p->setX(i, rng.randDouble(lb[i], ub[i]));
+			repaired=true;
 		}
 	}
+	if (repaired) nCorrected++;
 }
 
-void DEProjectionRepair::repair(Solution* const p) const{
+void DEProjectionRepair::repair(Solution* const p) {
+	bool repaired = false;
 	for (int i = 0; i < D; i++){
-		if (p->getX(i) < lb[i])			
+		if (p->getX(i) < lb[i]){
 			p->setX(i, lb[i]);
-		else if (p->getX(i) > ub[i])			
+			repaired=true;
+		} else if (p->getX(i) > ub[i]){
 			p->setX(i, ub[i]);
+			repaired=true;
+		}
 	}
+	if (repaired) nCorrected++;
 }
 
-void DEReflectionRepair::repair(Solution* const p) const{
+void DEReflectionRepair::repair(Solution* const p) {
+	bool repaired = false;
 	for (int i = 0; i < D; i++){
 		while (p->getX(i) < lb[i]){
 			p->setX(i, 2. * lb[i] - p->getX(i));
+			repaired=true;
 		}
 		while (p->getX(i) > ub[i]){
 			p->setX(i, 2. * ub[i] - p->getX(i));
+			repaired=true;
 		}
 	}
+	if (repaired) nCorrected++;
 }
 
-void DEWrappingRepair::repair(Solution* const p) const{
+void DEWrappingRepair::repair(Solution* const p) {
+	bool repaired = false;
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i]){
 			p->setX(i, ub[i] - std::fmod(lb[i] - p->getX(i), std::abs(ub[i]-lb[i])));
+			repaired=true;
 		} else if (p->getX(i) > ub[i]) {
 			p->setX(i, lb[i] + std::fmod(p->getX(i) - ub[i], std::abs(ub[i]-lb[i])));
+			repaired=true;
 		}
 	}
+	if (repaired) nCorrected++;
 }
 
 //Adapted from https://github.com/psbiomech/c-cmaes
@@ -258,34 +329,53 @@ DETransformationRepair::DETransformationRepair(std::vector<double>const lb, std:
 		r[i] = 2.*(ub[i] - lb[i] + al[i] + au[i]);
 	}
 }
-void DETransformationRepair::repair(Solution* const p) const{
-	shift(p);
+
+void DETransformationRepair::repair(Solution* const p) {
+	bool repaired = shift(p);
 	for (int i = 0; i < D; i++){
 		double const x_i = p->getX(i);
-		if (x_i < lb[i] + al[i])
+		if (x_i < lb[i] + al[i]){
 			p->setX(i, lb[i] + pow(x_i - (lb[i] - al[i]),2.)/(4.*al[i]));
-		else if (x_i > ub[i]-au[i])
+			repaired=true;
+		}
+		else if (x_i > ub[i]-au[i]){
 			p->setX(i, ub[i] - pow(x_i - (ub[i] + au[i]),2.)/(4.*au[i]));
+			repaired=true;
+		}
 	}
+	if (repaired) nCorrected++;
 }
 
-void DETransformationRepair::shift(Solution* const p) const {
+bool DETransformationRepair::shift(Solution* const p){
+	bool repaired = false;
 	for (int i = 0; i < D; i++){
-		if (p->getX(i) < xlo[i]) // Shift up
+		if (p->getX(i) < xlo[i]) {
 			p->setX(i, p->getX(i) + r[i] * (1 + (int)((xlo[i] - p->getX(i))/r[i])) );
-		if (p->getX(i) > xhi[i]) // Shift down
+			repaired=true;
+		}
+		if (p->getX(i) > xhi[i]){
 			p->setX(i, p->getX(i) - r[i] * (1 + (int)((p->getX(i)-xhi[i])/r[i])) );
+			repaired=true;
+		}
 
-		if (p->getX(i) < lb[i] - al[i]) // mirror
+		if (p->getX(i) < lb[i] - al[i]){
 			p->setX(i, p->getX(i) + 2. * (lb[i] - al[i] - p->getX(i)));
-		if (p->getX(i) > ub[i] + au[i])
+			repaired=true;
+		}
+		if (p->getX(i) > ub[i] + au[i]){
 			p->setX(i, p->getX(i) - 2. * (p->getX(i) - ub[i] - au[i]));
+			repaired=true;
+		}
 	}
+	return repaired;
 }
 
 // Generic
-bool ResamplingRepair::resample(Solution const* const p, int const resamples) const{
+bool ResamplingRepair::resample(Solution const* const p, int const resamples) {
 	if (resamples >= 100 || isFeasible(p))
 		return false;
+
+	if (resamples == 0) nCorrected++; // Only count the first resample
+
 	return true;
 }

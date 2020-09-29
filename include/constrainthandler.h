@@ -13,33 +13,33 @@ class ConstraintHandler {
 		std::vector<double> const lb;
 		std::vector<double> const ub;
 		int const D;
+		int nCorrected;
 		bool isFeasible(Solution const * const p) const;
 	public:
-		ConstraintHandler(std::vector<double> const lb, std::vector<double> const ub): lb(lb), ub(ub), D(lb.size()){};
+		ConstraintHandler(std::vector<double> const lb, std::vector<double> const ub): lb(lb), ub(ub), D(lb.size()), nCorrected(0){};
 		virtual ~ConstraintHandler(){};
-		virtual bool resample(Solution const * const p, int const resamples) const;
+		virtual bool resample(Solution const * const p, int const resamples);
 };
 
 class DEConstraintHandler : virtual public ConstraintHandler {
 	public:
 		DEConstraintHandler(std::vector<double>const lb,std::vector<double>const ub): ConstraintHandler(lb, ub){};
 		virtual ~DEConstraintHandler(){};
-		virtual void repairDE(Solution* const p, Solution const * const base, Solution const* const target) const {}; // DE constraint handler
-		virtual void repair(Solution* const p) const {};// Generic constraint handler
-		virtual void penalize(Solution* const p) const {}; // Generic penalize
+		virtual void repairDE(Solution* const p, Solution const * const base, Solution const* const target){}; // DE constraint handler
+		virtual void repair(Solution* const p){};// Generic constraint handler
+		virtual void penalize(Solution* const p){}; // Generic penalize
 };
 
 class PSOConstraintHandler : virtual public ConstraintHandler {
 	protected:
-		void repairVelocityPost(Particle* const p, int const i) const; // Change velocity after changing position
+		void repairVelocityPost(Particle* const p, int const i); // Change velocity after changing position
 	public:
 		PSOConstraintHandler(std::vector<double>const lb,std::vector<double>const ub): ConstraintHandler(lb,ub){};
 		virtual ~PSOConstraintHandler(){};
-		virtual void repairPSO(Particle* const p) const {};// PSO constraint handler
-		virtual void repairVelocityPre(Particle* const p) const {}; // For constraint handlers that fix the velocity
-																	// before updating the position
-		virtual void repair(Particle* const p) const {}; // Generic constraint handler
-		virtual void penalize(Solution* const p) const {}; // Generic penalize
+		virtual void repairPSO(Particle* const p){};// PSO constraint handler
+		virtual void repairVelocityPre(Particle* const p){}; // For constraint handlers that fix the velocity
+		virtual void repair(Particle* const p){}; // Generic constraint handler
+		virtual void penalize(Solution* const p){}; // Generic penalize
 };
 
 extern std::map<std::string, std::function<DEConstraintHandler* (std::vector<double>, std::vector<double>)>> const deCHs;

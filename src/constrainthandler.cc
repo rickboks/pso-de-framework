@@ -13,7 +13,7 @@ bool ConstraintHandler::isFeasible(Solution const * const p) const{
 	return true;
 }
 
-bool ConstraintHandler::resample(Solution const * const p, int const resamples) const{
+bool ConstraintHandler::resample(Solution const * const p, int const resamples){
 	return false;
 }
 

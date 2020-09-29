@@ -71,7 +71,6 @@ double JADEManager::lehmerMean(std::vector<double>const& SF) const {
 }
 
 // SHADE
-
 SHADEManager::SHADEManager(int const popSize) : DEAdaptationManager(popSize), H(popSize), MCr(H), MF(H), k(0){
 	std::fill(MCr.begin(), MCr.end(), 0.5);
 	std::fill(MF.begin(), MF.end(), 0.5);

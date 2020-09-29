@@ -20,6 +20,9 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
     		std::shared_ptr<IOHprofiler_csv_logger> const logger, 
     		int const evalBudget, int const popSize) const{
 
+	int const problemID = problem->IOHprofiler_get_problem_id();
+	int const instanceID = problem->IOHprofiler_get_instance_id();
+
 	int const D = problem->IOHprofiler_get_number_of_variables();
 	std::vector<double> const lowerBound = problem->IOHprofiler_get_lowerbound();
 	std::vector<double> const upperBound = problem->IOHprofiler_get_upperbound();
@@ -38,6 +41,8 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 
 	std::vector<double> Fs(popSize);
 	std::vector<double> Crs(popSize);
+
+	std::vector<double> percCorrected; 
 
 	while (problem->IOHprofiler_get_evaluations() < evalBudget && !problem->IOHprofiler_hit_optimal()){
 		adaptationManager->nextF(Fs);
@@ -61,7 +66,16 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 			delete g;
 
 		adaptationManager->update(parentF, trialF);
+
+		int const numEval = problem->IOHprofiler_get_evaluations();
+		if (numEval != 0 && numEval % 100000 == 0){
+			percCorrected.push_back(x / numEval);
+		}
 	}
+
+	//Solution* best = getBest(genomes);
+	std::cout << getIdString() << "p" << popSize << "D" << D << "f" << problem->IOHprofiler_get_problem_id() 
+		<< "i" << problem->IOHprofiler_get_instance_id() << std::endl;
 
 	for (Solution* d : genomes)
 		delete d;
@@ -75,5 +89,5 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 }
 
 std::string DifferentialEvolution::getIdString() const {
-	return "D_" + config.mutation + "_" + config.crossover + "_" + config.adaptation + "_" + config.constraintHandler;
+	return "DE_" + config.mutation + "_" + config.crossover + "_" + config.adaptation + "_" + config.constraintHandler;
 }

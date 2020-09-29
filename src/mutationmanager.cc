@@ -21,6 +21,7 @@ std::vector<Solution*> MutationManager::mutate(std::vector<Solution*>const& geno
 	}
 	return mutants;
 }
+
 std::map<std::string, std::function<MutationManager* (int const, DEConstraintHandler const*const)>> const mutations ({
 		{"R1", LC(Rand1MutationManager)},
 		{"T1", LC(TTB1MutationManager)},

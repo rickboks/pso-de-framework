@@ -25,20 +25,21 @@ void experiment
 
 int main(int argc, char **argv) {
 	suite.setMutationManagers(std::vector<std::string>{
-		"R1", "R2", "B1", "T1"
+		//"R1", "R2", "B1", "T1"
+		"B1"
 	});
 
 	suite.setCrossoverManagers(std::vector<std::string>{
-		"B", "E"
+		"B"//, "E"
 	});
 
 	suite.setDEAdaptationManagers(std::vector<std::string>{
-		"N"
+		"S"
 	});
 
-	suite.setConstraintHandlers(std::vector<std::string>{
-		"PR", "WR", "DP"
-	});
+	//suite.setConstraintHandlers(std::vector<std::string>{
+		//"PR", "WR", "DP"
+	//});
 
 	std::string templateFile = "./configuration.ini";
 	int id;

@@ -70,18 +70,16 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 		adaptationManager->update(parentF, trialF);
 	}
 
-	Solution const* const best = getBest(genomes);
-	std::cout << std::endl << getIdString() << "p" << popSize << "D" << D << "f" << problem->IOHprofiler_get_problem_id();
-
-	for (double d : percCorrected)
-		std::cout << d << " ";
-	for (double d : best->getX())
-		std::cout << d << " ";
-	std::cout << best->getFitness() << " " << problem->IOHprofiler_get_optimal()[0] << std::endl;
+	//Solution const* const best = getBest(genomes);
+	//std::cout << std::endl << getIdString() << "p" << popSize << "D" << D << "f" << problem->IOHprofiler_get_problem_id();
+	//for (double d : percCorrected)
+		//std::cout << d << " ";
+	//for (double d : best->getX())
+		//std::cout << d << " ";
+	//std::cout << best->getFitness() << " " << problem->IOHprofiler_get_optimal()[0] << std::endl;
 
 	for (Solution* d : genomes)
 		delete d;
-	
 	delete mutationManager;
 	delete crossoverManager;
 	delete adaptationManager;

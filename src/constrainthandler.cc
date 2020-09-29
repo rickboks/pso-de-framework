@@ -26,11 +26,11 @@ std::map<std::string, std::function<DEConstraintHandler*(std::vector<double>, st
 	{"RS", LC(ResamplingRepair)},
 
 	// Almost generic
-	{"RI", LC(DEReinitializationRepair)},
-	{"PR", LC(DEProjectionRepair)},
-	{"RF", LC(DEReflectionRepair)},
-	{"WR", LC(DEWrappingRepair)},
-	{"TR", LC(DETransformationRepair)},
+	{"RI", LC(ReinitializationRepair)},
+	{"PR", LC(ProjectionRepair)},
+	{"RF", LC(ReflectionRepair)},
+	{"WR", LC(WrappingRepair)},
+	{"TR", LC(TransformationRepair)},
 
 	//// DE
 	{"RB", LC(RandBaseRepair)},
@@ -47,11 +47,11 @@ std::map<std::string, std::function<PSOConstraintHandler*(std::vector<double>, s
 	{"RS", LC(ResamplingRepair)},
 
 	// Almost generic
-	{"RI", LC(PSOReinitializationRepair)},
-	{"PR", LC(PSOProjectionRepair)},
-	{"RF", LC(PSOReflectionRepair)},
-	{"WR", LC(PSOWrappingRepair)},
-	{"TR", LC(PSOTransformationRepair)},
+	{"RI", LC(ReinitializationRepair)},
+	{"PR", LC(ProjectionRepair)},
+	{"RF", LC(ReflectionRepair)},
+	{"WR", LC(WrappingRepair)},
+	{"TR", LC(TransformationRepair)},
 
 	//// PSO
 	{"HY", LC(HyperbolicRepair)},

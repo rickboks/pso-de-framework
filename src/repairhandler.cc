@@ -39,126 +39,6 @@ void PBestDimRepair::repairPSO(Particle* const p) {
 	if (repaired) nCorrected++;
 }
 
-void PSOReinitializationRepair::repair(Particle* const p) {
-	bool repaired = false;
-	for (int i = 0; i < D; i++){
-		if (p->getX(i) < lb[i] || p->getX(i) > ub[i]){
-			p->setX(i, rng.randDouble(lb[i], ub[i]));
-			repairVelocityPost(p, i);
-			repaired = true;
-		}
-	}
-
-	if (repaired) nCorrected++;
-}
-
-void PSOProjectionRepair::repair(Particle* const p) {
-	bool repaired = false;
-	for (int i = 0; i < D; i++){
-		if (p->getX(i) < lb[i]){
-			p->setX(i, lb[i]);
-			repairVelocityPost(p, i);
-			repaired = true;
-		} else if (p->getX(i) > ub[i]){
-			p->setX(i, ub[i]);
-			repairVelocityPost(p, i);
-			repaired = true;
-		}
-	}
-	if (repaired) nCorrected++;
-}
-
-void PSOReflectionRepair::repair(Particle* const p) {
-	bool repaired = false;
-	for (int i = 0; i < D; i++){
-		if (p->getX(i) < lb[i]){
-			do {
-				p->setX(i, 2. * lb[i] - p->getX(i));
-			} while(p->getX(i) < lb[i]);
-			repairVelocityPost(p, i);
-			repaired=true;
-		} else if (p->getX(i) > ub[i]) {
-			do {
-				p->setX(i, 2. * ub[i] - p->getX(i));
-			} while(p->getX(i) > ub[i]);
-			repairVelocityPost(p, i);
-			repaired=true;
-		}
-	}
-	if (repaired) nCorrected++;
-}
-
-void PSOWrappingRepair::repair(Particle* const p) {
-	bool repaired = false;
-	for (int i = 0; i < D; i++){
-		if (p->getX(i) < lb[i]){
-			p->setX(i, ub[i] - std::fmod(lb[i] - p->getX(i), std::abs(ub[i]-lb[i])));
-			repairVelocityPost(p,i);
-			repaired=true;
-		} else if (p->getX(i) > ub[i]) {
-			p->setX(i, lb[i] + std::fmod(p->getX(i) - ub[i], std::abs(ub[i]-lb[i])));
-			repairVelocityPost(p,i);
-			repaired=true;
-		}
-	}
-	if (repaired) nCorrected++;
-}
-//
-//Adapted from https://github.com/psbiomech/c-cmaes
-PSOTransformationRepair::PSOTransformationRepair(std::vector<double>const lb, std::vector<double>const ub) 
-	:ConstraintHandler(lb,ub), PSOConstraintHandler(lb,ub), al(D), au(D), xlo(D), xhi(D), r(D){
-	for (int i = 0; i < D; i++){
-		al[i] = std::min( (ub[i]-lb[i])/2., (1.+std::abs(lb[i]))/20. );
-		au[i] = std::min( (ub[i]-lb[i])/2., (1.+std::abs(ub[i]))/20. );
-		xlo[i] = lb[i] - 2. * al[i] - (ub[i] - lb[i]) / 2.;
-		xhi[i] = ub[i] + 2. * au[i] + (ub[i] - lb[i]) / 2.;
-		r[i] = 2.*(ub[i] - lb[i] + al[i] + au[i]);
-	}
-}
-
-// TODO maybe repair velocity in shift as well?
-void PSOTransformationRepair::repair(Particle* const p) {
-	bool repaired = shift(p);
-	for (int i = 0; i < D; i++){
-		double const x_i = p->getX(i);
-		if (x_i < lb[i] + al[i]){
-			p->setX(i, lb[i] + pow(x_i - (lb[i] - al[i]),2.)/(4.*al[i]));
-			repairVelocityPost(p,i);
-			repaired=true;
-		}
-		else if (x_i > ub[i]-au[i]){
-			p->setX(i, ub[i] - pow(x_i - (ub[i] + au[i]),2.)/(4.*au[i]));
-			repairVelocityPost(p,i);
-			repaired=true;
-		}
-	}
-	if (repaired) nCorrected++;
-}
-
-bool PSOTransformationRepair::shift(Particle* const p) {
-	bool repaired = false;
-	for (int i = 0; i < D; i++){
-		if (p->getX(i) < xlo[i]) {
-			p->setX(i, p->getX(i) + r[i] * (1 + (int)((xlo[i] - p->getX(i))/r[i])) );
-			repaired=true;
-		}
-		if (p->getX(i) > xhi[i]) {
-			p->setX(i, p->getX(i) - r[i] * (1 + (int)((p->getX(i)-xhi[i])/r[i])) );
-			repaired=true;
-		}
-
-		if (p->getX(i) < lb[i] - al[i]) {
-			p->setX(i, p->getX(i) + 2. * (lb[i] - al[i] - p->getX(i)));
-			repaired=true;
-		}
-		if (p->getX(i) > ub[i] + au[i]){
-			p->setX(i, p->getX(i) - 2. * (p->getX(i) - ub[i] - au[i]));
-			repaired=true;
-		}
-	}
-	return repaired;
-}
-
 // Differential Evolution
 void RandBaseRepair::repairDE(Solution* const p, Solution const* const base, Solution const* const target) {
 	bool repaired = false;
@@ -264,7 +144,41 @@ void ProjectionBaseRepair::repairDE(Solution* const p, Solution const* const bas
 	}
 }
 
-void DEReinitializationRepair::repair(Solution* const p) {
+//Adapted from https://github.com/psbiomech/c-cmaes
+// Generic
+bool ResamplingRepair::resample(Solution const* const p, int const resamples) {
+	if (resamples >= 100 || isFeasible(p))
+		return false;
+
+	if (resamples == 0) nCorrected++; // Only count the first resample
+
+	return true;
+}
+
+void DeathPenalty::repair(Particle* const p) {
+	repair((Solution*) p);
+}
+void DeathPenalty::repair(Solution* const p) {
+	if (!isFeasible(p)){
+		p->setFitness(std::numeric_limits<double>::max());
+		nCorrected++;
+	}
+}
+
+// Reinitialization
+void ReinitializationRepair::repair(Particle* const p) {
+	bool repaired = false;
+	for (int i = 0; i < D; i++){
+		if (p->getX(i) < lb[i] || p->getX(i) > ub[i]){
+			p->setX(i, rng.randDouble(lb[i], ub[i]));
+			repairVelocityPost(p, i);
+			repaired = true;
+		}
+	}
+
+	if (repaired) nCorrected++;
+}
+void ReinitializationRepair::repair(Solution* const p) {
 	bool repaired = false;
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i] || p->getX(i) > ub[i]){
@@ -275,7 +189,23 @@ void DEReinitializationRepair::repair(Solution* const p) {
 	if (repaired) nCorrected++;
 }
 
-void DEProjectionRepair::repair(Solution* const p) {
+// Projection
+void ProjectionRepair::repair(Particle* const p) {
+	bool repaired = false;
+	for (int i = 0; i < D; i++){
+		if (p->getX(i) < lb[i]){
+			p->setX(i, lb[i]);
+			repairVelocityPost(p, i);
+			repaired = true;
+		} else if (p->getX(i) > ub[i]){
+			p->setX(i, ub[i]);
+			repairVelocityPost(p, i);
+			repaired = true;
+		}
+	}
+	if (repaired) nCorrected++;
+}
+void ProjectionRepair::repair(Solution* const p) {
 	bool repaired = false;
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i]){
@@ -289,7 +219,27 @@ void DEProjectionRepair::repair(Solution* const p) {
 	if (repaired) nCorrected++;
 }
 
-void DEReflectionRepair::repair(Solution* const p) {
+// Reflection
+void ReflectionRepair::repair(Particle* const p) {
+	bool repaired = false;
+	for (int i = 0; i < D; i++){
+		if (p->getX(i) < lb[i]){
+			do {
+				p->setX(i, 2. * lb[i] - p->getX(i));
+			} while(p->getX(i) < lb[i]);
+			repairVelocityPost(p, i);
+			repaired=true;
+		} else if (p->getX(i) > ub[i]) {
+			do {
+				p->setX(i, 2. * ub[i] - p->getX(i));
+			} while(p->getX(i) > ub[i]);
+			repairVelocityPost(p, i);
+			repaired=true;
+		}
+	}
+	if (repaired) nCorrected++;
+}
+void ReflectionRepair::repair(Solution* const p) {
 	bool repaired = false;
 	for (int i = 0; i < D; i++){
 		while (p->getX(i) < lb[i]){
@@ -304,7 +254,23 @@ void DEReflectionRepair::repair(Solution* const p) {
 	if (repaired) nCorrected++;
 }
 
-void DEWrappingRepair::repair(Solution* const p) {
+// Wrapping
+void WrappingRepair::repair(Particle* const p) {
+	bool repaired = false;
+	for (int i = 0; i < D; i++){
+		if (p->getX(i) < lb[i]){
+			p->setX(i, ub[i] - std::fmod(lb[i] - p->getX(i), std::abs(ub[i]-lb[i])));
+			repairVelocityPost(p,i);
+			repaired=true;
+		} else if (p->getX(i) > ub[i]) {
+			p->setX(i, lb[i] + std::fmod(p->getX(i) - ub[i], std::abs(ub[i]-lb[i])));
+			repairVelocityPost(p,i);
+			repaired=true;
+		}
+	}
+	if (repaired) nCorrected++;
+}
+void WrappingRepair::repair(Solution* const p) {
 	bool repaired = false;
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < lb[i]){
@@ -318,9 +284,9 @@ void DEWrappingRepair::repair(Solution* const p) {
 	if (repaired) nCorrected++;
 }
 
-//Adapted from https://github.com/psbiomech/c-cmaes
-DETransformationRepair::DETransformationRepair(std::vector<double>const lb, std::vector<double>const ub) 
-	:ConstraintHandler(lb,ub), DEConstraintHandler(lb,ub), al(D), au(D), xlo(D), xhi(D), r(D){
+// Transformation, adapted from https://github.com/psbiomech/c-cmaes
+TransformationRepair::TransformationRepair(std::vector<double>const lb, std::vector<double>const ub) 
+	:ConstraintHandler(lb,ub), DEConstraintHandler(lb,ub), PSOConstraintHandler(lb,ub), al(D), au(D), xlo(D), xhi(D), r(D){
 	for (int i = 0; i < D; i++){
 		al[i] = std::min( (ub[i]-lb[i])/2., (1.+std::abs(lb[i]))/20. );
 		au[i] = std::min( (ub[i]-lb[i])/2., (1.+std::abs(ub[i]))/20. );
@@ -330,7 +296,50 @@ DETransformationRepair::DETransformationRepair(std::vector<double>const lb, std:
 	}
 }
 
-void DETransformationRepair::repair(Solution* const p) {
+// TODO maybe repair velocity in shift as well?
+void TransformationRepair::repair(Particle* const p) {
+	bool repaired = shift(p);
+	for (int i = 0; i < D; i++){
+		double const x_i = p->getX(i);
+		if (x_i < lb[i] + al[i]){
+			p->setX(i, lb[i] + pow(x_i - (lb[i] - al[i]),2.)/(4.*al[i]));
+			repairVelocityPost(p,i);
+			repaired=true;
+		}
+		else if (x_i > ub[i]-au[i]){
+			p->setX(i, ub[i] - pow(x_i - (ub[i] + au[i]),2.)/(4.*au[i]));
+			repairVelocityPost(p,i);
+			repaired=true;
+		}
+	}
+	if (repaired) nCorrected++;
+}
+
+bool TransformationRepair::shift(Particle* const p) {
+	bool repaired = false;
+	for (int i = 0; i < D; i++){
+		if (p->getX(i) < xlo[i]) {
+			p->setX(i, p->getX(i) + r[i] * (1 + (int)((xlo[i] - p->getX(i))/r[i])) );
+			repaired=true;
+		}
+		if (p->getX(i) > xhi[i]) {
+			p->setX(i, p->getX(i) - r[i] * (1 + (int)((p->getX(i)-xhi[i])/r[i])) );
+			repaired=true;
+		}
+
+		if (p->getX(i) < lb[i] - al[i]) {
+			p->setX(i, p->getX(i) + 2. * (lb[i] - al[i] - p->getX(i)));
+			repaired=true;
+		}
+		if (p->getX(i) > ub[i] + au[i]){
+			p->setX(i, p->getX(i) - 2. * (p->getX(i) - ub[i] - au[i]));
+			repaired=true;
+		}
+	}
+	return repaired;
+}
+
+void TransformationRepair::repair(Solution* const p) {
 	bool repaired = shift(p);
 	for (int i = 0; i < D; i++){
 		double const x_i = p->getX(i);
@@ -346,7 +355,7 @@ void DETransformationRepair::repair(Solution* const p) {
 	if (repaired) nCorrected++;
 }
 
-bool DETransformationRepair::shift(Solution* const p){
+bool TransformationRepair::shift(Solution* const p){
 	bool repaired = false;
 	for (int i = 0; i < D; i++){
 		if (p->getX(i) < xlo[i]) {
@@ -370,22 +379,3 @@ bool DETransformationRepair::shift(Solution* const p){
 	return repaired;
 }
 
-// Generic
-bool ResamplingRepair::resample(Solution const* const p, int const resamples) {
-	if (resamples >= 100 || isFeasible(p))
-		return false;
-
-	if (resamples == 0) nCorrected++; // Only count the first resample
-
-	return true;
-}
-
-void DeathPenalty::repair(Particle* const p) {
-	repair((Solution*) p);
-}
-void DeathPenalty::repair(Solution* const p) {
-	if (!isFeasible(p)){
-		p->setFitness(std::numeric_limits<double>::max());
-		nCorrected++;
-	}
-}

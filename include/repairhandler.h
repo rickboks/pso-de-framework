@@ -42,39 +42,6 @@ class ProjectionBaseRepair: public DEConstraintHandler {
 		void repairDE(Solution* const p, Solution const* const base, Solution const* const target);
 };
 
-class DEReinitializationRepair : public DEConstraintHandler {
-	public:
-		DEReinitializationRepair(std::vector<double> const lb, std::vector<double> const ub):ConstraintHandler(lb,ub), DEConstraintHandler(lb, ub){}; 
-		void repair(Solution* const p);
-};
-
-class DEProjectionRepair : public DEConstraintHandler {
-	public:
-		DEProjectionRepair(std::vector<double> const lb, std::vector<double> const ub):ConstraintHandler(lb,ub), DEConstraintHandler(lb, ub){}; 
-		void repair(Solution* const p);
-};
-
-class DEReflectionRepair : public DEConstraintHandler {
-	public:
-		DEReflectionRepair(std::vector<double> const lb, std::vector<double> const ub):ConstraintHandler(lb,ub), DEConstraintHandler(lb, ub){}; 
-		void repair(Solution* const p);
-};
-
-class DEWrappingRepair : public DEConstraintHandler {
-	public:
-		DEWrappingRepair(std::vector<double> const lb, std::vector<double> const ub):ConstraintHandler(lb,ub), DEConstraintHandler(lb, ub){}; 
-		void repair(Solution* const p);
-};
-
-class DETransformationRepair : public DEConstraintHandler { //Adapted from https://github.com/psbiomech/c-cmaes
-	private:
-		std::vector<double> al, au, xlo, xhi, r;
-		bool shift(Solution* const p);
-	public:
-		DETransformationRepair(std::vector<double> const lb, std::vector<double> const ub);
-		void repair(Solution* const p);
-};
-
 // Particle Swarm Optimization
 class HyperbolicRepair : public PSOConstraintHandler {
 	public:
@@ -86,39 +53,6 @@ class PBestDimRepair : public PSOConstraintHandler {
 	public:
 		PBestDimRepair(std::vector<double> const lb, std::vector<double> const ub):ConstraintHandler(lb,ub), PSOConstraintHandler(lb, ub){};
 		void repairPSO(Particle * const p);
-};
-
-class PSOReinitializationRepair : public PSOConstraintHandler {
-	public:
-		PSOReinitializationRepair(std::vector<double> const lb, std::vector<double> const ub):ConstraintHandler(lb,ub), PSOConstraintHandler(lb, ub){}; 
-		void repair(Particle* const p);
-};
-
-class PSOProjectionRepair : public PSOConstraintHandler {
-	public:
-		PSOProjectionRepair(std::vector<double> const lb, std::vector<double> const ub):ConstraintHandler(lb,ub), PSOConstraintHandler(lb, ub){}; 
-		void repair(Particle* const p);
-};
-
-class PSOReflectionRepair : public PSOConstraintHandler {
-	public:
-		PSOReflectionRepair(std::vector<double> const lb, std::vector<double> const ub):ConstraintHandler(lb,ub), PSOConstraintHandler(lb, ub){}; 
-		void repair(Particle* const p);
-};
-
-class PSOWrappingRepair : public PSOConstraintHandler {
-	public:
-		PSOWrappingRepair(std::vector<double> const lb, std::vector<double> const ub):ConstraintHandler(lb,ub), PSOConstraintHandler(lb, ub){}; 
-		void repair(Particle* const p);
-};
-
-class PSOTransformationRepair : public PSOConstraintHandler { //Adapted from https://github.com/psbiomech/c-cmaes
-	private:
-		std::vector<double> al, au, xlo, xhi, r;
-		bool shift(Particle* const p);
-	public:
-		PSOTransformationRepair(std::vector<double> const lb, std::vector<double> const ub);
-		void repair(Particle* const p);
 };
 
 // Generic
@@ -136,3 +70,47 @@ class DeathPenalty : public DEConstraintHandler, public PSOConstraintHandler {
 		void repair(Solution* const p);
 		void repair(Particle* const p);
 };
+
+class ReinitializationRepair : public DEConstraintHandler, public PSOConstraintHandler {
+	public:
+		ReinitializationRepair(std::vector<double> const lb, std::vector<double> const ub)
+			:ConstraintHandler(lb,ub), DEConstraintHandler(lb, ub), PSOConstraintHandler(lb,ub){}; 
+		void repair(Solution* const p);
+		void repair(Particle* const p);
+};
+
+class ProjectionRepair : public DEConstraintHandler, public PSOConstraintHandler {
+	public:
+		ProjectionRepair(std::vector<double> const lb, std::vector<double> const ub)
+			:ConstraintHandler(lb,ub), DEConstraintHandler(lb, ub), PSOConstraintHandler(lb,ub){};
+		void repair(Solution* const p);
+		void repair(Particle* const p);
+};
+
+class ReflectionRepair : public DEConstraintHandler, public PSOConstraintHandler {
+	public:
+		ReflectionRepair(std::vector<double> const lb, std::vector<double> const ub)
+			:ConstraintHandler(lb,ub), DEConstraintHandler(lb, ub), PSOConstraintHandler(lb,ub){}; 
+		void repair(Solution* const p);
+		void repair(Particle* const p);
+};
+
+class WrappingRepair : public DEConstraintHandler, public PSOConstraintHandler {
+	public:
+		WrappingRepair(std::vector<double> const lb, std::vector<double> const ub):ConstraintHandler(lb,ub), DEConstraintHandler(lb, ub), 
+		PSOConstraintHandler(lb,ub){}; 
+		void repair(Solution* const p);
+		void repair(Particle* const p);
+};
+
+class TransformationRepair : public DEConstraintHandler, public PSOConstraintHandler { //Adapted from https://github.com/psbiomech/c-cmaes
+	private:
+		std::vector<double> al, au, xlo, xhi, r;
+		bool shift(Solution* const p);
+		bool shift(Particle* const p);
+	public:
+		TransformationRepair(std::vector<double> const lb, std::vector<double> const ub);
+		void repair(Solution* const p);
+		void repair(Particle* const p);
+};
+

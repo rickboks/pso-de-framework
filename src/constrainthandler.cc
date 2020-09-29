@@ -17,6 +17,10 @@ bool ConstraintHandler::resample(Solution const * const p, int const resamples){
 	return false;
 }
 
+int ConstraintHandler::getCorrections() const {
+	return nCorrected;
+}
+
 std::map<std::string, std::function<DEConstraintHandler*(std::vector<double>, std::vector<double>)>> const deCHs ({
 	// Generic
 	{"DP", LC(DeathPenalty)},

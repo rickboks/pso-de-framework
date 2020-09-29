@@ -20,9 +20,6 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
     		std::shared_ptr<IOHprofiler_csv_logger> const logger, 
     		int const evalBudget, int const popSize) const{
 
-	int const problemID = problem->IOHprofiler_get_problem_id();
-	int const instanceID = problem->IOHprofiler_get_instance_id();
-
 	int const D = problem->IOHprofiler_get_number_of_variables();
 	std::vector<double> const lowerBound = problem->IOHprofiler_get_lowerbound();
 	std::vector<double> const upperBound = problem->IOHprofiler_get_upperbound();
@@ -34,14 +31,13 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 		genomes[i]->evaluate(problem, logger);
 	}
 
-	DEConstraintHandler const* const deCH = deCHs.at(config.constraintHandler)(lowerBound, upperBound);
+	DEConstraintHandler * const deCH = deCHs.at(config.constraintHandler)(lowerBound, upperBound);
 	CrossoverManager const* const crossoverManager = crossovers.at(config.crossover)(D);
 	MutationManager* const mutationManager = mutations.at(config.mutation)(D, deCH);
 	DEAdaptationManager* const adaptationManager = deAdaptations.at(config.adaptation)(popSize);
 
 	std::vector<double> Fs(popSize);
 	std::vector<double> Crs(popSize);
-
 	std::vector<double> percCorrected; 
 
 	while (problem->IOHprofiler_get_evaluations() < evalBudget && !problem->IOHprofiler_hit_optimal()){
@@ -58,6 +54,11 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 		for (int i = 0; i < popSize; i++){
 			parentF[i] = genomes[i]->getFitness();
 			trialF[i] = trials[i]->evaluate(problem, logger);
+
+			int const numEval = problem->IOHprofiler_get_evaluations();
+			if (numEval != 0 && numEval % 100000 == 0)
+				percCorrected.push_back(double(deCH->getCorrections()) / numEval); // save #corr every 100000 evals
+
 			if (trialF[i] < parentF[i])
 				genomes[i]->setX(trials[i]->getX(), trialF[i]);
 		}
@@ -66,16 +67,18 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 			delete g;
 
 		adaptationManager->update(parentF, trialF);
-
-		int const numEval = problem->IOHprofiler_get_evaluations();
-		if (numEval != 0 && numEval % 100000 == 0){
-			percCorrected.push_back(x / numEval);
-		}
 	}
 
-	//Solution* best = getBest(genomes);
-	std::cout << getIdString() << "p" << popSize << "D" << D << "f" << problem->IOHprofiler_get_problem_id() 
-		<< "i" << problem->IOHprofiler_get_instance_id() << std::endl;
+	Solution const* const best = getBest(genomes);
+	std::cout << std::endl << getIdString() << "p" << popSize << "D" << D << "f" << problem->IOHprofiler_get_problem_id() 
+		/*<< "i" << problem->IOHprofiler_get_instance_id()*/ << " 0.1 0.2 ";
+
+	for (double d : percCorrected)
+		std::cout << d << " ";
+	for (double d : best->getX())
+		std::cout << d << " ";
+
+	std::cout << best->getFitness() << " " << problem->IOHprofiler_get_optimal()[0] << std::endl;
 
 	for (Solution* d : genomes)
 		delete d;

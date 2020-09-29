@@ -19,14 +19,14 @@ void algorithm
     //psode2->run(problem, logger, D*10000, D*5, std::map<int,double>()); 
     //psode->run(problem, logger, D*10000, D*5, std::map<int,double>()); 
     //pso->run(problem, logger, D*10000, D*5, std::map<int,double>()); 
-    de->run(problem, logger, D*10000, D*5); 
+    de->run(problem, logger, D*10000, 100); 
 }
 
 void _run_experiment(bool const log) {
     //psode2 = new PSODE2(HybridConfig("I", "N", "HY", "A", "T1", "B", "J", "RI"));
     //psode = new PSODE(HybridConfig("I", "N", "HY", "A", "T1", "B", "P3", "J", "RI"));    
     //pso = new ParticleSwarm(PSOConfig("I", "N", "HY", "A"));
-    de = new DifferentialEvolution(DEConfig("P1", "E", "S", "RS"));
+    de = new DifferentialEvolution(DEConfig("B1", "B", "S", "PR"));
 
 	std::string templateFile = "./configuration.ini";
     std::string configFile = generateConfig(templateFile, de->getIdString());

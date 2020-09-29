@@ -1,5 +1,5 @@
 #include "mutationmanager.h"
-#define LC(X) [](int const D, DEConstraintHandler const * const ch){return new X(D,ch);}
+#define LC(X) [](int const D, DEConstraintHandler* const ch){return new X(D,ch);}
 std::vector<Solution*> MutationManager::mutate(std::vector<Solution*>const& genomes, std::vector<double>const& Fs){
 	this->genomes = genomes;
 	this->Fs = Fs;
@@ -22,7 +22,7 @@ std::vector<Solution*> MutationManager::mutate(std::vector<Solution*>const& geno
 	return mutants;
 }
 
-std::map<std::string, std::function<MutationManager* (int const, DEConstraintHandler const*const)>> const mutations ({
+std::map<std::string, std::function<MutationManager* (int const, DEConstraintHandler*const)>> const mutations ({
 		{"R1", LC(Rand1MutationManager)},
 		{"T1", LC(TTB1MutationManager)},
 		{"P1", LC(TTPB1MutationManager)},

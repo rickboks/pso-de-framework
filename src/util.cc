@@ -2,7 +2,7 @@
 #include "rng.h"
 #include <experimental/filesystem>
 
-void scale(std::vector<double> & vec, double x){
+void scale(std::vector<double> & vec, double const x){
 	std::transform(vec.begin(), vec.end(), vec.begin(),
            std::bind(std::multiplies<double>(), std::placeholders::_1, x));
 }
@@ -19,24 +19,15 @@ void subtract(std::vector<double>const& lhs, std::vector<double>const& rhs, std:
 	                std::minus<double>());
 }
 
-void randomMult(std::vector<double> & vec, double min, double max){
+void randomMult(std::vector<double>& vec, double const min, double const max){
 	for (unsigned int i = 0; i < vec.size(); i++){
 		vec[i] *= rng.randDouble(min, max);
 	}
 }
 
 
-bool comparePtrs(Solution*a, Solution*b){
+bool comparePtrs(Solution const* const a, Solution const *const b){
 	return *a < *b;
-}
-
-Solution* getPBest(std::vector<Solution*> genomes, double const p){
-	sortOnFitness(genomes);
-	std::vector<Solution*> bestP = std::vector<Solution*>(genomes.begin(), genomes.begin() + (genomes.size() * p));
-	if (bestP.empty())
-		return genomes[0];
-	else
-		return bestP[rng.randInt(0, bestP.size()-1)];
 }
 
 std::string generateConfig(std::string const templateFile, std::string const name){
@@ -58,9 +49,16 @@ std::string generateConfig(std::string const templateFile, std::string const nam
 	return cfgFile;
 }
 
-void printVec(std::vector<double> v){
+void printVec(std::vector<double> const v){
 	for (double d : v)
 		std::cout << d << " ";
 	std::cout << std::endl;
 }
 
+double distance(Solution const*const s1, Solution const*const s2) {
+	double d=0;
+	for (unsigned int i = 0; i < s1->getX().size(); i++){
+		d += std::pow(s1->getX(i) - s2->getX(i), 2.); 
+	}
+	return std::sqrt(d);
+}

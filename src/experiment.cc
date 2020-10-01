@@ -26,7 +26,7 @@ void _run_experiment(bool const log) {
     //psode2 = new PSODE2(HybridConfig("I", "N", "HY", "A", "T1", "B", "J", "RI"));
     //psode = new PSODE(HybridConfig("I", "N", "HY", "A", "T1", "B", "P3", "J", "RI"));    
     //pso = new ParticleSwarm(PSOConfig("I", "N", "HY", "A"));
-    de = new DifferentialEvolution(DEConfig("B1", "B", "S", "DP"));
+    de = new DifferentialEvolution(DEConfig("R1", "B", "S", "DP"));
 	std::string templateFile = "./configuration.ini";
     std::string configFile = generateConfig(templateFile, de->getIdString());
     IOHprofiler_experimenter<double> experimenter(configFile,algorithm); 

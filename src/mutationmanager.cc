@@ -1,5 +1,7 @@
 #include "mutationmanager.h"
 #include "util.h"
+#include <limits>
+#include <numeric>
 #define LC(X) [](int const D, DEConstraintHandler* const ch){return new X(D,ch);}
 std::vector<Solution*> MutationManager::mutate(std::vector<Solution*>const& genomes, std::vector<double>const& Fs){
 	this->genomes = genomes;
@@ -35,6 +37,7 @@ std::map<std::string, std::function<MutationManager* (int const, DEConstraintHan
 		{"TR", LC(TrigonometricMutationManager)},
 		{"O1", LC(TwoOpt1MutationManager)},
 		{"O2", LC(TwoOpt2MutationManager)},
+		{"PX", LC(ProximityMutationManager)},
 });
 
 // Rand/1
@@ -311,24 +314,30 @@ Solution* TwoOpt2MutationManager::mutate(int const i) const{
 	return m;
 }
 
-// Proximity-based
+// Proximity-based Rand/1
 Solution* ProximityMutationManager::mutate(int const i) const{
 	std::vector<Solution*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);
 
-	std::vector<Solution*> xr = pickRandom(possibilities, 5);
+	std::vector<double> dist(possibilities.size());
+	std::vector<double> prob(possibilities.size());
 
-	if (xr[1]->getFitness() < xr[0]->getFitness())
-		std::swap(xr[0], xr[1]);
+	double totalDist=0;
+	for (unsigned int j = 0; j < possibilities.size(); j++){
+		dist[j] = distance(genomes[i], possibilities[j]);
+		totalDist+=dist[j];
+	}
+
+	for (unsigned int j = 0; j < possibilities.size(); j++)
+		prob[j] = 1-(dist[j]/std::max(totalDist, std::numeric_limits<double>::min())); //totalDist could be 0
+
+	std::vector<Solution*> xr = rouletteSelect(possibilities, prob, 3);
 
 	std::vector<double> mutant = xr[0]->getX();
 	std::vector<double> subtraction(this->D);
 	subtract(xr[1]->getX(), xr[2]->getX(), subtraction);
 	scale(subtraction, Fs[i]);
-	add(mutant, subtraction, mutant);
-	subtract(xr[3]->getX(), xr[4]->getX(), subtraction);
-	scale(subtraction, Fs[i]);
-	add(mutant, subtraction, mutant);
+	add(mutant,subtraction, mutant);
 
 	Solution* m = new Solution(mutant);
 	deCH->repairDE(m, xr[0], genomes[i]);

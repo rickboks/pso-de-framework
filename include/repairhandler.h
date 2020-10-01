@@ -113,4 +113,3 @@ class TransformationRepair : public DEConstraintHandler, public PSOConstraintHan
 		void repair(Solution* const p);
 		void repair(Particle* const p);
 };
-

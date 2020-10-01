@@ -380,4 +380,3 @@ bool TransformationRepair::shift(Solution* const p){
 	}
 	return repaired;
 }
-

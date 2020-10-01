@@ -6,12 +6,14 @@
 #include "rng.h"
 #include "particle.h"
 
-void scale(std::vector<double>& vec, double x);
+void scale(std::vector<double>& vec, double const x);
 void add(std::vector<double>const& lhs, std::vector<double>const& rhs, std::vector<double>& store);
 void subtract(std::vector<double>const& lhs, std::vector<double>const& rhs, std::vector<double>& store);
-void randomMult(std::vector<double>& vec, double min, double max);
-bool comparePtrs(Solution*a, Solution*b);
-
+void randomMult(std::vector<double>& vec, double const min, double const max);
+bool comparePtrs(Solution const* const a, Solution const* const b);
+double distance(Solution const*const s1, Solution const*const s2);
+std::string generateConfig(std::string const templateFile, std::string const name);
+void printVec(std::vector<double> const v);
 
 template <typename T>
 void sortOnFitness(std::vector<T*>& genomes){
@@ -70,7 +72,7 @@ T* pickRandom(std::vector<T*>& possibilities){
 }
 
 template<typename T>
-std::vector<T*> pickRandom(std::vector<T*>& possibilities, int n){
+std::vector<T*> pickRandom(std::vector<T*>& possibilities, int const n){
 	std::vector<T*> particles;
 	for (int i = 0; i < n; i++){
 		particles.push_back(pickRandom(possibilities));
@@ -78,5 +80,27 @@ std::vector<T*> pickRandom(std::vector<T*>& possibilities, int n){
 	return particles;
 }
 
-std::string generateConfig(std::string templateFile, std::string name);
-void printVec(std::vector<double> v);
+template<typename T>
+T* rouletteSelect(std::vector<T*>& possibilities, std::vector<double>& prob){
+	double totalProb = std::accumulate(prob.begin(), prob.end(), 0.);
+	double rand = rng.randDouble(0.,totalProb);
+	for (unsigned int i = 0; i < possibilities.size(); i++){
+		rand -= prob[i];
+		if (rand <= 0.){
+			T* selected = possibilities[i];
+			possibilities.erase(possibilities.begin() + i);
+			prob.erase(prob.begin() + i);
+			return selected;
+		} 
+	}
+	return NULL; //should not happen
+}
+
+template<typename T>
+std::vector<T*> rouletteSelect(std::vector<T*>& possibilities, std::vector<double>& prob, int const n){
+	std::vector<T*> particles;
+	for (int i = 0; i < n; i++){
+		particles.push_back(rouletteSelect(possibilities, prob));
+	}
+	return particles;
+}

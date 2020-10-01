@@ -344,18 +344,22 @@ Solution* TwoOpt2MutationManager::mutate(int const i) const{
 Solution* ProximityMutationManager::mutate(int const i) const{
 	std::vector<Solution*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);
-
 	std::vector<double> dist(possibilities.size());
 	std::vector<double> prob(possibilities.size());
 
-	double totalDist=0;
+	double totalDist=0.;
 	for (unsigned int j = 0; j < possibilities.size(); j++){
 		dist[j] = distance(genomes[i], possibilities[j]);
-		totalDist+=dist[j];
+		totalDist += dist[j];
 	}
 
-	for (unsigned int j = 0; j < possibilities.size(); j++)
-		prob[j] = 1-(dist[j]/std::max(totalDist, std::numeric_limits<double>::min())); //totalDist could be 0
+	if (totalDist > 0.) {
+		for (unsigned int j = 0; j < possibilities.size(); j++)
+			prob[j] = 1-(dist[j]/totalDist); 
+	} else {  // When all particles are very close
+		for (unsigned int j = 0; j < possibilities.size(); j++)
+			prob[j] = rng.randDouble(0,1); 
+	}
 
 	std::vector<Solution*> xr = rouletteSelect(possibilities, prob, 3);
 

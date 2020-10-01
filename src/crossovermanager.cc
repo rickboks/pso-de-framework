@@ -1,3 +1,4 @@
+#include "util.h"
 #include "crossovermanager.h"
 #include<unordered_set>
 
@@ -21,6 +22,7 @@ std::vector<Solution*> CrossoverManager::crossover(std::vector<Solution*>const& 
 std::map<std::string, std::function<CrossoverManager* (int const)>> const crossovers({
 		{"B", LC(BinomialCrossoverManager)},
 		{"E", LC(ExponentialCrossoverManager)},
+		{"A", LC(ArithmeticCrossoverManager)},
 });
 
 std::vector<double> BinomialCrossoverManager::singleCrossover(std::vector<double>const& target, 
@@ -54,5 +56,16 @@ std::vector<double> ExponentialCrossoverManager::singleCrossover(std::vector<dou
 		else 
 			x[i] = target[i];
 	}
+	return x;
+}
+
+std::vector<double> ArithmeticCrossoverManager::singleCrossover(std::vector<double>const& target, 
+		std::vector<double>const& donor, double const Cr) const{
+	std::vector<double> x = target;
+	double const k = rng.randDouble(0,1);
+	std::vector<double> subtraction(D);
+	subtract(donor, target, subtraction);
+	scale(subtraction, k);
+	add(x, subtraction, x);
 	return x;
 }

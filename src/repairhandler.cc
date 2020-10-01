@@ -22,7 +22,6 @@ void HyperbolicRepair::repairVelocityPre(Particle * const p) {
 			repaired=true;
 		}
 	}
-
 	if (repaired) nCorrected++;
 }
 
@@ -35,7 +34,6 @@ void PBestDimRepair::repairPSO(Particle* const p) {
 			repaired = true;
 		}
 	}	
-
 	if (repaired) nCorrected++;
 }
 

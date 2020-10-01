@@ -1,4 +1,5 @@
 #include "mutationmanager.h"
+#include "util.h"
 #define LC(X) [](int const D, DEConstraintHandler* const ch){return new X(D,ch);}
 std::vector<Solution*> MutationManager::mutate(std::vector<Solution*>const& genomes, std::vector<double>const& Fs){
 	this->genomes = genomes;
@@ -159,22 +160,17 @@ Solution* Rand2DirMutationManager::mutate(int const i) const{
 	std::vector<Solution*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);
 
-	std::vector<Solution*> xr = pickRandom(possibilities, 4);
-
-	if (xr[1]->getFitness() < xr[0]->getFitness()){
-		std::swap(xr[0], xr[1]);
-	}
-
-	if (xr[3]->getFitness() < xr[2]->getFitness()){
-		std::swap(xr[3], xr[2]);
-	}
+	std::vector<Solution*> xr = pickRandom(possibilities, 3);
+	sortOnFitness(xr);
 
 	std::vector<double> mutant = xr[0]->getX();
-	std::vector<double> subtraction(this->D);
-	subtract(xr[0]->getX(), xr[1]->getX(), subtraction);
-	add(subtraction, xr[2]->getX(), subtraction);
-	subtract(subtraction, xr[3]->getX(), subtraction);
-	scale(subtraction, Fs[i]*0.5);
+
+	std::vector<double> subtraction = xr[0]->getX();
+	add(subtraction, xr[0]->getX(), subtraction);
+	subtract(subtraction, xr[1]->getX(), subtraction);
+	subtract(subtraction, xr[2]->getX(), subtraction);
+	scale(subtraction, Fs[i]/2.);
+
 	add(mutant, subtraction, mutant);
 
 	Solution* m = new Solution(mutant);

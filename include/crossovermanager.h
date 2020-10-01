@@ -32,3 +32,9 @@ class ExponentialCrossoverManager : public CrossoverManager {
 		ExponentialCrossoverManager(int const D): CrossoverManager(D){};
 		std::vector<double> singleCrossover(std::vector<double>const& target, std::vector<double>const& donor, double const Cr) const;
 };
+
+class ArithmeticCrossoverManager : public CrossoverManager {
+	public:
+		ArithmeticCrossoverManager(int const D): CrossoverManager(D){};
+		std::vector<double> singleCrossover(std::vector<double>const& target, std::vector<double>const& donor, double const Cr) const;
+};

@@ -36,6 +36,12 @@ class TTB1MutationManager : public MutationManager {
 		Solution* mutate(int const i) const;
 };
 
+class TTB2MutationManager : public MutationManager {
+	public:
+		TTB2MutationManager(int const D, DEConstraintHandler* const deCH): MutationManager(D, deCH){};
+		Solution* mutate(int const i) const;
+};
+
 class TTPB1MutationManager : public MutationManager {
 	public:
 		TTPB1MutationManager(int const D, DEConstraintHandler* const deCH): MutationManager(D, deCH){};

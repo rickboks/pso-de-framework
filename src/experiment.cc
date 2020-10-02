@@ -1,6 +1,7 @@
 #include <IOHprofiler_experimenter.h>
 #include <random>
 #include <set>
+#include "desuite.h"
 #include "hybridalgorithm.h"
 #include "differentialevolution.h"
 #include "hybridsuite.h"
@@ -23,6 +24,9 @@ void algorithm
 }
 
 void _run_experiment(bool const log) {
+    //DESuite suite;
+    //std::cout << "size: " << suite.size() << std::endl;
+    //return;
     //psode2 = new PSODE2(HybridConfig("I", "N", "HY", "A", "T1", "B", "J", "RI"));
     //psode = new PSODE(HybridConfig("I", "N", "HY", "A", "T1", "B", "P3", "J", "RI"));    
     //pso = new ParticleSwarm(PSOConfig("I", "N", "HY", "A"));

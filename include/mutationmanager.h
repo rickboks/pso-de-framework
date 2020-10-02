@@ -14,8 +14,8 @@ class MutationManager {
 		DEConstraintHandler* const deCH;
 		std::vector<Solution*> genomes;
 		std::vector<double> Fs;
-		Solution const* best;
 		virtual Solution* mutate(int const i) const=0;
+		virtual void preMutation(){};
 	public:
 		MutationManager(int const D, DEConstraintHandler * const deCH):D(D), deCH(deCH){};
 		virtual ~MutationManager(){};
@@ -31,12 +31,18 @@ class Rand1MutationManager : public MutationManager {
 };
 
 class TTB1MutationManager : public MutationManager {
+	private:
+		Solution const* best;
+		void preMutation();
 	public:
 		TTB1MutationManager(int const D, DEConstraintHandler* const deCH): MutationManager(D, deCH){};
 		Solution* mutate(int const i) const;
 };
 
 class TTB2MutationManager : public MutationManager {
+	private:
+		Solution const* best;
+		void preMutation();
 	public:
 		TTB2MutationManager(int const D, DEConstraintHandler* const deCH): MutationManager(D, deCH){};
 		Solution* mutate(int const i) const;
@@ -49,12 +55,18 @@ class TTPB1MutationManager : public MutationManager {
 };
 
 class Best1MutationManager: public MutationManager {
+	private:
+		Solution const* best;
+		void preMutation();
 	public:
 		Best1MutationManager(int const D, DEConstraintHandler* const deCH):MutationManager(D, deCH){};
 		Solution* mutate(int const i) const;
 };
 
 class Best2MutationManager: public MutationManager {
+	private:
+		Solution const* best;
+		void preMutation();
 	public:
 		Best2MutationManager(int const D, DEConstraintHandler* const deCH):MutationManager(D, deCH){};
 		Solution* mutate(int const i) const;
@@ -83,7 +95,6 @@ class TrigonometricMutationManager : public MutationManager {
 		double const gamma;
 		Solution* trigonometricMutation(int const i) const;
 		Solution* rand1Mutation(int const i) const;
-
 	public:
 		TrigonometricMutationManager(int const D, DEConstraintHandler* const deCH): MutationManager(D, deCH), gamma(0.05){};
 		Solution* mutate(int const i) const;
@@ -102,6 +113,10 @@ class TwoOpt2MutationManager : public MutationManager {
 };
 
 class ProximityMutationManager : public MutationManager {
+	private:
+		std::vector< std::vector<double> > Rp;
+		std::vector< std::vector<double> > Rd;
+		void preMutation();
 	public:
 		ProximityMutationManager(int const D, DEConstraintHandler* const deCH): MutationManager(D, deCH){};
 		Solution* mutate(int const i) const;

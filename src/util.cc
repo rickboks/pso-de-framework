@@ -57,7 +57,7 @@ void printVec(std::vector<double> const v){
 
 double distance(Solution const*const s1, Solution const*const s2) {
 	double d=0;
-	for (unsigned int i = 0; i < s1->getX().size(); i++){
+	for (int i = 0; i < s1->D; i++){
 		d += std::pow(s1->getX(i) - s2->getX(i), 2.); 
 	}
 	return std::sqrt(d);

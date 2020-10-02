@@ -6,7 +6,9 @@
 std::vector<Solution*> MutationManager::mutate(std::vector<Solution*>const& genomes, std::vector<double>const& Fs){
 	this->genomes = genomes;
 	this->Fs = Fs;
-	best = getBest(this->genomes);
+
+	preMutation();
+
 	std::vector<Solution*> mutants(this->genomes.size());
 
 	for (unsigned int i = 0; i < this->genomes.size(); i++){
@@ -59,11 +61,17 @@ Solution* Rand1MutationManager::mutate(int const i) const{
 }
 
 // Target-to-best/1
+void TTB1MutationManager::preMutation(){
+	best = getBest(genomes);
+}
+
 Solution* TTB1MutationManager::mutate(int const i) const{
 	std::vector<Solution*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);
+
 	std::vector<double> mutant = genomes[i]->getX();
 	std::vector<double> difference(this->D);
+
 	std::vector<Solution*> xr = pickRandom(possibilities, 2);
 
 	subtract(best->getX(), genomes[i]->getX(), difference);
@@ -78,6 +86,10 @@ Solution* TTB1MutationManager::mutate(int const i) const{
 }
 
 // Target-to-best/2
+void TTB2MutationManager::preMutation(){
+	best = getBest(genomes);
+}
+
 Solution* TTB2MutationManager::mutate(int const i) const{
 	std::vector<Solution*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);
@@ -101,8 +113,10 @@ Solution* TTB2MutationManager::mutate(int const i) const{
 	return m;
 }
 
+// Target-to-pbest/1
 Solution* TTPB1MutationManager::mutate(int const i) const{
-	Solution* pBest = getPBest(this->genomes);
+	Solution* pBest = getPBest(this->genomes); // pBest is sampled for each mutation
+
 	std::vector<Solution*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);
 
@@ -126,6 +140,11 @@ Solution* TTPB1MutationManager::mutate(int const i) const{
 }
 
 // Best/1
+
+void Best1MutationManager::preMutation(){
+	best = getBest(genomes);
+}
+
 Solution* Best1MutationManager::mutate(int const i) const{
 	std::vector<Solution*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);
@@ -145,6 +164,10 @@ Solution* Best1MutationManager::mutate(int const i) const{
 }
 
 // Best/2
+void Best2MutationManager::preMutation(){
+	best = getBest(genomes);
+}
+
 Solution* Best2MutationManager::mutate(int const i) const{
 	std::vector<Solution*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);
@@ -341,26 +364,64 @@ Solution* TwoOpt2MutationManager::mutate(int const i) const{
 }
 
 // Proximity-based Rand/1
+// TODO: currently, this assumes hyperbox constraints by using 
+// eucledian distance.
+// TODO: not implemented correctly I think. Contacted an author.
+void ProximityMutationManager::preMutation(){
+	int const size = genomes.size();
+	//Initialize the matrices
+	if (Rp.empty()){
+		Rd.resize(size, std::vector<double>(size));
+		Rp.resize(size, std::vector<double>(size));
+	}
+
+	// Fill distance matrix
+	std::vector<double> rowTotals(size, 0.);
+	for (int i = 0; i < size; i++){
+		for (int j = 0; j < size; j++){
+			if (i != j){
+				double const dist = std::max(distance(genomes[i], genomes[j]), std::pow(10., -10));
+				Rd[i][j] = dist;
+				Rd[j][i] = dist;
+				rowTotals[i] += dist;
+			} else {
+				Rd[i][j] = 0.;
+			}
+		}
+	}
+	
+	// Fill probability matrix
+	for (int i = 0; i < size; i++){
+		for (int j = 0; j < size; j++){
+			if (i != j){
+				if (rowTotals[i] > 0 && Rd[i][j] > 0){
+					double const prob = 1. / (Rd[i][j] / rowTotals[i]);
+					Rp[i][j] = prob;
+					Rp[j][i] = prob;
+				} else {
+					double const prob = rng.randDouble(0,1);
+					Rp[i][j] = prob;
+					Rp[j][i] = prob;
+				}
+			} else {
+				Rp[i][j] = 0.;
+			}
+		}
+		//std::cout << "distance: " << rowTotals[i] << std::endl;
+		//printVec(Rd[i]);
+		//std::cout << "probability: " << std::endl;
+		//printVec(Rp[i]);
+		//std::cout << std::endl;
+	}
+}
+
 Solution* ProximityMutationManager::mutate(int const i) const{
 	std::vector<Solution*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);
-	std::vector<double> dist(possibilities.size());
-	std::vector<double> prob(possibilities.size());
 
-	double totalDist=0.;
-	for (unsigned int j = 0; j < possibilities.size(); j++){
-		dist[j] = distance(genomes[i], possibilities[j]);
-		totalDist += dist[j];
-	}
-
-	if (totalDist > 0.) {
-		for (unsigned int j = 0; j < possibilities.size(); j++)
-			prob[j] = 1-(dist[j]/totalDist); 
-	} else {  // When all particles are very close
-		for (unsigned int j = 0; j < possibilities.size(); j++)
-			prob[j] = rng.randDouble(0,1); 
-	}
-
+	std::vector<double> prob = Rp[i];
+	prob.erase(prob.begin() + i); // Remove own probability
+	//printVec(prob);
 	std::vector<Solution*> xr = rouletteSelect(possibilities, prob, 3);
 
 	std::vector<double> mutant = xr[0]->getX();

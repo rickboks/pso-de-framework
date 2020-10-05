@@ -22,8 +22,9 @@ void sortOnFitness(std::vector<T*>& genomes){
 
 template<typename T>
 T* getPBest(std::vector<T*> genomes){
-	//double const p = rng.randDouble(2./genomes.size(), 0.2);
-	double const p = 0.1;
+	double const p = std::max(0.05, 3./genomes.size());
+	//double const p = 0.1;
+
 	sortOnFitness(genomes);
 	std::vector<T*> bestP = std::vector<T*>(genomes.begin(), genomes.begin() + (genomes.size() * p));
 	if (bestP.empty())

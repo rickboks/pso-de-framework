@@ -121,3 +121,13 @@ class ProximityMutationManager : public MutationManager {
 		ProximityMutationManager(int const D, DEConstraintHandler* const deCH): MutationManager(D, deCH){};
 		Solution* mutate(int const i) const;
 };
+
+class RankingMutationManager : public MutationManager {
+	private:
+		void preMutation();
+		std::map<Solution*, double> probability;
+		Solution* pickRanked(std::vector<Solution*> & possibilities) const;
+	public:
+		RankingMutationManager(int const D, DEConstraintHandler* const deCH): MutationManager(D, deCH){};
+		Solution* mutate(int const i) const;
+};

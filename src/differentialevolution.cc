@@ -12,13 +12,14 @@
 #include "deadaptationmanager.h"
 #include "util.h"
 #include "repairhandler.h"
+#include "logger.h"
 
 DifferentialEvolution::DifferentialEvolution(DEConfig const config)
 	: config(config){
 }
 
 void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > const problem, 
-    		std::shared_ptr<IOHprofiler_csv_logger> const logger, 
+    		std::shared_ptr<IOHprofiler_csv_logger> const iohLogger, 
     		int const evalBudget, int const popSize) const{
 
 	int const D = problem->IOHprofiler_get_number_of_variables();
@@ -29,7 +30,7 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 	for (int i = 0; i < popSize; i++){
 		genomes[i] = new Solution(D);
 		genomes[i]->randomize(lowerBound, upperBound);
-		genomes[i]->evaluate(problem, logger);
+		genomes[i]->evaluate(problem, iohLogger);
 	}
 
 	DEConstraintHandler * const deCH = deCHs.at(config.constraintHandler)(lowerBound, upperBound);
@@ -40,6 +41,10 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 	std::vector<double> Fs(popSize);
 	std::vector<double> Crs(popSize);
 	std::vector<double> percCorrected; 
+
+	std::filebuf fb;
+	fb.open("test.txt", std::ios::out);
+	Logger logger(&fb);
 
 	while (problem->IOHprofiler_get_evaluations() < evalBudget && !problem->IOHprofiler_hit_optimal()){
 		adaptationManager->nextF(Fs);
@@ -54,7 +59,7 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 		std::vector<double> parentF(popSize), trialF(popSize);
 		for (int i = 0; i < popSize; i++){
 			parentF[i] = genomes[i]->getFitness();
-			trialF[i] = trials[i]->evaluate(problem, logger);
+			trialF[i] = trials[i]->evaluate(problem, iohLogger);
 
 			int const numEval = problem->IOHprofiler_get_evaluations();
 			if (numEval != 0 && numEval % 100000 == 0)
@@ -63,6 +68,8 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 			if (trialF[i] < parentF[i])
 				genomes[i]->setX(trials[i]->getX(), trialF[i]);
 		}
+
+		logger.log(genomes);
 		
 		for (Solution* g : trials)
 			delete g;

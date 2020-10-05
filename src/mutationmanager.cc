@@ -40,7 +40,8 @@ std::map<std::string, std::function<MutationManager* (int const, DEConstraintHan
 		{"TR", LC(TrigonometricMutationManager)},
 		{"O1", LC(TwoOpt1MutationManager)},
 		{"O2", LC(TwoOpt2MutationManager)},
-		{"PX", LC(ProximityMutationManager)},
+		//{"PX", LC(ProximityMutationManager)},
+		{"RA", LC(RankingMutationManager)},
 });
 
 // Rand/1
@@ -128,8 +129,6 @@ Solution* TTPB1MutationManager::mutate(int const i) const{
 	subtract(pBest->getX(), genomes[i]->getX(), difference);
 	add(difference, xr[0]->getX(), difference);
 	subtract(difference, xr[1]->getX(), difference);
-	add(difference, xr[2]->getX(), difference);
-	subtract(difference, xr[3]->getX(), difference);
 	scale(difference,Fs[i]);
 
 	add(mutant, difference, mutant);
@@ -140,7 +139,6 @@ Solution* TTPB1MutationManager::mutate(int const i) const{
 }
 
 // Best/1
-
 void Best1MutationManager::preMutation(){
 	best = getBest(genomes);
 }
@@ -395,7 +393,7 @@ void ProximityMutationManager::preMutation(){
 		for (int j = 0; j < size; j++){
 			if (i != j){
 				if (rowTotals[i] > 0 && Rd[i][j] > 0){
-					double const prob = 1. / (Rd[i][j] / rowTotals[i]);
+					double const prob = 1. - (Rd[i][j] / rowTotals[i]);
 					Rp[i][j] = prob;
 					Rp[j][i] = prob;
 				} else {
@@ -432,5 +430,51 @@ Solution* ProximityMutationManager::mutate(int const i) const{
 
 	Solution* m = new Solution(mutant);
 	deCH->repairDE(m, xr[0], genomes[i]);
+	return m;
+}
+
+void RankingMutationManager::preMutation(){
+	int const size = genomes.size();
+	probability.clear();
+
+	std::vector<Solution*> sorted = genomes;
+	sortOnFitness(sorted);
+
+	for (int i = 0; i < size; i++)
+		probability[sorted[i]] = double(size - (i+1)) / double(size);
+}
+
+Solution* RankingMutationManager::pickRanked(std::vector<Solution*>& possibilities) const{
+	int index;
+	do {
+		index = rng.randInt(0, possibilities.size()-1);
+	} while (rng.randDouble(0,1) > probability.at(possibilities[index]));
+
+	Solution* pick = possibilities[index];
+	possibilities.erase(possibilities.begin() + index);
+	return pick;
+}
+
+Solution* RankingMutationManager::mutate(int const i) const{
+	Solution* pBest = getPBest(this->genomes); // pBest is sampled for each mutation
+
+	std::vector<Solution*> possibilities = genomes;
+	possibilities.erase(possibilities.begin() + i);
+
+	std::vector<double> mutant = genomes[i]->getX();
+	std::vector<double> difference(this->D);
+
+	Solution* xr0 = pickRanked(possibilities);
+	Solution* xr1 = pickRandom(possibilities);
+
+	subtract(pBest->getX(), genomes[i]->getX(), difference);
+	add(difference, xr0->getX(), difference);
+	subtract(difference, xr1->getX(), difference);
+	scale(difference,Fs[i]);
+
+	add(mutant, difference, mutant);
+
+	Solution* m = new Solution(mutant);
+	deCH->repairDE(m, genomes[i], genomes[i]);
 	return m;
 }

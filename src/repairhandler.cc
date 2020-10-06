@@ -115,7 +115,6 @@ void ProjectionMidpointRepair::repairDE(Solution* const p, Solution const* const
 		add(x, midpoint, x);
 		p->setX(x);
 		nCorrected++;
-		printVec(x); 
 	}
 }
 

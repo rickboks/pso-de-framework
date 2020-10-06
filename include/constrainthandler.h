@@ -19,6 +19,7 @@ class ConstraintHandler {
 		ConstraintHandler(std::vector<double> const lb, std::vector<double> const ub): lb(lb), ub(ub), D(lb.size()), nCorrected(0){};
 		virtual ~ConstraintHandler(){};
 		virtual bool resample(Solution const * const p, int const resamples);
+		virtual void penalize(Solution* const p){};
 		int getCorrections() const;
 };
 

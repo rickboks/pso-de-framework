@@ -67,8 +67,7 @@ class DeathPenalty : public DEConstraintHandler, public PSOConstraintHandler {
 	public:
 		DeathPenalty(std::vector<double>const lb,std::vector<double>const ub):ConstraintHandler(lb,ub), 
 			DEConstraintHandler(lb,ub), PSOConstraintHandler(lb,ub){};
-		void repair(Solution* const p);
-		void repair(Particle* const p);
+		void penalize(Solution* const p);
 };
 
 class ReinitializationRepair : public DEConstraintHandler, public PSOConstraintHandler {

@@ -20,6 +20,7 @@ double Solution::getFitness() const{
 
 void Solution::setFitness(double const f){
 	this->fitness = f;
+	evaluated=true;
 }
 
 double Solution::evaluate(std::shared_ptr<IOHprofiler_problem<double> > problem, std::shared_ptr<IOHprofiler_csv_logger> logger) {

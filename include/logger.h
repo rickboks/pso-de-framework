@@ -20,4 +20,7 @@ class Logger { // Used to log arbitrary stuff
 				out << "\n";
 			}
 		}
+
+		void log(int const function, int const D, std::vector<double> const percCorrected, 
+				std::vector<double> const bestX, double const bestF, int const numEvals);
 };

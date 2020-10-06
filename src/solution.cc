@@ -14,6 +14,7 @@ void Solution::setX(std::vector<double> x, double fitness){
 void Solution::setX(std::vector<double> x){
 	this->x = x;
 }
+
 double Solution::getFitness() const{
 	return fitness;
 }

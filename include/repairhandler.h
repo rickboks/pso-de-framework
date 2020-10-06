@@ -60,7 +60,7 @@ class ResamplingRepair : public DEConstraintHandler, public PSOConstraintHandler
 	public:
 		ResamplingRepair(std::vector<double> const lb, std::vector<double> const ub)
 			:ConstraintHandler(lb,ub), DEConstraintHandler(lb,ub), PSOConstraintHandler(lb, ub){};
-		bool resample(Solution const* const p, int const resamples);
+		bool resample(Solution * const p, int const resamples);
 };
 
 class DeathPenalty : public DEConstraintHandler, public PSOConstraintHandler {

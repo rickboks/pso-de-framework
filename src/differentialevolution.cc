@@ -58,13 +58,13 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 		for (Solution* m : donors)
 			delete m;
 
-		for (Solution* const s : trials)
-			deCH->penalize(s);
-		
 		std::vector<double> parentF(popSize), trialF(popSize);
 		for (int i = 0; i < popSize; i++){
 			parentF[i] = genomes[i]->getFitness();
 			trialF[i] = trials[i]->evaluate(problem, iohLogger);
+
+			deCH->penalize(trials[i]); // This is done after and not before the evaluation, because otherwise
+			// it could loop endlessly
 
 			int const numEval = problem->IOHprofiler_get_evaluations();
 			if (numEval != 0 && numEval % 100000 == 0)

@@ -144,9 +144,18 @@ void ProjectionBaseRepair::repairDE(Solution* const p, Solution const* const bas
 
 //Adapted from https://github.com/psbiomech/c-cmaes
 // Generic
-bool ResamplingRepair::resample(Solution const* const p, int const resamples) {
-	if (resamples >= 100 || isFeasible(p))
+bool ResamplingRepair::resample(Solution * const p, int const resamples) {
+	if (isFeasible(p)){
 		return false;
+	} else if (resamples >= 100){
+		for (int i = 0; i < D; i++){
+			if (p->getX(i) < lb[i])
+				p->setX(i, lb[i]);
+			else if (p->getX(i) > ub[i])
+				p->setX(i, ub[i]);
+		}
+		return false;
+	}
 
 	if (resamples == 0) nCorrected++; // Only count the first resample
 

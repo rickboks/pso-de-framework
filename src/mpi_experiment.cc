@@ -15,31 +15,23 @@ DESuite suite;
 void experiment
 	(std::shared_ptr<IOHprofiler_problem<double>> problem,
 		std::shared_ptr<IOHprofiler_csv_logger> logger) {
+
 	int const D = problem->IOHprofiler_get_number_of_variables();
+	int const popSize = 100;
+
 	int id;
 	MPI_Comm_rank(MPI_COMM_WORLD, &id);
 
 	DifferentialEvolution de = suite.getDE(id);
-  	de.run(problem, logger, D*10000, D*5);
+  	de.run(problem, logger, D*10000, popSize);
 }
 
 int main(int argc, char **argv) {
-	suite.setMutationManagers(std::vector<std::string>{
-		//"R1", "R2", "B1", "T1"
-		"B1"
-	});
-
-	suite.setCrossoverManagers(std::vector<std::string>{
-		"B"//, "E"
-	});
-
 	suite.setDEAdaptationManagers(std::vector<std::string>{
-		"S"
+		"N"
 	});
 
-	//suite.setConstraintHandlers(std::vector<std::string>{
-		//"PR", "WR", "DP"
-	//});
+	std::cout << suite.size() << std::endl;
 
 	std::string templateFile = "./configuration.ini";
 	int id;
@@ -49,7 +41,7 @@ int main(int argc, char **argv) {
 	if (id < suite.size()){
 		std::string configFile = generateConfig(templateFile, suite.getDE(id).getIdString());
 		IOHprofiler_experimenter<double> experimenter(configFile, experiment);
-		experimenter._set_independent_runs(10);
+		experimenter._set_independent_runs(100);
 		experimenter._run();
 	} else {
 		std::cerr << "Error: suite does not contain " << id << std::endl;

@@ -5,14 +5,14 @@
 
 bool ConstraintHandler::isFeasible(Solution const * const p) const{
 	for (int i = 0; i < D; i++){
-		if (p->getX(i) < lb[i] || p->getX(i) > ub[i]){
+		if (p->getX(i) < lb[i] - 1.0e-15 || p->getX(i) > ub[i] + 1.0e-15){
 			return false;
 		}
 	}
 	return true;
 }
 
-bool ConstraintHandler::resample(Solution const * const p, int const resamples){
+bool ConstraintHandler::resample(Solution * const p, int const resamples){
 	return false;
 }
 

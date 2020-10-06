@@ -98,9 +98,9 @@ void ProjectionMidpointRepair::repairDE(Solution* const p, Solution const* const
 
 	for (int i = 0; i < D; i++){
 		if (x[i] > ub[i]){
-			alphas[i] = (lb[i] - ub[i])/std::min((lb[i] - 2. * x[i] + ub[i]), -1.0e-12);
+			alphas[i] = (lb[i] - ub[i])/std::min((lb[i] - 2. * x[i] + ub[i]), -1.0e-15);
 		} else if (x[i] < lb[i]){
-			alphas[i] = (ub[i] - lb[i])/std::max((lb[i] - 2. * x[i] + ub[i]), 1.0e-12);
+			alphas[i] = (ub[i] - lb[i])/std::max((lb[i] - 2. * x[i] + ub[i]), 1.0e-15);
 		} else
 			alphas[i] = std::numeric_limits<double>::max(); //Can't divide by zero
 	}
@@ -124,9 +124,9 @@ void ProjectionBaseRepair::repairDE(Solution* const p, Solution const* const bas
 
 	for (int i = 0; i < D; i++){
 		if (x[i] > ub[i]){
-			alphas[i] = (base->getX(i) - ub[i])/ std::min((base->getX(i) - x[i]), -1.0e-12);
+			alphas[i] = (base->getX(i) - ub[i])/ std::min((base->getX(i) - x[i]), -1.0e-15);
 		} else if (x[i] < lb[i]){
-			alphas[i] = (base->getX(i) - lb[i])/ std::max((base->getX(i) - x[i]), 1.0e-12);
+			alphas[i] = (base->getX(i) - lb[i])/ std::max((base->getX(i) - x[i]), 1.0e-15);
 		} else
 			alphas[i] = std::numeric_limits<double>::max(); //Can't divide by zero
 	}
@@ -244,6 +244,7 @@ void ReflectionRepair::repair(Particle* const p) {
 	}
 	if (repaired) nCorrected++;
 }
+
 void ReflectionRepair::repair(Solution* const p) {
 	bool repaired = false;
 	for (int i = 0; i < D; i++){
@@ -275,6 +276,7 @@ void WrappingRepair::repair(Particle* const p) {
 	}
 	if (repaired) nCorrected++;
 }
+
 void WrappingRepair::repair(Solution* const p) {
 	bool repaired = false;
 	for (int i = 0; i < D; i++){

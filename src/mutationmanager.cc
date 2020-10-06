@@ -376,8 +376,8 @@ void ProximityMutationManager::preMutation(){
 	int const size = genomes.size();
 	//Initialize the matrices
 	if (Rp.empty()){
-		Rd.resize(size, std::vector<double>(size));
 		Rp.resize(size, std::vector<double>(size));
+		Rd.resize(size, std::vector<double>(size));
 	}
 
 	// Fill distance matrix
@@ -385,7 +385,7 @@ void ProximityMutationManager::preMutation(){
 	for (int i = 0; i < size; i++){
 		for (int j = 0; j < size; j++){
 			if (i != j){
-				double const dist = std::max(distance(genomes[i], genomes[j]), 1.0e-12);
+				double const dist = std::max(distance(genomes[i], genomes[j]), 1.0e-15);
 				Rd[i][j] = dist;
 				Rd[j][i] = dist;
 				rowTotals[i] += dist;

@@ -61,10 +61,10 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 		std::vector<double> parentF(popSize), trialF(popSize);
 		for (int i = 0; i < popSize; i++){
 			parentF[i] = genomes[i]->getFitness();
-			trialF[i] = trials[i]->evaluate(problem, iohLogger);
 
-			deCH->penalize(trials[i]); // This is done after and not before the evaluation, because otherwise
-			// it could loop endlessly
+			trials[i]->evaluate(problem, iohLogger);
+			deCH->penalize(trials[i]); // This is done after and not before the evaluation, because otherwise it could loop endlessly
+			trialF[i] = trials[i]->getFitness();
 
 			int const numEval = problem->IOHprofiler_get_evaluations();
 			if (numEval != 0 && numEval % 100000 == 0)
@@ -83,7 +83,7 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 	if (percCorrected.empty()){
 		double const perc = double(deCH->getCorrections()) / problem->IOHprofiler_get_evaluations();
 		percCorrected.resize(3, perc);
-	} else if (percCorrected.size() != 3){
+	} else if (percCorrected.size() < 3){
 		int const lastIndex = percCorrected.size() -1;
 		for (int i = lastIndex+1; i < 3; i++)
 			percCorrected.push_back(percCorrected[lastIndex]);

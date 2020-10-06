@@ -27,11 +27,8 @@ void experiment
 }
 
 int main(int argc, char **argv) {
-	suite.setDEAdaptationManagers(std::vector<std::string>{
-		"N"
-	});
-
-	std::cout << suite.size() << std::endl;
+	suite.setDEAdaptationManagers({"N"});
+	suite.setCrossoverManagers({"B"});
 
 	std::string templateFile = "./configuration.ini";
 	int id;

@@ -107,7 +107,6 @@ void ProjectionMidpointRepair::repairDE(Solution* const p, Solution const* const
 
 	std::vector<double>::iterator alpha=std::min_element(alphas.begin(), alphas.end());
 	if (alpha != std::next(alphas.end(), -1)){
-		printVec(x);
 		std::vector<double> midpoint(D);
 		add(lb, ub, midpoint);
 		scale(midpoint, 0.5*(1.- *alpha));
@@ -115,7 +114,6 @@ void ProjectionMidpointRepair::repairDE(Solution* const p, Solution const* const
 		add(x, midpoint, x);
 		p->setX(x);
 		nCorrected++;
-		printVec(x);
 	}
 }
 
@@ -132,8 +130,6 @@ void ProjectionBaseRepair::repairDE(Solution* const p, Solution const* const bas
 		} else
 			alphas[i] = std::numeric_limits<double>::max(); //Can't divide by zero
 	}
-
-	//printVec(alphas);
 
 	std::vector<double>::iterator alpha=std::min_element(alphas.begin(), alphas.end());
 	if (alpha != std::next(alphas.end(), -1)){

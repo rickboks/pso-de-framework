@@ -43,7 +43,7 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 	std::vector<double> Crs(popSize);
 	std::vector<double> percCorrected; 
 
-	std::string const dataFolder = "scratch/extra_data";
+	std::string const dataFolder = "extra_data";
 	std::filebuf fb;
 	fb.open(dataFolder + "/" + getIdString() + ".dat", std::ios::app);
 	Logger logger(&fb);

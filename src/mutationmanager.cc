@@ -385,7 +385,7 @@ void ProximityMutationManager::preMutation(){
 	for (int i = 0; i < size; i++){
 		for (int j = 0; j < size; j++){
 			if (i != j){
-				double const dist = std::max(distance(genomes[i], genomes[j]), std::pow(10, -12));
+				double const dist = std::max(distance(genomes[i], genomes[j]), 1.0e-12);
 				Rd[i][j] = dist;
 				Rd[j][i] = dist;
 				rowTotals[i] += dist;

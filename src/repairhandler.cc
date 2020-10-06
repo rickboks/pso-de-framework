@@ -98,15 +98,16 @@ void ProjectionMidpointRepair::repairDE(Solution* const p, Solution const* const
 
 	for (int i = 0; i < D; i++){
 		if (x[i] > ub[i]){
-			alphas[i] = (lb[i] - ub[i])/(lb[i] - 2. * x[i] + ub[i]);
+			alphas[i] = (lb[i] - ub[i])/std::min((lb[i] - 2. * x[i] + ub[i]), -1.0e-12);
 		} else if (x[i] < lb[i]){
-			alphas[i] = (ub[i] - lb[i])/(lb[i] - 2. * x[i] + ub[i]);
+			alphas[i] = (ub[i] - lb[i])/std::max((lb[i] - 2. * x[i] + ub[i]), 1.0e-12);
 		} else
 			alphas[i] = std::numeric_limits<double>::max(); //Can't divide by zero
 	}
 
 	std::vector<double>::iterator alpha=std::min_element(alphas.begin(), alphas.end());
 	if (alpha != std::next(alphas.end(), -1)){
+		printVec(x);
 		std::vector<double> midpoint(D);
 		add(lb, ub, midpoint);
 		scale(midpoint, 0.5*(1.- *alpha));
@@ -114,6 +115,7 @@ void ProjectionMidpointRepair::repairDE(Solution* const p, Solution const* const
 		add(x, midpoint, x);
 		p->setX(x);
 		nCorrected++;
+		printVec(x);
 	}
 }
 
@@ -124,12 +126,14 @@ void ProjectionBaseRepair::repairDE(Solution* const p, Solution const* const bas
 
 	for (int i = 0; i < D; i++){
 		if (x[i] > ub[i]){
-			alphas[i] = (base->getX(i) - ub[i])/(base->getX(i) - x[i]);
+			alphas[i] = (base->getX(i) - ub[i])/ std::min((base->getX(i) - x[i]), -1.0e-12);
 		} else if (x[i] < lb[i]){
-			alphas[i] = (base->getX(i) - lb[i])/(base->getX(i) - x[i]);
+			alphas[i] = (base->getX(i) - lb[i])/ std::max((base->getX(i) - x[i]), 1.0e-12);
 		} else
 			alphas[i] = std::numeric_limits<double>::max(); //Can't divide by zero
 	}
+
+	//printVec(alphas);
 
 	std::vector<double>::iterator alpha=std::min_element(alphas.begin(), alphas.end());
 	if (alpha != std::next(alphas.end(), -1)){

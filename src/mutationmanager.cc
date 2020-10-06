@@ -46,7 +46,7 @@ std::map<std::string, std::function<MutationManager* (int const, DEConstraintHan
 		{"RA", LC(RankingMutationManager)},
 });
 
-// Rand/1
+// Rand/2
 Solution* Rand1MutationManager::mutate(int const i) const{
 	std::vector<Solution*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);
@@ -385,7 +385,7 @@ void ProximityMutationManager::preMutation(){
 	for (int i = 0; i < size; i++){
 		for (int j = 0; j < size; j++){
 			if (i != j){
-				double const dist = std::max(distance(genomes[i], genomes[j]), 1.0e-15);
+				double const dist = std::max(distance(genomes[i], genomes[j]), 1.0e-12);
 				Rd[i][j] = dist;
 				Rd[j][i] = dist;
 				rowTotals[i] += dist;

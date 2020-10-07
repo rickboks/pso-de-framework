@@ -124,9 +124,9 @@ void ProjectionBaseRepair::repairDE(Solution* const p, Solution const* const bas
 	alphas[D] = 1.;
 
 	for (int i = 0; i < D; i++){
-		if (x[i] > ub[i] + 1.0e-12){
+		if (x[i] > ub[i] && x[i] - base->getX(i) > 1.0e-12){
 			alphas[i] = (ub[i] - base->getX(i)) / (x[i] - base->getX(i));
-		} else if (x[i] < lb[i] - 1.0e-12){
+		} else if (x[i] < lb[i] && base->getX(i) - x[i] > 1.0e-12){
 			alphas[i] = (base->getX(i) - lb[i]) / (base->getX(i) - x[i]);
 		} else
 			alphas[i] = std::numeric_limits<double>::max(); 
@@ -140,6 +140,14 @@ void ProjectionBaseRepair::repairDE(Solution* const p, Solution const* const bas
 		add(x, b, x);
 		p->setX(x);
 		nCorrected++;
+	}
+
+	// Fix the solutions that were over the bound by less than 1e-12
+	for (int i = 0; i < D; i++){
+		if (p->getX(i) < lb[i])
+			p->setX(i, lb[i]);
+		else if (p->getX(i) > ub[i])
+			p->setX(i, ub[i]);
 	}
 }
 

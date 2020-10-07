@@ -159,6 +159,7 @@ Solution* Best1MutationManager::mutate(int const i) const{
 	add(mutant, difference, mutant);
 
 	Solution* m = new Solution(mutant);
+	deCH->repairDE(m, best, genomes[i]);
 	return m;
 }
 

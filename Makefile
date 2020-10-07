@@ -2,7 +2,7 @@ EXE  = experiment
 MPI_EXE = mpi_experiment
 SRC_DIR = src
 OBJ_DIR = obj
-RESULT_DIR= results
+RESULT_DIR= data
 INC_DIR = include
 LDFLAGS += -L ~/.local/lib -lboost_system -lboost_filesystem -lm -lIOH -lstdc++fs
 
@@ -24,7 +24,7 @@ clean:
 	rm -f $(OBJ_DIR)/*.o $(EXE) $(MPI_EXE)
 .PHONY: cleanall
 cleanall:
-	rm -rf $(OBJ_DIR) $(EXE) $(MPI_EXE) results
+	rm -rf $(OBJ_DIR) $(EXE) $(MPI_EXE) $(RESULT_DIR)
 
 $(EXE): $(OBJ) $(OBJ_DIR)/experiment.o
 	${CC} ${CFLAGS} -o $(EXE) $(OBJ) $(OBJ_DIR)/experiment.o ${LDFLAGS}
@@ -42,4 +42,3 @@ $(OBJ_DIR):
 	mkdir $(OBJ_DIR)
 $(RESULT_DIR):
 	mkdir $(RESULT_DIR)
-

@@ -120,5 +120,5 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 }
 
 std::string DifferentialEvolution::getIdString() const {
-	return "DE_" + config.mutation + "_" + config.crossover + "_" + config.adaptation + "_" + config.constraintHandler;
+	return /*"DE_" +*/ config.mutation + "_" + config.crossover + "_" /*+ config.adaptation + "_"*/ + config.constraintHandler;
 }

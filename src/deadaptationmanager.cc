@@ -139,10 +139,9 @@ void SHADEManager::nextCr(std::vector<double>& Crs){
 	previousCrs = Crs;
 }
 
-
 //NO ADAPTATION
 NoAdaptationManager::NoAdaptationManager(int const popSize)
- : DEAdaptationManager(popSize), F(0.5), Cr(0.9){}
+ : DEAdaptationManager(popSize), F(0.5), Cr(.9){}
 
 void NoAdaptationManager::update(std::vector<double>const& orig, std::vector<double>const& trials){
 	//ignore

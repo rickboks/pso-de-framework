@@ -46,7 +46,7 @@ std::map<std::string, std::function<MutationManager* (int const, DEConstraintHan
 		{"RA", LC(RankingMutationManager)},
 });
 
-// Rand/2
+// Rand/1
 Solution* Rand1MutationManager::mutate(int const i) const{
 	std::vector<Solution*> possibilities = genomes;
 	possibilities.erase(possibilities.begin() + i);
@@ -159,7 +159,6 @@ Solution* Best1MutationManager::mutate(int const i) const{
 	add(mutant, difference, mutant);
 
 	Solution* m = new Solution(mutant);
-	deCH->repairDE(m, best, genomes[i]);
 	return m;
 }
 

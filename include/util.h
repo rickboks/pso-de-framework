@@ -35,33 +35,24 @@ T* getPBest(std::vector<T*> genomes){
 
 template<typename T>
 T* getBest(std::vector<T*>const& genomes){
-	int best = 0;
-	double bestF = std::numeric_limits<double>::max();
+	T* best = NULL;
 
-	for (unsigned int i = 0; i < genomes.size(); i++){
-		double const score = genomes[i]->getFitness();
-		if (score < bestF){
-			bestF = score;
-			best = i;
-		}
-	}
-	return genomes[best];
+	for (T* s : genomes)
+		if (best == NULL || *s < *best)
+			best = s;
+
+	return best;
 }
 
 template<typename T>
 T* getWorst(std::vector<T*>const& genomes){
-	int worst = 0;
-	double worstF = -std::numeric_limits<double>::max();
+	T* worst = NULL;
 
-	for (unsigned int i = 0; i < genomes.size(); i++){
-		double const score = genomes[i]->getFitness();
-		if (score > worstF){
-			worstF = score;
-			worst = i;
-		}
-	}
+	for (T* s : genomes)
+		if (worst == NULL || *worst < *s)
+			worst = s;
 
-	return genomes[worst];
+	return worst;
 }
 
 template<typename T>

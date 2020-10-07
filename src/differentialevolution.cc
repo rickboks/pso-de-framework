@@ -28,6 +28,7 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 	std::vector<double> const upperBound = problem->IOHprofiler_get_upperbound();
 
 	std::vector<Solution*> genomes(popSize);
+
 	for (int i = 0; i < popSize; i++){
 		genomes[i] = new Solution(D);
 		genomes[i]->randomize(lowerBound, upperBound);
@@ -44,13 +45,23 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 	std::vector<double> percCorrected; 
 
 	std::string const dataFolder = "scratch/extra_data";
-	std::filebuf fb;
-	fb.open(dataFolder + "/" + getIdString() + ".dat", std::ios::app);
-	Logger logger(&fb);
+	std::filebuf fbExtra;
+	fbExtra.open(dataFolder + "/" + getIdString() + ".dat", std::ios::app);
+	Logger logger(&fbExtra);
 
+	std::filebuf fbParams;
+	fbParams.open(dataFolder + "/" + getIdString() + ".par", std::ios::app);
+	Logger loggerParams(&fbParams);
+
+	loggerParams.start(problem->IOHprofiler_get_problem_id(), D);
+
+	int iteration = 0;
 	while (problem->IOHprofiler_get_evaluations() < evalBudget && !problem->IOHprofiler_hit_optimal()){
 		adaptationManager->nextF(Fs);
 		adaptationManager->nextCr(Crs);
+
+		if (iteration % 10 == 0)
+			loggerParams.log(Fs, Crs);
 		
 		std::vector<Solution*> const donors = mutationManager->mutate(genomes,Fs);
 		std::vector<Solution*> const trials = crossoverManager->crossover(genomes, donors, Crs);
@@ -61,8 +72,8 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 		std::vector<double> parentF(popSize), trialF(popSize);
 		for (int i = 0; i < popSize; i++){
 			parentF[i] = genomes[i]->getFitness();
-
 			trials[i]->evaluate(problem, iohLogger);
+
 			deCH->penalize(trials[i]); // This is done after and not before the evaluation, because otherwise it could loop endlessly
 			trialF[i] = trials[i]->getFitness();
 
@@ -78,6 +89,7 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 			delete g;
 
 		adaptationManager->update(parentF, trialF);
+		iteration++;
 	}
 
 	if (percCorrected.empty()){
@@ -89,9 +101,11 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 			percCorrected.push_back(percCorrected[lastIndex]);
 	}
 
-	Solution const * const best = getBest(genomes);
+	Solution const*const best = getBest(genomes);
+
 	logger.log(problem->IOHprofiler_get_problem_id(), D, percCorrected, best->getX(), best->getFitness(), problem->IOHprofiler_get_evaluations());
-	
+	loggerParams.newLine();
+
 	for (Solution* d : genomes)
 		delete d;
 
@@ -100,9 +114,11 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 	delete adaptationManager;
 	delete deCH;
 
+	fbExtra.close();
+	fbParams.close();
 	genomes.clear();
 }
 
 std::string DifferentialEvolution::getIdString() const {
-	return /*"DE_" + */config.mutation + "_" + config.crossover + /*"_" + config.adaptation + */ "_" + config.constraintHandler;
+	return "DE_" + config.mutation + "_" + config.crossover + "_" + config.adaptation + "_" + config.constraintHandler;
 }

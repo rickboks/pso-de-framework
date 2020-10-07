@@ -11,8 +11,6 @@ std::vector<Solution*> CrossoverManager::crossover(std::vector<Solution*>const& 
 	std::vector<double> x(D);
 
 	for (unsigned int i = 0; i < genomes.size(); i++){
-		std::vector<double> const mutantX = mutants[i]->getX();
-		std::vector<double> const parentX = genomes[i]->getX();
 		trials.push_back(new Solution(singleCrossover(genomes[i]->getX(), mutants[i]->getX(), Crs[i])));
 	}
 	return trials;
@@ -28,6 +26,7 @@ std::map<std::string, std::function<CrossoverManager* (int const)>> const crosso
 std::vector<double> BinomialCrossoverManager::singleCrossover(std::vector<double>const& target, 
 		std::vector<double>const& donor, double const Cr) const{
 	std::vector<double> x(D);
+
 	int const jrand = rng.randInt(0,D-1);
 	for (int j = 0; j < D; j++){
 		if (j == jrand || rng.randDouble(0,1) < Cr){

@@ -24,6 +24,7 @@ void algorithm
 }
 
 void _run_experiment(bool const log) {
+
     //DESuite suite;
     //std::cout << "size: " << suite.size() << std::endl;
     //return;
@@ -31,7 +32,7 @@ void _run_experiment(bool const log) {
     //psode = new PSODE(HybridConfig("I", "N", "HY", "A", "T1", "B", "P3", "J", "RI"));    
     //pso = new ParticleSwarm(PSOConfig("I", "N", "HY", "A"));
 
-    de = new DifferentialEvolution(DEConfig("TR", "B", "N", "PB"));
+    de = new DifferentialEvolution(DEConfig("B1", "B", "S", "WR"));
 	std::string templateFile = "./configuration.ini";
     std::string configFile = generateConfig(templateFile, de->getIdString());
     IOHprofiler_experimenter<double> experimenter(configFile,algorithm); 

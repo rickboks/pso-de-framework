@@ -36,7 +36,6 @@ std::map<std::string, std::function<DEConstraintHandler*(std::vector<double>, st
 	{"RB", LC(RandBaseRepair)},
 	{"MB", LC(MidpointBaseRepair)},
 	{"MT", LC(MidpointTargetRepair)},
-	{"CO", LC(ConservatismRepair)},
 	{"PM", LC(ProjectionMidpointRepair)},
 	{"PB", LC(ProjectionBaseRepair)},
 });

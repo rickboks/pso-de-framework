@@ -5,11 +5,10 @@
 #include <iostream>
 
 /*		Base 		*/
-TopologyManager::TopologyManager(std::vector<Particle*> const & particles)
-	:particles(particles){}
+TopologyManager::TopologyManager(std::vector<Particle*> const & particles) :particles(particles){}
 
-#define LC(X) [](std::vector<Particle*> const p){return new X(p);}
-std::map<std::string, std::function<TopologyManager* (std::vector<Particle*> const)>> const topologies{
+#define LC(X) [](std::vector<Particle*> const& p){return new X(p);}
+std::map<std::string, std::function<TopologyManager* (std::vector<Particle*> const&)>> const topologies{
 	{"L", LC(LbestTopologyManager)},
 	{"G", LC(GbestTopologyManager)},
 	{"R", LC(RandomTopologyManager)},
@@ -213,14 +212,14 @@ void DecreasingTopologyManager::update(double progress){
 
 
 /* Dynamic multi-swarm */
-MultiSwarmTopologyManager::MultiSwarmTopologyManager(std::vector<Particle*> const & particles)
-	:TopologyManager(particles), clusterSize(3), count(0){
+MultiSwarmTopologyManager::MultiSwarmTopologyManager(std::vector<Particle*> const & ptcs)
+	:TopologyManager(ptcs), clusterSize(3), count(0){
 	createClusters();
 }
 
 void MultiSwarmTopologyManager::createClusters(){
 	std::vector<Particle*> toInitialize = particles;
-	
+
 	while (!toInitialize.empty()){
 		std::vector<Particle*> cluster;
 		int newClusterSize;

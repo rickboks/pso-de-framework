@@ -38,7 +38,7 @@ void ParticleSwarm::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> 
 	PSOConstraintHandler* const psoCH = psoCHs.at(config.constraintHandler)(lowerBound, upperBound); 
 	ParticleUpdateSettings const settings(config.update, particleUpdateParams, psoCH);
 
-	particles.resize(popSize);
+	std::vector<Particle*> particles(popSize);
 	for (int i = 0; i < popSize; i++){
 		particles[i] = new Particle(D, &settings);
 		particles[i]->randomize(lowerBound, upperBound);
@@ -82,7 +82,7 @@ void ParticleSwarm::runSynchronous(std::shared_ptr<IOHprofiler_problem<double> >
 	PSOConstraintHandler* const psoCH = psoCHs.at(config.constraintHandler)(lowerBound, upperBound); 
 	ParticleUpdateSettings const settings(config.update, particleUpdateParams, psoCH);
 
-	particles.resize(popSize);
+	std::vector<Particle*> particles(popSize);
 	for (int i = 0; i < popSize; i++){
 		particles[i] = new Particle(D, &settings);
 		particles[i]->randomize(lowerBound, upperBound);
@@ -102,6 +102,7 @@ void ParticleSwarm::runSynchronous(std::shared_ptr<IOHprofiler_problem<double> >
 			p->updateGbest();
 			p->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/evalBudget);
 		}
+
 	
 		topologyManager->update(double(problem->IOHprofiler_get_evaluations())/evalBudget);	
 	}

@@ -8,14 +8,14 @@ class Particle;
 
 class TopologyManager {
 	protected:
-		std::vector<Particle*> const &particles;
+		std::vector<Particle*>const &particles;
 	public:
 		TopologyManager(std::vector<Particle*> const & particles);
 		virtual ~TopologyManager();
 		virtual void update(double progress);
 };
 
-extern std::map<std::string, std::function<TopologyManager* (std::vector<Particle*> const)>> const topologies;
+extern std::map<std::string, std::function<TopologyManager* (std::vector<Particle*> const&)>> const topologies;
 
 class LbestTopologyManager : public TopologyManager {
 	public:

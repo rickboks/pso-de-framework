@@ -22,7 +22,7 @@ struct PSOConfig {
 class ParticleSwarm {
 	private:
 		PSOConfig const config;
-		std::vector<Particle*> particles;
+
 		void runSynchronous(std::shared_ptr<IOHprofiler_problem<double> > const problem, 
     		std::shared_ptr<IOHprofiler_csv_logger> const logger,
     		int const evalBudget, int const popSize, std::map<int,double> const particleUpdateParams);

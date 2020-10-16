@@ -19,8 +19,8 @@ void algorithm
     int const D = problem->IOHprofiler_get_number_of_variables(); 
     //psode2->run(problem, logger, D*10000, D*5, std::map<int,double>()); 
     //psode->run(problem, logger, D*10000, D*5, std::map<int,double>()); 
-    //pso->run(problem, logger, D*10000, D*5, std::map<int,double>()); 
-    de->run(problem, logger, D*10000, D*5); 
+    pso->run(problem, logger, D*10000, D*20, std::map<int,double>()); 
+    //de->run(problem, logger, D*10000, 20 * D); 
 }
 
 void _run_experiment(bool const log) {
@@ -30,17 +30,17 @@ void _run_experiment(bool const log) {
     //return;
     //psode2 = new PSODE2(HybridConfig("I", "N", "HY", "A", "T1", "B", "J", "RI"));
     //psode = new PSODE(HybridConfig("I", "N", "HY", "A", "T1", "B", "P3", "J", "RI"));    
-    //pso = new ParticleSwarm(PSOConfig("I", "N", "HY", "A"));
+    pso = new ParticleSwarm(PSOConfig("I", "M", "PR", "S"));
 
-    de = new DifferentialEvolution(DEConfig("P1", "B", "S", "PM"));
+    //de = new DifferentialEvolution(DEConfig("PX", "B", "S", "PM"));
 	std::string templateFile = "./configuration.ini";
-    std::string configFile = generateConfig(templateFile, de->getIdString());
+    std::string configFile = generateConfig(templateFile, pso->getIdString());
     IOHprofiler_experimenter<double> experimenter(configFile,algorithm); 
 
     experimenter._set_independent_runs(1);
     experimenter._run();
-    //delete pso;
-    delete de;
+    delete pso;
+    //delete de;
 	//delete psode;
 	//delete psode2;
 }

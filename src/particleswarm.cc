@@ -8,6 +8,7 @@
 #include <limits>
 #include <iostream>
 #include <fstream>
+#include "logger.h"
 
 ParticleSwarm::ParticleSwarm(PSOConfig const config) : config(config){
 }
@@ -45,16 +46,22 @@ void ParticleSwarm::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> 
 
 	TopologyManager* const topologyManager = topologies.at(config.topology)(particles);
 
+	Logger loggerAnimation("scratch/animations/" + getIdString() + "_f" +
+			std::to_string(problem->IOHprofiler_get_problem_id()) + "D" + std::to_string(D) + 
+			".log");
+
 	while (	problem->IOHprofiler_get_evaluations() < evalBudget &&
 			!problem->IOHprofiler_hit_optimal()){
-		
+
 		for (Particle* p : particles){
 			p->evaluate(problem,logger);
 			p->updatePbest();
 			p->updateGbest();
 			p->updateVelocityAndPosition(double(problem->IOHprofiler_get_evaluations())/evalBudget);			
 		}
+
 		topologyManager->update(double(problem->IOHprofiler_get_evaluations())/evalBudget);	
+		loggerAnimation.log(particles);
 	}
 
 	delete topologyManager;

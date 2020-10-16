@@ -8,7 +8,7 @@ class Particle;
 
 class TopologyManager {
 	protected:
-		std::vector<Particle*> const & particles;
+		std::vector<Particle*> const &particles;
 	public:
 		TopologyManager(std::vector<Particle*> const & particles);
 		virtual ~TopologyManager();

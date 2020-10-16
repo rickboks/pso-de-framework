@@ -170,7 +170,6 @@ void IncreasingTopologyManager::update(double progress){
 }
 
 /* Decreasing connectivity */
-
 DecreasingTopologyManager::DecreasingTopologyManager(std::vector<Particle*> const & particles)
 	:TopologyManager(particles){
 	int const popSize = particles.size();
@@ -214,7 +213,6 @@ void DecreasingTopologyManager::update(double progress){
 
 
 /* Dynamic multi-swarm */
-
 MultiSwarmTopologyManager::MultiSwarmTopologyManager(std::vector<Particle*> const & particles)
 	:TopologyManager(particles), clusterSize(3), count(0){
 	createClusters();

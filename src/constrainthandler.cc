@@ -38,6 +38,7 @@ std::map<std::string, std::function<DEConstraintHandler*(std::vector<double>, st
 	{"MT", LC(MidpointTargetRepair)},
 	{"PM", LC(ProjectionMidpointRepair)},
 	{"PB", LC(ProjectionBaseRepair)},
+	{"CO", LC(ConservatismRepair)}
 });
 
 std::map<std::string, std::function<PSOConstraintHandler*(std::vector<double>, std::vector<double>)>> const psoCHs {

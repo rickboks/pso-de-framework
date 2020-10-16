@@ -36,6 +36,12 @@ class ProjectionBaseRepair: public DEConstraintHandler {
 		void repairDE(Solution* const p, Solution const* const base, Solution const* const target);
 };
 
+class ConservatismRepair : public DEConstraintHandler {
+	public:
+		ConservatismRepair(std::vector<double> const lb, std::vector<double> const ub):ConstraintHandler(lb,ub), DEConstraintHandler(lb, ub){};
+		void repairDE(Solution* const p, Solution const* const base, Solution const* const target);
+};
+
 // Particle Swarm Optimization
 class HyperbolicRepair : public PSOConstraintHandler {
 	public:

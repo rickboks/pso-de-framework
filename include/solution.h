@@ -23,4 +23,5 @@ class Solution {
 		std::string positionString() const;
 		void randomize(std::vector<double> const lowerBounds, std::vector<double> const upperBounds);
 		bool operator < (Solution const& s) const;
+		void copy (Solution const * const other);
 };

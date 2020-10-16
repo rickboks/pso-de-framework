@@ -140,6 +140,13 @@ void ProjectionBaseRepair::repairDE(Solution* const p, Solution const* const bas
 	}
 }
 
+void ConservatismRepair::repairDE(Solution* const p, Solution const*const base, Solution const*const target){
+	if (!isFeasible(p)){
+		p->copy(base);
+		nCorrected++;
+	}
+}
+
 //Adapted from https://github.com/psbiomech/c-cmaes
 // Generic
 bool ResamplingRepair::resample(Solution * const p, int const resamples) {

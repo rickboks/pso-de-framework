@@ -13,6 +13,7 @@ void Solution::setX(std::vector<double> x, double fitness){
 
 void Solution::setX(std::vector<double> x){
 	this->x = x;
+	evaluated=false;
 }
 
 double Solution::getFitness() const{
@@ -29,10 +30,9 @@ double Solution::evaluate(std::shared_ptr<IOHprofiler_problem<double> > problem,
 		evaluated = true;		
 		fitness = problem->evaluate(x);
 		logger->do_log(problem->loggerCOCOInfo());
-		return fitness;
-	} else {
-		return fitness;
-	}
+	} 
+
+	return fitness;
 }
 
 std::vector<double> Solution::getX() const {
@@ -67,4 +67,10 @@ void Solution::setX(int const dim, double const val){
 
 double Solution::getX(int const dim) const {
 	return x[dim];
+}
+
+void Solution::copy(Solution const* const other){
+	x = other->x;
+	evaluated = other->evaluated;
+	fitness = other->fitness;
 }

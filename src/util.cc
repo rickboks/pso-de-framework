@@ -62,3 +62,13 @@ double distance(Solution const*const s1, Solution const*const s2) {
 	}
 	return std::sqrt(d);
 }
+
+std::string checkFilename(std::string const fn){
+	std::string newFn = fn;
+	int i = 1;
+	while (std::experimental::filesystem::exists(newFn)){
+		newFn = fn + "." + std::to_string(i);
+		i++;
+	}
+	return newFn;
+}

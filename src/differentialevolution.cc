@@ -44,14 +44,11 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 	std::vector<double> Crs(popSize);
 	std::vector<double> percCorrected; 
 
-	std::string const dataFolder = "scratch/extra_data";
-	std::filebuf fbExtra;
-	fbExtra.open(dataFolder + "/" + getIdString() + ".dat", std::ios::app);
-	Logger logger(&fbExtra);
-
-	std::filebuf fbParams;
-	fbParams.open(dataFolder + "/" + getIdString() + ".par", std::ios::app);
-	Logger loggerParams(&fbParams);
+	Logger logger("scratch/extra_data/" + getIdString() + ".dat");
+	Logger loggerParams("scratch/extra_data/" + getIdString() + ".par");
+	Logger loggerAnimation("scratch/animations/" + getIdString() + "_f" +
+			std::to_string(problem->IOHprofiler_get_problem_id()) + "D" + std::to_string(D) + 
+			".log");
 
 	loggerParams.start(problem->IOHprofiler_get_problem_id(), D);
 
@@ -88,6 +85,8 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 		for (Solution* g : trials)
 			delete g;
 
+		loggerAnimation.log(genomes);
+
 		adaptationManager->update(parentF, trialF);
 		iteration++;
 	}
@@ -114,8 +113,6 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 	delete adaptationManager;
 	delete deCH;
 
-	fbExtra.close();
-	fbParams.close();
 	genomes.clear();
 }
 

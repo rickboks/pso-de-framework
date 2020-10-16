@@ -14,6 +14,7 @@ bool comparePtrs(Solution const* const a, Solution const* const b);
 double distance(Solution const*const s1, Solution const*const s2);
 std::string generateConfig(std::string const templateFile, std::string const name);
 void printVec(std::vector<double> const v);
+std::string checkFilename(std::string fn);
 
 template <typename T>
 void sortOnFitness(std::vector<T*>& genomes){

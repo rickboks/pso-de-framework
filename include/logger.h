@@ -1,15 +1,16 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include "suite_bbob_legacy_code.hpp"
 #include "util.h" 
 class Solution;
 
 class Logger { // Used to log arbitrary stuff
 	private:
-		std::ostream out;
+		std::ofstream out;
 	public:
-		Logger(std::streambuf *const out): out(out){};
-		~Logger(){};
+		Logger(std::string filename): out(checkFilename(filename), std::ios::app){};
+		~Logger();
 
 		template <typename T>
 		void log(std::vector<T*> const pop) {
@@ -17,8 +18,10 @@ class Logger { // Used to log arbitrary stuff
 				for (double x : s->getX()){
 					out << x << " ";
 				}
+				out << s->getFitness();
 				out << "\n";
 			}
+			out << "\n";
 		}
 
 		void log(int const function, int const D, std::vector<double> const percCorrected, 

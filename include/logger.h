@@ -9,7 +9,7 @@ class Logger { // Used to log arbitrary stuff
 	private:
 		std::ofstream out;
 	public:
-		Logger(std::string filename): out(checkFilename(filename), std::ios::app){};
+		Logger(std::string filename): out(filename, std::ios::app){};
 		~Logger();
 
 		template <typename T>

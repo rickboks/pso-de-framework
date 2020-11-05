@@ -43,6 +43,7 @@ class SHADEManager : public DEAdaptationManager {
 		int const H;
 		std::vector<double> MCr;
 		std::vector<double> MF;
+		std::vector<int> r;
 
 		int k;
 		double weightedLehmerMean(std::vector<double>const& x, std::vector<double>const& w) const;

@@ -46,9 +46,9 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 
 	Logger logger("scratch/extra_data/" + getIdString() + ".dat");
 	Logger loggerParams("scratch/extra_data/" + getIdString() + ".par");
-	Logger loggerAnimation("scratch/animations/" + getIdString() + "_f" +
-			std::to_string(problem->IOHprofiler_get_problem_id()) + "D" + std::to_string(D) + 
-			".log");
+	//Logger loggerAnimation("scratch/animations/" + getIdString() + "_f" +
+			//std::to_string(problem->IOHprofiler_get_problem_id()) + "D" + std::to_string(D) + 
+			//".log");
 
 	loggerParams.start(problem->IOHprofiler_get_problem_id(), D);
 
@@ -69,9 +69,11 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 		std::vector<double> parentF(popSize), trialF(popSize);
 		for (int i = 0; i < popSize; i++){
 			parentF[i] = genomes[i]->getFitness();
+
 			trials[i]->evaluate(problem, iohLogger);
 
 			deCH->penalize(trials[i]); // This is done after and not before the evaluation, because otherwise it could loop endlessly
+
 			trialF[i] = trials[i]->getFitness();
 
 			int const numEval = problem->IOHprofiler_get_evaluations();
@@ -85,7 +87,7 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 		for (Solution* g : trials)
 			delete g;
 
-		loggerAnimation.log(genomes);
+		//loggerAnimation.log(genomes);
 
 		adaptationManager->update(parentF, trialF);
 		iteration++;

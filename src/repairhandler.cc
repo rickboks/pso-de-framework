@@ -233,18 +233,18 @@ void ProjectionRepair::repair(Solution* const p) {
 void ReflectionRepair::repair(Particle* const p) {
 	bool repaired = false;
 	for (int i = 0; i < D; i++){
-		if (p->getX(i) < lb[i]){
-			do {
+		while (true){
+			if (p->getX(i) < lb[i]){
 				p->setX(i, 2. * lb[i] - p->getX(i));
-			} while(p->getX(i) < lb[i]);
-			repairVelocityPost(p, i);
-			repaired=true;
-		} else if (p->getX(i) > ub[i]) {
-			do {
+				repairVelocityPost(p,i);
+				repaired=true;
+			}
+			else if (p->getX(i) > ub[i]){
 				p->setX(i, 2. * ub[i] - p->getX(i));
-			} while(p->getX(i) > ub[i]);
-			repairVelocityPost(p, i);
-			repaired=true;
+				repairVelocityPost(p,i);
+				repaired=true;
+			} else
+				break;
 		}
 	}
 	if (repaired) nCorrected++;
@@ -253,13 +253,16 @@ void ReflectionRepair::repair(Particle* const p) {
 void ReflectionRepair::repair(Solution* const p) {
 	bool repaired = false;
 	for (int i = 0; i < D; i++){
-		while (p->getX(i) < lb[i]){
-			p->setX(i, 2. * lb[i] - p->getX(i));
-			repaired=true;
-		}
-		while (p->getX(i) > ub[i]){
-			p->setX(i, 2. * ub[i] - p->getX(i));
-			repaired=true;
+		while (true){
+			if (p->getX(i) < lb[i]){
+				p->setX(i, 2. * lb[i] - p->getX(i));
+				repaired=true;
+			}
+			else if (p->getX(i) > ub[i]){
+				p->setX(i, 2. * ub[i] - p->getX(i));
+				repaired=true;
+			} else
+				break;
 		}
 	}
 	if (repaired) nCorrected++;

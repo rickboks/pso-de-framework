@@ -28,8 +28,9 @@ void experiment
 
 int main(int argc, char **argv) {
 	suite.setDEAdaptationManagers({"S"});
-	suite.setCrossoverManagers({"B", "E"});
+	suite.setCrossoverManagers({"B"});
 	//suite.setConstraintHandlers({"CO"});
+	//
 
 	std::string templateFile = "./configuration.ini";
 	int id;

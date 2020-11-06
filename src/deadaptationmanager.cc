@@ -117,8 +117,9 @@ void SHADEManager::update(std::vector<double>const& targets, std::vector<double>
 	}
 
 	if (!SF.empty() && !MCr.empty()){
-		MF[k] = weightedLehmerMean(SF, w(delta));
-		MCr[k] = weightedMean(SCr, w(delta));
+		std::vector<double> const _w = w(delta);
+		MF[k] = weightedLehmerMean(SF, _w);
+		MCr[k] = weightedMean(SCr, _w);
 		k = (k+1)%H;
 	}
 

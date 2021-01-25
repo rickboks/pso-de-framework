@@ -15,7 +15,10 @@ ax.set_zlabel('Z')
 
 plt.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
 
-sc = ax.scatter([],[],[])
+Writer = animation.writers['ffmpeg']
+writer = Writer(fps=8)
+
+sc = ax.scatter([],[],[], s=12, c='blue')
 def init(): 
 	return sc
 
@@ -40,5 +43,6 @@ def animate(i):
 	return sc 
 	
 # plt.axis('off') 
-anim = animation.FuncAnimation(fig, animate, init_func=init, interval=50) 
-plt.show()
+anim = animation.FuncAnimation(fig, animate, init_func=init) 
+anim.save('animation.mp4', writer=writer, dpi=500)
+# plt.show()

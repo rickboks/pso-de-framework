@@ -369,42 +369,30 @@ Solution* TwoOpt2MutationManager::mutate(int const i) const{
 }
 
 // Proximity-based Rand/1
-// TODO: currently, this assumes hyperbox constraints by using 
-// eucledian distance.
-// TODO: not implemented correctly I think. Contacted an author.
 void ProximityMutationManager::preMutation(){
 	int const size = genomes.size();
 	//Initialize the matrices
 	if (Rp.empty()){
-		Rp.resize(size, std::vector<double>(size));
-		Rd.resize(size, std::vector<double>(size));
+		Rp.resize(size, std::vector<double>(size, 0.));
+		Rd.resize(size, std::vector<double>(size, 0.));
 	}
 
 	// Fill distance matrix
 	std::vector<double> rowTotals(size, 0.);
-	for (int i = 0; i < size; i++){
-		for (int j = 0; j < size; j++){
-			if (i != j){
-				double const dist = std::max(distance(genomes[i], genomes[j]), 1.0e-12);
-				Rd[i][j] = dist;
-				Rd[j][i] = dist;
-				rowTotals[i] += dist;
-			} else {
-				Rd[i][j] = 0.;
-			}
+	for (int i = 0; i < size-1; i++){
+		for (int j = i+1; j < size; j++){
+			double const dist = std::max(distance(genomes[i], genomes[j]), 1.0e-12);
+			Rd[i][j] = dist; Rd[j][i] = dist;
+			rowTotals[i] += dist; rowTotals[j] += dist;
 		}
 	}
-	
+
 	// Fill probability matrix
-	for (int i = 0; i < size; i++){
-		for (int j = 0; j < size; j++){
-			if (i != j){
-				double const prob = 1. / (Rd[i][j] / rowTotals[i]);
-				Rp[i][j] = prob;
-				Rp[j][i] = prob;
-			} else {
-				Rp[i][j] = 0.;
-			}
+	for (int i = 0; i < size-1; i++){
+		for (int j = i+1; j < size; j++){
+			double const prob = 1. / (Rd[i][j] / rowTotals[i]);
+			Rp[i][j] = prob;
+			Rp[j][i] = prob;
 		}
 	}
 }

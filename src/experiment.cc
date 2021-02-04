@@ -2,11 +2,14 @@
 #include "hybridsuite.h"
 #include "desuite.h"
 #include "psode2.h"
+#include "random_suite.h"
 
 HybridAlgorithm* ha;
 ParticleSwarm* pso;
 DifferentialEvolution* de;
 PSODE2* psode2;
+
+static registerInFactory<IOHprofiler_suite<double>,Random_suite> regSuite("RANDOM");
 
 void algorithm
 (std::shared_ptr<IOHprofiler_problem<double>> problem,
@@ -18,8 +21,9 @@ void algorithm
 
 void _run_experiment(bool const log) {
     de = new DifferentialEvolution(DEConfig("PX", "B", "S", "RS"));
-    //pso = new ParticleSwarm(PSOConfig("I", "N", "RS", "A"));
 	std::string templateFile = "./configuration.ini";
+
+    //std::shared_ptr<IOHprofiler_suite<double>> suite = genericGenerator<IOHprofiler_suite<double>>::instance().create("RANDOM");
     std::string configFile = generateConfig(templateFile, de->getIdString());
     IOHprofiler_experimenter<double> experimenter(configFile,algorithm); 
 

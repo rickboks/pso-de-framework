@@ -9,8 +9,12 @@
 #include "hybridsuite.h"
 #include "particleswarmsuite.h"
 #include "util.h"
+#include "problem.h"
 
-DESuite suite;
+DESuite DEsuite;
+
+static registerInFactory<IOHprofiler_suite<double>,Random_suite> regSuite("PBO");
+std::shared_ptr<IOHprofiler_suite<double>> suite = genericGenerator<IOHprofiler_suite<double>>::instance().create("RANDOM");
 
 void experiment
 	(std::shared_ptr<IOHprofiler_problem<double>> problem,
@@ -22,21 +26,21 @@ void experiment
 	int id;
 	MPI_Comm_rank(MPI_COMM_WORLD, &id);
 
-	DifferentialEvolution de = suite.getDE(id);
+	DifferentialEvolution de = DEsuite.getDE(id);
   	de.run(problem, logger, D*10000, popSize);
 }
 
 int main(int argc, char **argv) {
-	suite.setDEAdaptationManagers({"S"});
-	suite.setCrossoverManagers({"B"});
+	DEsuite.setDEAdaptationManagers({"S"});
+	DEsuite.setCrossoverManagers({"B"});
 
 	std::string templateFile = "./configuration.ini";
 	int id;
 	MPI_Init(&argc, &argv);
 	MPI_Comm_rank(MPI_COMM_WORLD, &id);
 
-	if (id < suite.size()){
-		std::string configFile = generateConfig(templateFile, suite.getDE(id).getIdString());
+	if (id < DEsuite.size()){
+		std::string configFile = generateConfig(templateFile, DEsuite.getDE(id).getIdString());
 		IOHprofiler_experimenter<double> experimenter(configFile, experiment);
 		experimenter._set_independent_runs(100);
 		experimenter._run();

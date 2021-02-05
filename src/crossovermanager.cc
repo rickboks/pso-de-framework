@@ -53,7 +53,7 @@ std::vector<double> ExponentialCrossoverManager::singleCrossover(std::vector<dou
 		[](int const i, int const start, int const end) {return i >= start && i <= end;}: 
 		[](int const i, int const start, int const end) {return i <= end || i >= start;};
 
-	for (unsigned int i = 0; i < D; i++)
+	for (int i = 0; i < D; i++)
 		if (condition(i, start, end))
 			x[i] = donor[i];
 

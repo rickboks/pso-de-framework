@@ -48,13 +48,17 @@ f0::f0(int instance_id, int dimension) : rng(dev()), dist(0.,1.){
 	IOHprofiler_set_number_of_objectives(1);
 	IOHprofiler_set_lowerbound(std::vector<double>(dimension,0.));
 	IOHprofiler_set_upperbound(std::vector<double>(dimension,1.));
-	IOHprofiler_set_optimal(0.);
+	IOHprofiler_set_best_variables(0.5);
 	IOHprofiler_set_number_of_variables(dimension);
 	IOHprofiler_set_as_minimization();
+	IOHprofiler_set_optimal(0.);
 }
 
 double f0::internal_evaluate(std::vector<double> const& x) {
-	return dist(rng);
+	for (double i : x)
+		if (i != 0.5) 
+			return dist(rng);
+	return 0;
 };
 
 f0* f0::createInstance(int instance_id = 1, int dimension = 30){
@@ -67,13 +71,17 @@ g0::g0(int instance_id, int dimension) : rng(dev()), dist(0.,1.){
 	IOHprofiler_set_number_of_objectives(1);
 	IOHprofiler_set_lowerbound(std::vector<double>(dimension, 0.));
 	IOHprofiler_set_upperbound(std::vector<double>(dimension, 100.));
-	IOHprofiler_set_optimal(0.);
+	IOHprofiler_set_best_variables(50);
 	IOHprofiler_set_number_of_variables(dimension);
 	IOHprofiler_set_as_minimization();
+	IOHprofiler_set_optimal(0.);
 }
 
 double g0::internal_evaluate(std::vector<double> const& x) {
-	return dist(rng);
+	for (double i : x)
+		if (i != 50)
+			return dist(rng);
+	return 0;
 };
 
 g0* g0::createInstance(int instance_id = 1, int dimension = 30){
@@ -86,13 +94,16 @@ h0::h0(int instance_id, int dimension) : rng(dev()), dist(0.,1.){
 	IOHprofiler_set_number_of_objectives(1);
 	IOHprofiler_set_lowerbound(std::vector<double>(dimension, -0.6));
 	IOHprofiler_set_upperbound(std::vector<double>(dimension, 0.4));
-	IOHprofiler_set_optimal(0.);
+	IOHprofiler_set_best_variables(-0.1);
 	IOHprofiler_set_number_of_variables(dimension);
 	IOHprofiler_set_as_minimization();
+	IOHprofiler_set_optimal(0.);
 }
 
 double h0::internal_evaluate(std::vector<double> const& x) {
-	return dist(rng);
+	for (double i : x)
+		if (i != -0.1) return dist(rng);
+	return 0;
 };
 
 h0* h0::createInstance(int instance_id = 1, int dimension = 30){

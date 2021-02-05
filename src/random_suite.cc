@@ -1,7 +1,6 @@
 #include "random_suite.h"
 
 Random_suite::Random_suite(){
-	std::cout << "CONSTRUCTOR CALLED" << std::endl;
 	std::vector<int> problem_id = {1,2,3};
 	std::vector<int> instance_id = {1};
 	std::vector<int> dimension = {30};
@@ -9,7 +8,7 @@ Random_suite::Random_suite(){
 	IOHprofiler_set_suite_problem_id(problem_id);
 	IOHprofiler_set_suite_instance_id(instance_id);
 	IOHprofiler_set_suite_dimension(dimension);
-	IOHprofiler_set_suite_name("RANDOM");
+	IOHprofiler_set_suite_name("random");
 	registerProblem();
 	loadProblem();
 }
@@ -18,7 +17,7 @@ Random_suite::Random_suite(std::vector<int> problem_id, std::vector<int> instanc
 	IOHprofiler_set_suite_problem_id(problem_id);
 	IOHprofiler_set_suite_instance_id(instance_id);
 	IOHprofiler_set_suite_dimension(dimension);
-	IOHprofiler_set_suite_name("RANDOM");
+	IOHprofiler_set_suite_name("random");
 	registerProblem();
 	loadProblem();
 }

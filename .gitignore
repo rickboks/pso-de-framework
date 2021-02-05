@@ -7,3 +7,5 @@ obj
 configurations
 Visualizer
 scratch
+*.mp4
+*.gif

@@ -9,12 +9,9 @@
 #include "hybridsuite.h"
 #include "particleswarmsuite.h"
 #include "util.h"
-#include "problem.h"
+#include "random_suite.h"
 
 DESuite DEsuite;
-
-static registerInFactory<IOHprofiler_suite<double>,Random_suite> regSuite("PBO");
-std::shared_ptr<IOHprofiler_suite<double>> suite = genericGenerator<IOHprofiler_suite<double>>::instance().create("RANDOM");
 
 void experiment
 	(std::shared_ptr<IOHprofiler_problem<double>> problem,
@@ -31,6 +28,7 @@ void experiment
 }
 
 int main(int argc, char **argv) {
+    static registerInFactory<IOHprofiler_suite<double>,Random_suite> regSuite("random");
 	DEsuite.setDEAdaptationManagers({"S"});
 	DEsuite.setCrossoverManagers({"B"});
 

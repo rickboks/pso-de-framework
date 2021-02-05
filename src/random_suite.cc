@@ -45,12 +45,12 @@ Random_suite* Random_suite::createInstance(std::vector<int> problem_id, std::vec
 f0::f0(int instance_id, int dimension) : rng(dev()), dist(0.,1.){
 	IOHprofiler_set_instance_id(instance_id);
 	IOHprofiler_set_problem_name("f0");
-	IOHprofiler_set_as_minimization();
-	IOHprofiler_set_optimal(0.);
 	IOHprofiler_set_number_of_objectives(1);
-	IOHprofiler_set_number_of_variables(dimension);
 	IOHprofiler_set_lowerbound(std::vector<double>(dimension,0.));
 	IOHprofiler_set_upperbound(std::vector<double>(dimension,1.));
+	IOHprofiler_set_optimal(0.);
+	IOHprofiler_set_number_of_variables(dimension);
+	IOHprofiler_set_as_minimization();
 }
 
 double f0::internal_evaluate(std::vector<double> const& x) {
@@ -64,12 +64,12 @@ f0* f0::createInstance(int instance_id = 1, int dimension = 30){
 g0::g0(int instance_id, int dimension) : rng(dev()), dist(0.,1.){
 	IOHprofiler_set_instance_id(instance_id);
 	IOHprofiler_set_problem_name("g0");
-	IOHprofiler_set_as_minimization();
-	IOHprofiler_set_optimal(0.);
 	IOHprofiler_set_number_of_objectives(1);
-	IOHprofiler_set_number_of_variables(dimension);
 	IOHprofiler_set_lowerbound(std::vector<double>(dimension, 0.));
 	IOHprofiler_set_upperbound(std::vector<double>(dimension, 100.));
+	IOHprofiler_set_optimal(0.);
+	IOHprofiler_set_number_of_variables(dimension);
+	IOHprofiler_set_as_minimization();
 }
 
 double g0::internal_evaluate(std::vector<double> const& x) {
@@ -83,12 +83,12 @@ g0* g0::createInstance(int instance_id = 1, int dimension = 30){
 h0::h0(int instance_id, int dimension) : rng(dev()), dist(0.,1.){
 	IOHprofiler_set_instance_id(instance_id);
 	IOHprofiler_set_problem_name("h0");
-	IOHprofiler_set_as_minimization();
-	IOHprofiler_set_optimal(0.);
 	IOHprofiler_set_number_of_objectives(1);
-	IOHprofiler_set_number_of_variables(dimension);
 	IOHprofiler_set_lowerbound(std::vector<double>(dimension, -0.6));
 	IOHprofiler_set_upperbound(std::vector<double>(dimension, 0.4));
+	IOHprofiler_set_optimal(0.);
+	IOHprofiler_set_number_of_variables(dimension);
+	IOHprofiler_set_as_minimization();
 }
 
 double h0::internal_evaluate(std::vector<double> const& x) {

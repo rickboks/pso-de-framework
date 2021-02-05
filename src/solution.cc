@@ -30,7 +30,6 @@ double Solution::evaluate(std::shared_ptr<IOHprofiler_problem<double> > problem,
 		evaluated = true;		
 		fitness = problem->evaluate(x);
 		logger->do_log(problem->loggerCOCOInfo());
-		std::cout << fitness << std::endl;
 	} 
 
 	return fitness;

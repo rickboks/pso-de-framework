@@ -30,6 +30,7 @@ double Solution::evaluate(std::shared_ptr<IOHprofiler_problem<double> > problem,
 		evaluated = true;		
 		fitness = problem->evaluate(x);
 		logger->do_log(problem->loggerCOCOInfo());
+		std::cout << fitness << std::endl;
 	} 
 
 	return fitness;
@@ -53,6 +54,7 @@ std::string Solution::positionString() const {
 void Solution::randomize(std::vector<double> const lowerBounds, std::vector<double> const upperBounds){
 	for (int i = 0; i < D; i++)
 		x[i] = rng.randDouble(lowerBounds[i], upperBounds[i]);
+
 	evaluated=false;
 }
 

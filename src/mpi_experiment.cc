@@ -30,7 +30,7 @@ void experiment
 int main(int argc, char **argv) {
 	static registerInFactory<IOHprofiler_suite<double>,Random_suite> regSuite("random");
 	suite.setDEAdaptationManagers({"S"});
-	suite.setCrossoverManagers({"B"});
+	suite.setCrossoverManagers({"E"});
 
 	std::string const templateFile = "./configuration.ini";
 	int id;

@@ -152,7 +152,7 @@ void ConservatismRepair::repairDE(Solution* const p, Solution const*const base, 
 bool ResamplingRepair::resample(Solution * const p, int const resamples) {
 	if (isFeasible(p)){
 		return false;
-	} else if (resamples >= 100){
+	} else if (resamples >= 10){
 		for (int i = 0; i < D; i++){
 			if (p->getX(i) < lb[i])
 				p->setX(i, lb[i]);

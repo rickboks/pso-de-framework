@@ -1,4 +1,5 @@
 #include "random_suite.h"
+#include "util.h"
 
 Random_suite::Random_suite(){
 	std::vector<int> problem_id = {1,2,3};
@@ -45,9 +46,9 @@ f0::f0(int instance_id, int dimension) : rng(dev()), dist(0.,1.){
 	IOHprofiler_set_instance_id(instance_id);
 	IOHprofiler_set_problem_name("f0");
 	IOHprofiler_set_number_of_objectives(1);
+	IOHprofiler_set_number_of_variables(dimension);
 	IOHprofiler_set_lowerbound(std::vector<double>(dimension,0.));
 	IOHprofiler_set_upperbound(std::vector<double>(dimension,1.));
-	IOHprofiler_set_number_of_variables(dimension);
 }
 
 double f0::internal_evaluate(std::vector<double> const& x) {
@@ -62,9 +63,9 @@ g0::g0(int instance_id, int dimension) : rng(dev()), dist(0.,1.){
 	IOHprofiler_set_instance_id(instance_id);
 	IOHprofiler_set_problem_name("g0");
 	IOHprofiler_set_number_of_objectives(1);
+	IOHprofiler_set_number_of_variables(dimension);
 	IOHprofiler_set_lowerbound(std::vector<double>(dimension, 0.));
 	IOHprofiler_set_upperbound(std::vector<double>(dimension, 100.));
-	IOHprofiler_set_number_of_variables(dimension);
 }
 
 double g0::internal_evaluate(std::vector<double> const& x) {
@@ -79,9 +80,9 @@ h0::h0(int instance_id, int dimension) : rng(dev()), dist(0.,1.){
 	IOHprofiler_set_instance_id(instance_id);
 	IOHprofiler_set_problem_name("h0");
 	IOHprofiler_set_number_of_objectives(1);
-	IOHprofiler_set_lowerbound(std::vector<double>(dimension, -.6));
-	IOHprofiler_set_upperbound(std::vector<double>(dimension, .4));
 	IOHprofiler_set_number_of_variables(dimension);
+	IOHprofiler_set_lowerbound(std::vector<double>(dimension, -0.6));
+	IOHprofiler_set_upperbound(std::vector<double>(dimension, 0.4));
 }
 
 double h0::internal_evaluate(std::vector<double> const& x) {

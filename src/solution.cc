@@ -51,9 +51,8 @@ std::string Solution::positionString() const {
 }
 
 void Solution::randomize(std::vector<double> const lowerBounds, std::vector<double> const upperBounds){
-	for (int i = 0; i < D; i++){
+	for (int i = 0; i < D; i++)
 		x[i] = rng.randDouble(lowerBounds[i], upperBounds[i]);
-	}
 	evaluated=false;
 }
 

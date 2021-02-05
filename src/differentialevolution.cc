@@ -65,6 +65,7 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 
 		std::vector<double> parentF(popSize), trialF(popSize);
 		for (int i = 0; i < popSize; i++){
+			//printVec(trials[i]->getX());
 			parentF[i] = genomes[i]->getFitness();
 
 			trials[i]->evaluate(problem, iohLogger);

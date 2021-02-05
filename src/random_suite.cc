@@ -102,7 +102,8 @@ h0::h0(int instance_id, int dimension) : rng(dev()), dist(0.,1.){
 
 double h0::internal_evaluate(std::vector<double> const& x) {
 	for (double i : x)
-		if (i != -0.1) return dist(rng);
+		if (i != -0.1) 
+			return dist(rng);
 	return 0;
 };
 

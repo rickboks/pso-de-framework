@@ -388,11 +388,10 @@ void ProximityMutationManager::preMutation(){
 	}
 
 	// Fill probability matrix
-	for (int i = 0; i < size-1; i++){
-		for (int j = i+1; j < size; j++){
+	for (int i = 0; i < size; i++){
+		for (int j = 0; j < size; j++){
 			double const prob = 1. / (Rd[i][j] / rowTotals[i]);
 			Rp[i][j] = prob;
-			Rp[j][i] = prob;
 		}
 	}
 }

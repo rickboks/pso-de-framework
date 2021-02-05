@@ -40,22 +40,24 @@ std::vector<double> BinomialCrossoverManager::singleCrossover(std::vector<double
 
 std::vector<double> ExponentialCrossoverManager::singleCrossover(std::vector<double>const& target, 
 		std::vector<double>const& donor, double const Cr) const{
-	std::vector<double> x(D);
+	std::vector<double> x = target;
 	int const start = rng.randInt(0,D-1);
 
-	int L = 0;
-	do {
+	int L = 1;
+	while (L < D && rng.randDouble(0,1) <= Cr)
 		L++;
-	} while (rng.randDouble(0,1) <= Cr && L <= D);
 
-	int const end = (start+L-1) % D;
-	for (int i = 0; i < D; i++){
-		if ((end >= start && (i >= start && i <= end)) || (start > end && (i <= end || i >= start)))
+	int const end = (start+L-1) % x.size();
+
+	auto const condition = end >= start ? \
+		[](int const i, int const start, int const end) {return i >= start && i <= end;}: 
+		[](int const i, int const start, int const end) {return i <= end || i >= start;};
+
+	for (unsigned int i = 0; i < x.size(); i++)
+		if (condition(i, start, end))
 			x[i] = donor[i];
-		else 
-			x[i] = target[i];
-	}
-	return x;
+
+	return x; 
 }
 
 std::vector<double> ArithmeticCrossoverManager::singleCrossover(std::vector<double>const& target, 

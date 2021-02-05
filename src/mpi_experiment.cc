@@ -11,7 +11,7 @@
 #include "util.h"
 #include "random_suite.h"
 
-DESuite DEsuite;
+DESuite suite;
 
 void experiment
 	(std::shared_ptr<IOHprofiler_problem<double>> problem,
@@ -23,24 +23,22 @@ void experiment
 	int id;
 	MPI_Comm_rank(MPI_COMM_WORLD, &id);
 
-	DifferentialEvolution de = DEsuite.getDE(id);
+	DifferentialEvolution de = suite.getDE(id);
   	de.run(problem, logger, D*10000, popSize);
 }
 
 int main(int argc, char **argv) {
-    static registerInFactory<IOHprofiler_suite<double>,Random_suite> regSuite("random");
-	DEsuite.setDEAdaptationManagers({"S"});
-	DEsuite.setCrossoverManagers({"B"});
+	static registerInFactory<IOHprofiler_suite<double>,Random_suite> regSuite("random");
+	suite.setDEAdaptationManagers({"S"});
+	suite.setCrossoverManagers({"B"});
 
-	std::cout << "size: " << DEsuite.size() << std::endl;
-
-	std::string templateFile = "./configuration.ini";
+	std::string const templateFile = "./configuration.ini";
 	int id;
 	MPI_Init(&argc, &argv);
 	MPI_Comm_rank(MPI_COMM_WORLD, &id);
 
-	if (id < DEsuite.size()){
-		std::string configFile = generateConfig(templateFile, DEsuite.getDE(id).getIdString());
+	if (id < suite.size()){
+		std::string const configFile = generateConfig(templateFile, suite.getDE(id).getIdString());
 		IOHprofiler_experimenter<double> experimenter(configFile, experiment);
 		experimenter._set_independent_runs(100);
 		experimenter._run();

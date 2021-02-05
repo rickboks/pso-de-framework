@@ -20,7 +20,7 @@ void algorithm
 
 void _run_experiment(bool const log) {
     static registerInFactory<IOHprofiler_suite<double>,Random_suite> regSuite("random");
-    de = new DifferentialEvolution(DEConfig("PX", "B", "S", "RS"));
+    de = new DifferentialEvolution(DEConfig("R1", "E", "S", "RS"));
 	std::string templateFile = "./configuration.ini";
 
     std::string configFile = generateConfig(templateFile, de->getIdString());

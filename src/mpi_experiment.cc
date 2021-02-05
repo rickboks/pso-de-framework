@@ -32,6 +32,8 @@ int main(int argc, char **argv) {
 	DEsuite.setDEAdaptationManagers({"S"});
 	DEsuite.setCrossoverManagers({"B"});
 
+	std::cout << "size: " << DEsuite.size() << std::endl;
+
 	std::string templateFile = "./configuration.ini";
 	int id;
 	MPI_Init(&argc, &argv);

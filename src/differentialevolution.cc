@@ -46,8 +46,6 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 
 	Logger logger("scratch/extra_data/" + getIdString() + ".dat");
 	Logger loggerParams("scratch/extra_data/" + getIdString() + ".par");
-	Logger loggerAnimation("scratch/animations/" + getIdString() + "_f" +
-			std::to_string(problem->IOHprofiler_get_problem_id()) + "D" + std::to_string(D) + ".log");
 
 	loggerParams.start(problem->IOHprofiler_get_problem_id(), D);
 
@@ -85,8 +83,6 @@ void DifferentialEvolution::run(std::shared_ptr<IOHprofiler_problem<double> > co
 
 		for (Solution* g : trials)
 			delete g;
-
-		loggerAnimation.log(genomes);
 
 		adaptationManager->update(parentF, trialF);
 		iteration++;

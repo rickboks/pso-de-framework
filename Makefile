@@ -1,4 +1,4 @@
-EXE  = experiment2
+EXE  = experiment
 MPI_EXE = mpi_experiment
 SRC_DIR = src
 OBJ_DIR = obj

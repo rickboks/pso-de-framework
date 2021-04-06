@@ -1,3 +1,7 @@
+**Note:** For Differential Evolution, please consider using [this project](https://github.com/rickboks/auto-DE) instead.
+
+---
+
 This is a framework that allows instantiating arbitrary combinations of existing Particle Swarm Optimization and Differential Evolution algorithms as well as hybrid PSO/DE algorithms in a very simple way. Algorithms are generated as combinations of serveral operator modules, such as mutation, crossover, velocity updates, ... etc. Many modules have been implemented, and it is simple to implement new variants. Thousands of different combinations are possible.
 
 To compile and run your experiment:

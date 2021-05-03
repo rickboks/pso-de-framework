@@ -147,7 +147,6 @@ void ConservatismRepair::repairDE(Solution* const p, Solution const*const base, 
 	}
 }
 
-//Adapted from https://github.com/psbiomech/c-cmaes
 // Generic
 bool ResamplingRepair::resample(Solution * const p, int const resamples) {
 	if (isFeasible(p)){

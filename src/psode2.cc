@@ -21,13 +21,13 @@ PSODE2::PSODE2(HybridConfig const config)
 PSODE2::~PSODE2(){}
 
 void PSODE2::run(std::shared_ptr<IOHprofiler_problem<double> > problem, 
-    		std::shared_ptr<IOHprofiler_csv_logger> logger,
-    		int const evalBudget, int const popSize, std::map<int,double> particleUpdateParams){
+			std::shared_ptr<IOHprofiler_csv_logger> logger,
+			int const evalBudget, int const popSize, std::map<int,double> particleUpdateParams){
 	runAsynchronous(problem, logger, evalBudget, popSize, particleUpdateParams);
 }
 
 void PSODE2::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > problem, 
-    		std::shared_ptr<IOHprofiler_csv_logger> logger, int const evalBudget, int const popSize, 
+			std::shared_ptr<IOHprofiler_csv_logger> logger, int const evalBudget, int const popSize, 
 			std::map<int,double> particleUpdateParams){
 
 	int const D = problem->IOHprofiler_get_number_of_variables(); /// dimension

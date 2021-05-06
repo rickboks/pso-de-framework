@@ -16,7 +16,7 @@ DEAdaptationManager::DEAdaptationManager(int const popSize): popSize(popSize){}
 
 //JADE
 JADEManager::JADEManager(int const popSize)
- : DEAdaptationManager(popSize), MuCr(0.5), MuF(0.6), c(0.1){}
+	: DEAdaptationManager(popSize), MuCr(0.5), MuF(0.6), c(0.1){}
 
 void JADEManager::update(std::vector<double>const& orig, std::vector<double>const& trials){
 	std::vector<double> SF, SCr;
@@ -147,7 +147,7 @@ void SHADEManager::nextCr(std::vector<double>& Crs){
 
 //NO ADAPTATION
 NoAdaptationManager::NoAdaptationManager(int const popSize)
- : DEAdaptationManager(popSize), F(0.5), Cr(.9){}
+	: DEAdaptationManager(popSize), F(0.5), Cr(.9){}
 
 void NoAdaptationManager::update(std::vector<double>const& orig, std::vector<double>const& trials){
 	//ignore

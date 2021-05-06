@@ -18,8 +18,8 @@ void ParticleSwarm::reset(){}
 ParticleSwarm::~ParticleSwarm(){}
 
 void ParticleSwarm::run(std::shared_ptr<IOHprofiler_problem<double> > const problem, 
-    		std::shared_ptr<IOHprofiler_csv_logger> const logger,
-    		int const evalBudget, int const popSize, std::map<int,double> const particleUpdateParams){
+			std::shared_ptr<IOHprofiler_csv_logger> const logger,
+			int const evalBudget, int const popSize, std::map<int,double> const particleUpdateParams){
 
 	if (config.synchronicity == "A")
 		runAsynchronous(problem, logger, evalBudget, popSize, particleUpdateParams);
@@ -28,8 +28,8 @@ void ParticleSwarm::run(std::shared_ptr<IOHprofiler_problem<double> > const prob
 }
 
 void ParticleSwarm::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > const problem, 
-    		std::shared_ptr<IOHprofiler_csv_logger> const logger,
-    		int const evalBudget, int const popSize, std::map<int,double> const particleUpdateParams){
+			std::shared_ptr<IOHprofiler_csv_logger> const logger,
+			int const evalBudget, int const popSize, std::map<int,double> const particleUpdateParams){
 
 	int const D = problem->IOHprofiler_get_number_of_variables(); 
 	std::vector<double> const lowerBound = problem->IOHprofiler_get_lowerbound(); 
@@ -72,8 +72,8 @@ void ParticleSwarm::runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> 
 }
 
 void ParticleSwarm::runSynchronous(std::shared_ptr<IOHprofiler_problem<double> > const problem, 
-    		std::shared_ptr<IOHprofiler_csv_logger> const logger,
-    		int const evalBudget, int const popSize, std::map<int,double> const particleUpdateParams){
+			std::shared_ptr<IOHprofiler_csv_logger> const logger,
+			int const evalBudget, int const popSize, std::map<int,double> const particleUpdateParams){
 
 	int const D = problem->IOHprofiler_get_number_of_variables(); 
 	std::vector<double> const lowerBound = problem->IOHprofiler_get_lowerbound(); 

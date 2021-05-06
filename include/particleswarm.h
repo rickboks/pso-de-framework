@@ -24,19 +24,19 @@ class ParticleSwarm {
 		PSOConfig const config;
 
 		void runSynchronous(std::shared_ptr<IOHprofiler_problem<double> > const problem, 
-    		std::shared_ptr<IOHprofiler_csv_logger> const logger,
-    		int const evalBudget, int const popSize, std::map<int,double> const particleUpdateParams);
+			std::shared_ptr<IOHprofiler_csv_logger> const logger,
+			int const evalBudget, int const popSize, std::map<int,double> const particleUpdateParams);
 
 		void runAsynchronous(std::shared_ptr<IOHprofiler_problem<double> > const problem, 
-    		std::shared_ptr<IOHprofiler_csv_logger> const logger,
-    		int const evalBudget, int const popSize, std::map<int,double> const particleUpdateParams);
+			std::shared_ptr<IOHprofiler_csv_logger> const logger,
+			int const evalBudget, int const popSize, std::map<int,double> const particleUpdateParams);
 	public:
 		ParticleSwarm(PSOConfig const config);
 		~ParticleSwarm();
 
 		void run(std::shared_ptr<IOHprofiler_problem<double> > const problem, 
-    		std::shared_ptr<IOHprofiler_csv_logger> const logger,
-    		int const evalBudget, int const popSize, std::map<int,double> const particleUpdateParams);
+			std::shared_ptr<IOHprofiler_csv_logger> const logger,
+			int const evalBudget, int const popSize, std::map<int,double> const particleUpdateParams);
 
 		void reset();
 		std::string getIdString() const;

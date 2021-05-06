@@ -4,13 +4,13 @@
 
 void scale(std::vector<double> & vec, double const x){
 	std::transform(vec.begin(), vec.end(), vec.begin(),
-           std::bind(std::multiplies<double>(), std::placeholders::_1, x));
+	       std::bind(std::multiplies<double>(), std::placeholders::_1, x));
 }
 
 void add(std::vector<double>const& lhs, std::vector<double>const& rhs, std::vector<double>& store){
 	std::transform( lhs.begin(), lhs.end(),
-                rhs.begin(), store.begin(), 
-                std::plus<double>());
+	            rhs.begin(), store.begin(), 
+	            std::plus<double>());
 }
 
 void subtract(std::vector<double>const& lhs, std::vector<double>const& rhs, std::vector<double>& store){
@@ -40,7 +40,7 @@ std::string generateConfig(std::string const templateFile, std::string const nam
 	}
 
 	std::ifstream src(templateFile, std::ios::binary);
-    std::ofstream dst(cfgFile, std::ios::binary);
+	std::ofstream dst(cfgFile, std::ios::binary);
 
 	dst << src.rdbuf() 
 		<< "result_folder = " + name << std::endl 

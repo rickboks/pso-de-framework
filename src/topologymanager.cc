@@ -81,10 +81,10 @@ RandomTopologyManager::RandomTopologyManager(std::vector<Particle*> const & part
 VonNeumannTopologyManager::VonNeumannTopologyManager(std::vector<Particle*> const & particles)
 	:TopologyManager(particles){
 	int rows = (int)sqrt(particles.size());
-	  while (particles.size() % rows != 0) {
+	while (particles.size() % rows != 0) {
 	    rows--;
-  	}
-  	int const columns = particles.size() / rows;
+	}
+	int const columns = particles.size() / rows;
 
 	for (int i = 0; i < rows; i++){
 		for (int j = 0; j < columns; j++){

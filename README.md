@@ -1,4 +1,5 @@
-**Note:** For Differential Evolution, please consider using [this project](https://github.com/rickboks/auto-DE) instead.
+**Note:** For Differential Evolution, please consider using [this project](https://github.com/rickboks/auto-DE) instead. It
+is a much more mature project.
 
 ---
 
